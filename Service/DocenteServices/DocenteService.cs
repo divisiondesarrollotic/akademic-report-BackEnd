@@ -44,7 +44,7 @@ namespace AkademicReport.Service.DocenteServices
                     docente.id = d._id;
                     docente.tiempoDedicacion = d.tiempo_dedicacion;
                     docente.identificacion = d.cedula_pasaporte;
-                    if (d.cedula_pasaporte != null)
+                    if (d.cedula_pasaporte != null && d.maximo_nivel_academico!=null)
                     {
                         if (d.cedula_pasaporte[0].ToString().Trim() == "0" && d.cedula_pasaporte[1].ToString().Trim() == "0" && d.cedula_pasaporte[2].ToString().Trim() == "-" || d.cedula_pasaporte.Length == 13)
                         {

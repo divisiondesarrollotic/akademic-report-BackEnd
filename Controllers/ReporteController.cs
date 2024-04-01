@@ -9,8 +9,8 @@ namespace AkademicReport.Controllers
     [Route("[controller]")]
     public class ReporteController : ControllerBase
     {
-        private readonly IReposteService _reposteService;
-        public ReporteController(IReposteService reposteService)
+        private readonly IReporteService _reposteService;
+        public ReporteController(IReporteService reposteService)
         {
             _reposteService = reposteService;
         }
@@ -18,7 +18,7 @@ namespace AkademicReport.Controllers
         [Route("docente")]
         public async Task<ActionResult>PorDocente(ReporteDto filtro)
         {
-            var response =await _reposteService.PorDocente(filtro);
+            var response =await _reposteService.PorDocenteCall(filtro);
             if(response.Status==204)
             {
                 var ServiceR = new ServicesResponseMessage<string>();
@@ -33,10 +33,18 @@ namespace AkademicReport.Controllers
         [Route("recinto")]
         public async Task<ActionResult> PorRecinto(ReportePorRecintoDto filtro)
         {
-            var response = await _reposteService.PorRecinto (filtro);
+            var response = await _reposteService.PorRecinto(filtro);
             return Ok(response);
            
 
         }
+        [HttpPost]
+        [Route("consolidar")]
+        public async Task<ActionResult> ReporteConsolidado(FiltroReporteConsolidado filtro)
+        {
+            var response = await _reposteService.ReporteConsolidado(filtro);
+            return Ok(response);
+        }
     }
+
 }

@@ -7,10 +7,11 @@ using AkademicReport.Service.CargaServices;
 using AkademicReport.Service.DocenteServices;
 using AutoMapper.Configuration.Conventions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace AkademicReport.Service.ReposteServices
 {
-    public class ReporteService : IReposteService
+    public class ReporteService : IReporteService
     {
         private readonly ICargaDocenteService _cargaService;
         private readonly IDocenteService _docentesService;
@@ -25,7 +26,7 @@ namespace AkademicReport.Service.ReposteServices
         }
 
 
-       public async Task<ServiceResponseData<DocenteCargaReporteDto>> PorDocente(ReporteDto filtro)
+       public async Task<ServiceResponseData<DocenteCargaReporteDto>> PorDocente(ReporteDto filtro, List<DocenteGetDto>DocentesAmilca)
         {
             DocenteCargaReporteDto DataResult = new DocenteCargaReporteDto();
             DataResult.Carga = new List<CargaReporteDto>();
@@ -33,7 +34,7 @@ namespace AkademicReport.Service.ReposteServices
             var CargaMapeada = new List<CargaReporteDto>();
             var CargaLista = new List<CargaGetDto>();
             var Docente = new DocenteReporteDto();
-            var cargas = await _cargaService.GetCarga(filtro.Cedula, filtro.Periodo);
+            var cargas = await _cargaService.GetCarga(filtro.Cedula, filtro.Periodo, DocentesAmilca);
             if (cargas.Data.Value.Item1.Docente != null )
             {
                 Docente.Id = cargas.Data.Value.Item1.Docente.id;
@@ -53,18 +54,14 @@ namespace AkademicReport.Service.ReposteServices
                 Docente.Nivel = cargas.Data.Value.Item1.Docente.nivel;
                 DataResult.Docente = Docente;
             }
-
-
             if (cargas.Data.Value.Item1.Carga==null)
             {
-                
-          
                 DataResult.Docente = Docente;
                 Response.Data = DataResult;
                 Response.Status = 204;
                 return Response;
             }
-            var cargarPorRecinto= cargas.Data.Value.Item1.Carga.Where(c=>c.Recinto==filtro.idRecinto).ToList();
+            //var cargarPorRecinto= cargas.Data.Value.Item1.Carga.Where(c=>c.Recinto==filtro.idRecinto).ToList();
             if(cargas.Data.Value.Item1.Carga != null)
             {
                 
@@ -88,7 +85,7 @@ namespace AkademicReport.Service.ReposteServices
                                                                 .Replace("ú", "u")))
                         .FirstOrDefaultAsync();
                     DataResult.Docente.Pago_hora = nivelAcademico.PagoHora.ToString();
-                    foreach (var item in cargas.Data.Value.Item1.Carga.OrderBy(c => c.dia_id).OrderBy(c => c.hora_inicio))
+                    foreach (var item in cargas.Data.Value.Item1.Carga)
                     {
                         var existe = CargaLista.Where(c => c.cod_asignatura == item.cod_asignatura && c.Seccion == item.Seccion).FirstOrDefault();
                         if (existe == null)
@@ -115,8 +112,6 @@ namespace AkademicReport.Service.ReposteServices
                         c.precio_hora = nivelAcademico.PagoHora;
                         c.pago_asignatura = c.precio_hora * c.credito;
                         DataResult.Carga.Add(c);
-
-
                     }
 
                     Response.Data = DataResult;
@@ -193,7 +188,7 @@ namespace AkademicReport.Service.ReposteServices
                          .FirstOrDefaultAsync();
 
                     DataResult.Docente.Pago_hora = nivelAcademico.PagoHora.ToString();
-                    foreach (var item in cargas.Data.Value.Item1.Carga.OrderBy(c=>c.dia_id).OrderBy(c=>c.hora_inicio))
+                    foreach (var item in cargas.Data.Value.Item1.Carga)
                     {
                           var existe = CargaLista.Where(c=>c.cod_asignatura==item.cod_asignatura && c.Seccion==item.Seccion).FirstOrDefault();
                           if (existe==null)
@@ -202,9 +197,11 @@ namespace AkademicReport.Service.ReposteServices
                             }else
                             {
                                 item.credito = 0;
+                                CargaLista.Add(item);
                             }
-
+ 
                         var c = new CargaReporteDto();
+                        c.Periodo = item.Periodo;
                         c.curricular = item.Curricular;
                         c.codigo_asignatura = item.cod_asignatura;
                         c.nombre_asignatura = item.nombre_asignatura;
@@ -236,10 +233,13 @@ namespace AkademicReport.Service.ReposteServices
 
             }
             return Response;
+        }
 
-
-
-
+        public async Task<ServiceResponseData<DocenteCargaReporteDto>> PorDocenteCall(ReporteDto filtro)
+        {
+            var Docentes = await _docentesService.GetAll();
+            var Result = await PorDocente(filtro, Docentes.Data);
+            return Result;
         }
 
         public async Task<ServiceResponseData<List<DocenteCargaReporteDto>>> PorRecinto(ReportePorRecintoDto filtro)
@@ -248,40 +248,96 @@ namespace AkademicReport.Service.ReposteServices
             var docentes = await _docentesService.GetAll();
             var docentesRecinto = docentes.Data.Where(c=>c.id_recinto==filtro.idRecinto.ToString()).ToList();
             List<DocenteCargaReporteDto> CargadDocentes = new List<DocenteCargaReporteDto>();
+       
             foreach (var docente in docentesRecinto)
             {
                 if (docente.identificacion != null)
                 {
 
-
+                    int Monto = 0;
                     var carga = await _dataContext.CargaDocentes.Where(c => c.Cedula == docente.identificacion && c.Curricular==int.Parse(filtro.Curricular)).ToListAsync();
-                    if (carga.Count > 0)
+                    if (carga.Count > 0 && docente.nivel!=null)
                     {
                         var filter = new ReporteDto();
                         filter.Cedula = docente.identificacion;
                         filter.Periodo = filtro.Periodo;
                         filter.idRecinto = filtro.idRecinto.ToString();
-                        var DocenteConSuCarga = await PorDocente(filter);
+                        var nivelAcademico = await _dataContext.NivelAcademicos
+                        .Where(n => n.Nivel.Replace("á", "a")
+                                            .Replace("é", "e")
+                                            .Replace("í", "i")
+                                            .Replace("ó", "o")
+                                            .Replace("ú", "u")
+                                            .Contains(docente.nivel.Replace("á", "a")
+                                                                .Replace("é", "e")
+                                                                .Replace("í", "i")
+                                                                .Replace("ó", "o")
+                                                                .Replace("ú", "u")))
+                        .FirstOrDefaultAsync();
+                        var DocenteConSuCarga = await PorDocente(filter, docentes.Data);
                         if(DocenteConSuCarga.Data!=null && DocenteConSuCarga.Data.Carga!=null)
                         {
                             var CargaFilter = DocenteConSuCarga.Data.Carga.Where(c => c.curricular == int.Parse(filtro.Curricular)).ToList();
+                            CargaFilter.ForEach(c =>
+                            {
+                                Monto += c.precio_hora * c.credito;
+                            });
+
                             var DocenteCargaListo = new DocenteCargaReporteDto()
                             {
                                 Docente = DocenteConSuCarga.Data.Docente,
-                                Carga = CargaFilter
+                                Carga = CargaFilter,
+                                Monto = Monto  
                             };
-                            CargadDocentes.Add(DocenteCargaListo);
+                            if(DocenteCargaListo.Carga.Count>0)
+                            {
 
-                        }
-                        
+                                CargadDocentes.Add(DocenteCargaListo);
+                            }
+                        } 
                     }
                 }
-
             }
 
-            return new ServiceResponseData<List<DocenteCargaReporteDto>>() { Status = 200, Data = CargadDocentes };
+            return new ServiceResponseData<List<DocenteCargaReporteDto>>() { Status = 200, Data = CargadDocentes.OrderBy(c=>c.Docente.Nombre).ToList()};
            
            
+        }
+
+        public async Task<ServiceResponseReporte<List<ReporteConsolidadoResponseDto>>> ReporteConsolidado(FiltroReporteConsolidado filtro)
+        {
+            var Recintos = await _dataContext.Recintos.ToListAsync();
+            var DataList = new List<ReporteConsolidadoResponseDto>();
+            int TotalRecintos = 0;
+            
+            foreach (var recinto in Recintos)
+            {
+                ReportePorRecintoDto filterReporte = new ReportePorRecintoDto();
+                filterReporte.Curricular = filtro.curricular;
+                filterReporte.idRecinto = recinto.Id;
+                filterReporte.Periodo = filtro.periodo;
+                var response = await PorRecinto(filterReporte);
+
+                var Data = new ReporteConsolidadoResponseDto();
+                Data.idRecinto = recinto.Id;
+                Data.nombreRecinto = recinto.NombreCorto;
+                Data.periodo = filtro.periodo;
+                Data.ano = filtro.periodo!.Split("-")[0].ToString();
+                int Monto = 0;
+                foreach (var item in response.Data)
+                {
+                     Monto+= item.Monto;
+                }
+                Data.monto = Monto;
+                DataList.Add(Data);
+                TotalRecintos += Monto;
+
+            }
+            return new ServiceResponseReporte<List<ReporteConsolidadoResponseDto>>() { Status = 200, Data = DataList };
+
+
+
+
         }
     }
 }

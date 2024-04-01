@@ -40,14 +40,14 @@ namespace AkademicReport.Service.CargaServices
             }
         }
 
-        public async Task<ServiceResponseCarga<DocenteCargaDto, string>> GetCarga(string Cedula, string Periodo)
-        {
+        public async Task<ServiceResponseCarga<DocenteCargaDto, string>> GetCarga(string Cedula, string Periodo, List<DocenteGetDto> Docentes)
+        {   
             var ResulData = new DocenteCargaDto();
-            var carga = await _dataContext.CargaDocentes.Where(c => c.Cedula.Contains(Cedula) && c.Periodo==Periodo).Include(c=>c.DiasNavigation).ToListAsync();
-            var docente = await _docenteService.GetAll();
-            
-            var consultaDocente = docente.Data.Where(c => c.identificacion==Cedula).FirstOrDefault();
-            if (consultaDocente== null)
+            var carga = await _dataContext.CargaDocentes.Where(c => c.Cedula.Contains(Cedula) && c.Periodo==Periodo).Include(c=>c.DiasNavigation).OrderBy(c=>c.DiasNavigation.Id).OrderBy(c=>c.HoraInicio) .ToListAsync();
+            var docentes = Docentes;
+            var DocenteFilter = docentes.Where(c => c.identificacion==Cedula).FirstOrDefault();
+           
+            if (DocenteFilter == null)
             {
                 ResulData.Carga = null;
                 return new ServiceResponseCarga<DocenteCargaDto, string>() { Status = 204, Data = (ResulData, "Docente no existe") };
@@ -55,7 +55,7 @@ namespace AkademicReport.Service.CargaServices
             if (carga==null)
             {
                 ResulData.Carga = new List<CargaGetDto>();
-                ResulData.Docente = consultaDocente;
+                ResulData.Docente = DocenteFilter;
                 return new ServiceResponseCarga<DocenteCargaDto, string>() { Status = 200, Data = (ResulData, "No hay carga") };
             }
             var CargaMap = _mapper.Map<List<CargaGetDto>>(carga);
@@ -68,9 +68,17 @@ namespace AkademicReport.Service.CargaServices
                     i.id_concepto = codigo.IdConcepto.ToString();
                 }   
             }
-            ResulData.Carga = CargaMap.OrderBy(c => c.dia_id).ToList();
-            ResulData.Docente = consultaDocente;
+            ResulData.Carga = CargaMap.OrderBy(c=>c.dia_id).ThenBy(c=>c.hora_inicio).ToList();
+            ResulData.Docente = DocenteFilter;
             return new ServiceResponseCarga<DocenteCargaDto, string> {Data=(ResulData, ""),Status = 200};
+        }
+
+        public async Task<ServiceResponseCarga<DocenteCargaDto, string>> GetCargaCall(string cedula, string periodo)
+        {
+            var Docentes = await _docenteService.GetAll();
+            var Result = await GetCarga(cedula, periodo, Docentes.Data);
+            return Result;
+
         }
 
         public async Task<ServicesResponseMessage<string>> Insert(CargaAddDto item)

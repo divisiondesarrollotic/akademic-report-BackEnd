@@ -23,7 +23,7 @@ namespace AkademicReport.Controllers
         [HttpPost]
         public async Task<ActionResult> GetCarga(DtoCarga filtro)
         {
-            var result = await _service.GetCarga(filtro.Cedula, filtro.Periodo);
+            var result = await _service.GetCargaCall(filtro.Cedula, filtro.Periodo);
             if (result.Data.Value.Item1.Docente == null && result.Data.Value.Item1.Carga == null)
             {
                 return Ok(new ServicesResponseMessage<string>() { Status = 204, Message = "Docente no existe" });

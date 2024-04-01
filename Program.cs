@@ -35,7 +35,7 @@ builder.Services.AddScoped<IAsignaturaService, AsignaturaService>();
 
 builder.Services.AddScoped<IDocenteService, DocenteService>();
 builder.Services.AddScoped<ICargaDocenteService, CargaService>();
-builder.Services.AddScoped<IReposteService, ReporteService>();
+builder.Services.AddScoped<IReporteService, ReporteService>();
 builder.Services.AddAutoMapper(typeof(Program));
 
 var app = builder.Build();
