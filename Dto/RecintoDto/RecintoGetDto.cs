@@ -2,8 +2,8 @@
 {
     public class RecintoGetDto
     {
-        public int Id { get; set; }
-        public string Recinto { get; set; } = null!;
-        public string NombreCorto { get; set; } = null!;
+        public int id { get; set; }
+        public string recinto { get; set; } = null!;
+        public string nombre_corto { get; set; } = null!;
     }
 }

@@ -61,6 +61,7 @@ namespace AkademicReport.Service.CargaServices
             var CargaMap = _mapper.Map<List<CargaGetDto>>(carga);
             foreach (var i in CargaMap)
             {
+               
                 var codigo = await _dataContext.Codigos.Where(c => c.Codigo1.Contains(i.cod_asignatura)).FirstOrDefaultAsync();
                if(codigo!=null)
                 {
@@ -85,7 +86,28 @@ namespace AkademicReport.Service.CargaServices
         {
             try
             {
-                _dataContext.CargaDocentes.Add(_mapper.Map<CargaDocente>(item));
+                CargaDocente carga = new CargaDocente();
+                carga.Curricular = item.curricular;
+                carga.Periodo = item.periodo;
+                carga.Recinto = item.recinto.ToString();
+                carga.CodAsignatura = item.cod_asignatura;
+                carga.NombreAsignatura = item.nombre_asignatura;
+                carga.CodUniversitas = item.cod_universitas;
+                carga.Seccion = item.seccion.ToString();
+                carga.Aula = item.aula;
+                carga.Modalidad = item.modalidad;
+                carga.Dias = item.dia_id;
+                carga.HoraInicio = item.hora_inicio;
+                carga.MinutoInicio = item.minuto_inicio;
+                carga.HoraFin = item.hora_fin;
+                carga.MinutoFin = item.minuto_fin;
+                carga.NumeroHora = item.numero_hora;
+                carga.Credito = item.credito;
+                carga.NombreProfesor = item.nombre_profesor;
+                carga.Cedula = item.Cedula;
+
+
+                _dataContext.CargaDocentes.Add(carga);
                 await _dataContext.SaveChangesAsync();
                 return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjInsert };
             }

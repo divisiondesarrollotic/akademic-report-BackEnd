@@ -16,10 +16,10 @@ namespace AkademicReport.Models
         public string Aula { get; set; } = null!;
         public string Modalidad { get; set; } = null!;
         public int Dias { get; set; }
-        public int HoraInicio { get; set; }
-        public int MinutoInicio { get; set; }
-        public int HoraFin { get; set; }
-        public int MinutoFin { get; set; }
+        public string? HoraInicio { get; set; }
+        public string? MinutoInicio { get; set; }
+        public string? HoraFin { get; set; }
+        public string? MinutoFin { get; set; }
         public double NumeroHora { get; set; }
         public int Credito { get; set; }
         public string NombreProfesor { get; set; } = null!;

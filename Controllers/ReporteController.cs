@@ -1,4 +1,5 @@
-﻿using AkademicReport.Dto.ReporteDto;
+﻿using AkademicReport.Dto.DocentesDto;
+using AkademicReport.Dto.ReporteDto;
 using AkademicReport.Service;
 using AkademicReport.Service.ReposteServices;
 using Microsoft.AspNetCore.Mvc;
@@ -7,10 +8,10 @@ namespace AkademicReport.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class ReporteController : ControllerBase
+    public class reporteController : ControllerBase
     {
         private readonly IReporteService _reposteService;
-        public ReporteController(IReporteService reposteService)
+        public reporteController(IReporteService reposteService)
         {
             _reposteService = reposteService;
         }
@@ -26,7 +27,17 @@ namespace AkademicReport.Controllers
                 ServiceR.Message = "Docente no existe";
                 return Ok(ServiceR);
             }
-            return Ok(response);
+            var ResponseDone = new ServiceResponseData<List<DocenteCargaReporteDtoPorDocente>>();
+            ResponseDone.Status = 200;
+            ResponseDone.Data = new List<DocenteCargaReporteDtoPorDocente>();
+            var Uni = new DocenteCargaReporteDtoPorDocente();
+            Uni.Docente = response.Data.Docente;
+            Uni.Carga = response.Data.Carga;
+            Uni.Monto = response.Data.Monto;
+            ResponseDone.Data.Add(Uni);
+
+
+            return Ok(ResponseDone);
 
         }
         [HttpPost]

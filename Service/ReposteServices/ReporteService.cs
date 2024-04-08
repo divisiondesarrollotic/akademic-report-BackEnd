@@ -7,6 +7,7 @@ using AkademicReport.Service.CargaServices;
 using AkademicReport.Service.DocenteServices;
 using AutoMapper.Configuration.Conventions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace AkademicReport.Service.ReposteServices
@@ -98,6 +99,7 @@ namespace AkademicReport.Service.ReposteServices
                         }
 
                         var c = new CargaReporteDto();
+                        c.curricularName = item.Curricular == 1 ? "Curricular" : "Co-Curricular";
                         c.curricular = item.Curricular;
                         c.codigo_asignatura = item.cod_asignatura;
                         c.nombre_asignatura = item.nombre_asignatura;
@@ -151,6 +153,7 @@ namespace AkademicReport.Service.ReposteServices
                         }
                         var c = new CargaReporteDto();
                         c.curricular = item.Curricular;
+                        c.curricularName = item.Curricular == 1 ? "Curricular" : "Co-Curricular";
                         c.codigo_asignatura = item.cod_asignatura;
                         c.nombre_asignatura = item.nombre_asignatura;
                         c.id = item.Id;
@@ -203,6 +206,7 @@ namespace AkademicReport.Service.ReposteServices
                         var c = new CargaReporteDto();
                         c.Periodo = item.Periodo;
                         c.curricular = item.Curricular;
+                        c.curricularName = item.Curricular == 1 ? "Curricular" : "Co-Curricular";
                         c.codigo_asignatura = item.cod_asignatura;
                         c.nombre_asignatura = item.nombre_asignatura;
                         c.id = item.Id;
@@ -242,20 +246,30 @@ namespace AkademicReport.Service.ReposteServices
             return Result;
         }
 
-        public async Task<ServiceResponseData<List<DocenteCargaReporteDto>>> PorRecinto(ReportePorRecintoDto filtro)
+        public async Task<ServiceResponseReporte<List<DocenteCargaReporteDto>>> PorRecinto(ReportePorRecintoDto filtro)
         {  
 
             var docentes = await _docentesService.GetAll();
             var docentesRecinto = docentes.Data.Where(c=>c.id_recinto==filtro.idRecinto.ToString()).ToList();
             List<DocenteCargaReporteDto> CargadDocentes = new List<DocenteCargaReporteDto>();
-       
+            int Monto = 0;
+            int Total = 0;
+
             foreach (var docente in docentesRecinto)
             {
                 if (docente.identificacion != null)
                 {
+                    List<Models.CargaDocente> carga = new List<Models.CargaDocente>();
+                    if(filtro.Curricular!="3")
+                    {
+                        carga = await _dataContext.CargaDocentes.Where(c => c.Cedula == docente.identificacion && c.Curricular == int.Parse(filtro.Curricular)).ToListAsync();
 
-                    int Monto = 0;
-                    var carga = await _dataContext.CargaDocentes.Where(c => c.Cedula == docente.identificacion && c.Curricular==int.Parse(filtro.Curricular)).ToListAsync();
+                    }
+                    else
+                    {
+                        carga = await _dataContext.CargaDocentes.Where(c => c.Cedula == docente.identificacion).ToListAsync();
+
+                    }
                     if (carga.Count > 0 && docente.nivel!=null)
                     {
                         var filter = new ReporteDto();
@@ -277,7 +291,15 @@ namespace AkademicReport.Service.ReposteServices
                         var DocenteConSuCarga = await PorDocente(filter, docentes.Data);
                         if(DocenteConSuCarga.Data!=null && DocenteConSuCarga.Data.Carga!=null)
                         {
-                            var CargaFilter = DocenteConSuCarga.Data.Carga.Where(c => c.curricular == int.Parse(filtro.Curricular)).ToList();
+                            List<CargaReporteDto> CargaFilter = new List<CargaReporteDto>();
+                            if(filtro.Curricular!="3")
+                            {
+                                CargaFilter = DocenteConSuCarga.Data.Carga.Where(c => c.curricular == int.Parse(filtro.Curricular)).ToList();
+                            }
+                            else
+                            {
+                                CargaFilter = DocenteConSuCarga.Data.Carga;
+                            }
                             CargaFilter.ForEach(c =>
                             {
                                 Monto += c.precio_hora * c.credito;
@@ -287,19 +309,23 @@ namespace AkademicReport.Service.ReposteServices
                             {
                                 Docente = DocenteConSuCarga.Data.Docente,
                                 Carga = CargaFilter,
-                                Monto = Monto  
-                            };
-                            if(DocenteCargaListo.Carga.Count>0)
+                                Monto = Monto
+                                
+                           };
+                            Total += Monto;
+                            Monto = 0;
+                            if (DocenteCargaListo.Carga.Count>0)
                             {
 
                                 CargadDocentes.Add(DocenteCargaListo);
+                                
                             }
                         } 
                     }
                 }
             }
 
-            return new ServiceResponseData<List<DocenteCargaReporteDto>>() { Status = 200, Data = CargadDocentes.OrderBy(c=>c.Docente.Nombre).ToList()};
+            return new ServiceResponseReporte<List<DocenteCargaReporteDto>>() { Status = 200, Data = CargadDocentes.OrderBy(c=>c.Docente.Nombre).ToList(), totalRecinto=Total};
            
            
         }
@@ -317,7 +343,7 @@ namespace AkademicReport.Service.ReposteServices
                 filterReporte.idRecinto = recinto.Id;
                 filterReporte.Periodo = filtro.periodo;
                 var response = await PorRecinto(filterReporte);
-
+                var Cargas = new List<CargaGetDto>();
                 var Data = new ReporteConsolidadoResponseDto();
                 Data.idRecinto = recinto.Id;
                 Data.nombreRecinto = recinto.NombreCorto;
@@ -326,6 +352,7 @@ namespace AkademicReport.Service.ReposteServices
                 int Monto = 0;
                 foreach (var item in response.Data)
                 {
+                     
                      Monto+= item.Monto;
                 }
                 Data.monto = Monto;
@@ -333,7 +360,7 @@ namespace AkademicReport.Service.ReposteServices
                 TotalRecintos += Monto;
 
             }
-            return new ServiceResponseReporte<List<ReporteConsolidadoResponseDto>>() { Status = 200, Data = DataList };
+            return new ServiceResponseReporte<List<ReporteConsolidadoResponseDto>>() { Status = 200, Data = DataList, totalRecinto=TotalRecintos };
 
 
 

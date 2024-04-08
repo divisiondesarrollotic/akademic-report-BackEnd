@@ -4,6 +4,7 @@
     {
         public int Id { get; set; }
         public int Curricular { get; set; }
+        public string? curricularName { get; set; }
         public string Periodo { get; set; } = null!;
         public string Recinto { get; set; } = null!;
         public string id_asignatura { get; set; } = null!;
@@ -15,14 +16,16 @@
         public string Modalidad { get; set; } = null!;
         public int dia_id { get; set; }
         public string dia_nombre { get; set; }=null!;
-        public int hora_inicio { get; set; }
-        public int minuto_inicio { get; set; }
-        public int hora_fin { get; set; }
-        public int minuto_fin { get; set; }
+        public string hora_inicio { get; set; } = null!;
+        public string minuto_inicio { get; set; } = null!;
+        public string hora_fin { get; set; } = null!;
+        public string minuto_fin { get; set; } = null!;
         public double numero_hora { get; set; }
         public int credito { get; set; }
         public string nombre_profesor { get; set; } = null!;
         public string Cedula { get; set; } = null!;
         public string  id_concepto { get; set; }=null!;
+
+
     }
 }

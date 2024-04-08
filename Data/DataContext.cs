@@ -167,13 +167,25 @@ namespace AkademicReport.Data
 
                 entity.Property(e => e.Dias).HasColumnName("dias");
 
-                entity.Property(e => e.HoraFin).HasColumnName("hora_fin");
+                entity.Property(e => e.HoraFin)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("hora_fin");
 
-                entity.Property(e => e.HoraInicio).HasColumnName("hora_inicio");
+                entity.Property(e => e.HoraInicio)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("hora_inicio");
 
-                entity.Property(e => e.MinutoFin).HasColumnName("minuto_fin");
+                entity.Property(e => e.MinutoFin)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("minuto_fin");
 
-                entity.Property(e => e.MinutoInicio).HasColumnName("minuto_inicio");
+                entity.Property(e => e.MinutoInicio)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("minuto_inicio");
 
                 entity.Property(e => e.Modalidad)
                     .HasMaxLength(50)

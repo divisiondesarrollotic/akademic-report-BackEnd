@@ -13,10 +13,10 @@
         public string Aula { get; set; } = null!;
         public string Modalidad { get; set; } = null!;
         public int dia_id { get; set; }
-        public int hora_inicio { get; set; }
-        public int minuto_inicio { get; set; }
-        public int hora_fin { get; set; }
-        public int minuto_fin { get; set; }
+        public string? hora_inicio { get; set; }
+        public string? minuto_inicio { get; set; }
+        public string? hora_fin { get; set; }
+        public string? minuto_fin { get; set; }
         public double numero_hora { get; set; }
         public int credito { get; set; }
         public string nombre_profesor { get; set; } = null!;

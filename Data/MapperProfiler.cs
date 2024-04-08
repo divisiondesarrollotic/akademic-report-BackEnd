@@ -16,11 +16,14 @@ namespace AkademicReport.Data
     {
         public MapperProfiler()
         {
-            CreateMap<Recinto, RecintoGetDto>().ForMember(c => c.Recinto, opt => opt.MapFrom(c => c.Recinto1));
+            CreateMap<Recinto, RecintoGetDto>().ForMember(c => c.recinto, opt => opt.MapFrom(c => c.Recinto1)).ForMember(c=>c.nombre_corto, opt=>opt.MapFrom(c=>c.NombreCorto));
             CreateMap<UsuarioAddDto, Usuario>();
             CreateMap<UsuarioUpdateDto, Usuario>();
-            CreateMap<Usuario, UsuarioGetDto>().ForMember(c=>c.NivelId, opt=>opt.MapFrom(c=>c.Nivel))
-                .ForMember(c=>c.NivelNombre, opt=>opt.MapFrom(c=>c.NivelNavigation.Nivel)).ForMember(c=>c.Nombre_Corto, opt=>opt.MapFrom(c=>c.IdRecintoNavigation.NombreCorto));
+            CreateMap<Usuario, UsuarioGetDto>().ForMember(c => c.nivel, opt => opt.MapFrom(c => c.Nivel))
+               .ForMember(c => c.nombre_corto, opt => opt.MapFrom(c => c.IdRecintoNavigation.NombreCorto))
+               .ForMember(c => c.recinto, opt => opt.MapFrom(c => c.IdRecintoNavigation.Recinto1))
+               .ForMember(c => c.id_recinto, opt => opt.MapFrom(c => c.IdRecinto))
+            .ForMember(c => c.nivelNombre, opt => opt.MapFrom(c => c.NivelNavigation.Nivel));
 
             CreateMap<PeriodoAcademico, PeriodoGetDto>();
             CreateMap<PeriodoAddDto, PeriodoAcademico>();
@@ -55,6 +58,7 @@ namespace AkademicReport.Data
                 .ForMember(c => c.Dias, o => o.MapFrom(c => c.dia_id))
                 .ForMember(c => c.HoraInicio, o => o.MapFrom(c => c.hora_inicio))
                 .ForMember(c => c.HoraFin, o => o.MapFrom(c => c.hora_fin))
+                .ForMember(c => c.MinutoInicio, o => o.MapFrom(c => c.minuto_inicio))
                 .ForMember(c => c.MinutoFin, o => o.MapFrom(c => c.minuto_fin))
                 .ForMember(c => c.NumeroHora, o => o.MapFrom(c => c.numero_hora))
                 .ForMember(c => c.NombreProfesor, o => o.MapFrom(c => c.nombre_profesor));
@@ -74,6 +78,7 @@ namespace AkademicReport.Data
              .ForMember(c => c.cod_universitas, o => o.MapFrom(c => c.CodUniversitas))
              .ForMember(c => c.dia_id, o => o.MapFrom(c => c.Dias))
              .ForMember(c => c.hora_inicio, o => o.MapFrom(c => c.HoraInicio))
+             .ForMember(c => c.minuto_inicio, o => o.MapFrom(c => c.MinutoInicio))
              .ForMember(c => c.hora_fin, o=> o.MapFrom(c => c.HoraFin))
              .ForMember(c => c.minuto_fin, o => o.MapFrom(c => c.MinutoFin))
              .ForMember(c => c.numero_hora, o => o.MapFrom(c => c.NumeroHora))

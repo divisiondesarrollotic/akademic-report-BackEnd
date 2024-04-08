@@ -2,12 +2,13 @@
 {
     public class UsuarioGetDto
     {
-        public int Id { get; set; }
-        public string? Nombre { get; set; }
-        public string? Correo { get; set; }
-        public string? NivelNombre { get; set; }
-        public string? NivelId { get; set; }
-        public string? IdRecinto { get; set; }
-        public string? Nombre_Corto { get; set; }
+        public int id { get; set; }
+        public string? nombre { get; set; }
+        public string? correo { get; set; }
+        public string? nivel { get; set; }
+        public string? nivelNombre { get; set; }
+        public string? recinto { get; set; }
+        public string? id_recinto { get; set; }
+        public string? nombre_corto { get; set; }
     }
 }

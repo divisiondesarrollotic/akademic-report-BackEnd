@@ -21,6 +21,7 @@ namespace AkademicReport.Controllers
             _service = service;
         }
         [HttpPost]
+        [Route("docente")]
         public async Task<ActionResult> GetCarga(DtoCarga filtro)
         {
             var result = await _service.GetCargaCall(filtro.Cedula, filtro.Periodo);

@@ -4,6 +4,7 @@
     {
         public string Periodo { get; set; } = null!;
         public int curricular { get; set; }
+        public string? curricularName { get; set; }
         public string codigo_asignatura { get; set; } = null!;
         public string nombre_asignatura { get; set; } = null!;
         public int id { get; set; }

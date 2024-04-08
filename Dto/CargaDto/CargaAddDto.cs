@@ -2,20 +2,20 @@
 {
     public class CargaAddDto
     {
-        public int Curricular { get; set; }
-        public string Periodo { get; set; } = null!;
-        public int Recinto { get; set; } 
+        public int curricular { get; set; }
+        public string periodo { get; set; } = null!;
+        public int recinto { get; set; } 
         public string cod_asignatura { get; set; } = null!;
         public string nombre_asignatura { get; set; } = null!;
         public string cod_universitas { get; set; } = null!;
-        public int Seccion { get; set; } 
-        public string Aula { get; set; } = null!;
-        public string Modalidad { get; set; } = null!;
+        public int seccion { get; set; } 
+        public string aula { get; set; } = null!;
+        public string modalidad { get; set; } = null!;
         public int dia_id { get; set; }
-        public int hora_inicio { get; set; }
-        public int minuto_inicio { get; set; }
-        public int hora_fin { get; set; }
-        public int minuto_fin { get; set; }
+        public string hora_inicio { get; set; } = null!;
+        public string minuto_inicio { get; set; } = null!;
+        public string hora_fin { get; set; } = null!;
+        public string minuto_fin { get; set; } = null!;
         public double numero_hora { get; set; }
         public int credito { get; set; }
         public string nombre_profesor { get; set; } = null!;

@@ -11,11 +11,11 @@ namespace AkademicReport.Service.RecintoServices
         private readonly IMapper _mapper;
         private readonly DataContext _dataContext;
         public RecintoService(IMapper mapper, DataContext dataContext) { _mapper = mapper; _dataContext = dataContext; }
-        public async Task<List<RecintoGetDto>> GetAll()
+        public async Task<ServiceResponseData<List<RecintoGetDto>>> GetAll()
         {
             
             var recintos= await _dataContext.Recintos.ProjectTo<RecintoGetDto>(_mapper.ConfigurationProvider).ToListAsync();
-            return recintos;
+            return new ServiceResponseData<List<RecintoGetDto>>() { Data = recintos, Status=200};
         
         }
     }

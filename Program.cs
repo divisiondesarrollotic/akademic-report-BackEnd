@@ -41,7 +41,7 @@ builder.Services.AddAutoMapper(typeof(Program));
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsProduction())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
@@ -50,7 +50,10 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
-
+app.UseCors(routes =>
+{
+    routes.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
+});
 app.MapControllers();
 
 app.Run();

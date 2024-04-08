@@ -4,6 +4,6 @@ namespace AkademicReport.Service.RecintoServices
 {
     public interface IRecintoService
     {
-        Task<List<RecintoGetDto>> GetAll();
+        Task<ServiceResponseData<List<RecintoGetDto>>> GetAll();
     }
 }
