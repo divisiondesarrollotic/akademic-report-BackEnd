@@ -25,6 +25,7 @@ namespace AkademicReport.Models
         public string NombreProfesor { get; set; } = null!;
         public string Cedula { get; set; } = null!;
 
+        public virtual TipoCarga? CurricularNavigation { get; set; }
         public virtual Dia DiasNavigation { get; set; } = null!;
     }
 }

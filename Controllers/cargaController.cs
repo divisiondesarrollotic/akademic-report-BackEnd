@@ -55,6 +55,13 @@ namespace AkademicReport.Controllers
         {
             return Ok(await _service.Delete(id));
         }
+
+        [HttpGet]
+        [Route("get-tipo-carga")]
+        public async Task<ActionResult>GetTipoCarga()
+        {
+            return Ok(await _service.GetTipoCarga());
+        }
     }
 }
 

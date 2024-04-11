@@ -40,6 +40,8 @@ namespace AkademicReport.Data
             CreateMap<Aula, AulaGettDto>();
             CreateMap<Paisesnacionalidade, NacionalidadDto>();
 
+            CreateMap<TipoCarga, TipoDeCargaDto>();
+
 
             CreateMap<AsignaturaAddDto, Codigo>();
             CreateMap<AsignaturaUpdateDto, Codigo>();
@@ -83,7 +85,8 @@ namespace AkademicReport.Data
              .ForMember(c => c.minuto_fin, o => o.MapFrom(c => c.MinutoFin))
              .ForMember(c => c.numero_hora, o => o.MapFrom(c => c.NumeroHora))
              .ForMember(c => c.nombre_profesor, o => o.MapFrom(c => c.NombreProfesor))
-             .ForMember(c => c.dia_nombre, o => o.MapFrom(c => c.DiasNavigation.Nombre));
+             .ForMember(c => c.dia_nombre, o => o.MapFrom(c => c.DiasNavigation.Nombre))
+             .ForMember(c => c.curricularName, o => o.MapFrom(c => c.CurricularNavigation.Nombre));
 
 
 

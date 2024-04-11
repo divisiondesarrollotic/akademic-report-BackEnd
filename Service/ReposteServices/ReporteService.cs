@@ -9,6 +9,7 @@ using AutoMapper.Configuration.Conventions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
+using System.Collections.Generic;
 
 namespace AkademicReport.Service.ReposteServices
 {
@@ -99,8 +100,9 @@ namespace AkademicReport.Service.ReposteServices
                         }
 
                         var c = new CargaReporteDto();
-                        c.curricularName = item.Curricular == 1 ? "Curricular" : "Co-Curricular";
+                        c.curricularName = item.curricularName;
                         c.curricular = item.Curricular;
+                        c.Periodo = item.Periodo;
                         c.codigo_asignatura = item.cod_asignatura;
                         c.nombre_asignatura = item.nombre_asignatura;
                         c.id = item.Id;
@@ -153,7 +155,8 @@ namespace AkademicReport.Service.ReposteServices
                         }
                         var c = new CargaReporteDto();
                         c.curricular = item.Curricular;
-                        c.curricularName = item.Curricular == 1 ? "Curricular" : "Co-Curricular";
+                        c.Periodo = item.Periodo;
+                        c.curricularName = item.curricularName;
                         c.codigo_asignatura = item.cod_asignatura;
                         c.nombre_asignatura = item.nombre_asignatura;
                         c.id = item.Id;
@@ -206,7 +209,7 @@ namespace AkademicReport.Service.ReposteServices
                         var c = new CargaReporteDto();
                         c.Periodo = item.Periodo;
                         c.curricular = item.Curricular;
-                        c.curricularName = item.Curricular == 1 ? "Curricular" : "Co-Curricular";
+                        c.curricularName = item.curricularName;
                         c.codigo_asignatura = item.cod_asignatura;
                         c.nombre_asignatura = item.nombre_asignatura;
                         c.id = item.Id;
@@ -260,7 +263,7 @@ namespace AkademicReport.Service.ReposteServices
                 if (docente.identificacion != null)
                 {
                     List<Models.CargaDocente> carga = new List<Models.CargaDocente>();
-                    if(filtro.Curricular!="3")
+                    if(filtro.Curricular!="0")
                     {
                         carga = await _dataContext.CargaDocentes.Where(c => c.Cedula == docente.identificacion && c.Curricular == int.Parse(filtro.Curricular)).ToListAsync();
 
@@ -292,7 +295,7 @@ namespace AkademicReport.Service.ReposteServices
                         if(DocenteConSuCarga.Data!=null && DocenteConSuCarga.Data.Carga!=null)
                         {
                             List<CargaReporteDto> CargaFilter = new List<CargaReporteDto>();
-                            if(filtro.Curricular!="3")
+                            if(filtro.Curricular!="0")
                             {
                                 CargaFilter = DocenteConSuCarga.Data.Carga.Where(c => c.curricular == int.Parse(filtro.Curricular)).ToList();
                             }
@@ -365,6 +368,30 @@ namespace AkademicReport.Service.ReposteServices
 
 
 
+        }
+
+        public async Task<ServiceResponseReporte<List<DocenteCargaReporteDto>>> ReporteDiplomado(ReportePorRecintoDto filtro)
+        {
+            //var DataPorRecinto = await PorRecinto(filtro);
+            //var result = new List<DocenteCargaReporteDto>();
+            //foreach (var item in DataPorRecinto.Data!)
+            //{
+                
+            //        string filtroIngles1 = "ing";
+            //        string filtroIngles12 = "gdo";
+            //        item.Carga = item.Carga.Where(c => c.codigo_asignatura.ToUpper().Contains(filtroIngles1.ToUpper())
+            //        || c.codigo_asignatura.ToUpper().Contains(filtroIngles12.ToUpper())).ToList();
+            //    if(item.Carga.Count>0)
+            //    {
+            //        var CargaDocente = new DocenteCargaReporteDto();
+            //        CargaDocente.Carga =   
+            //    }
+
+
+
+            //}
+            //return DataPorRecinto;
+            throw new NotImplementedException();
         }
     }
 }

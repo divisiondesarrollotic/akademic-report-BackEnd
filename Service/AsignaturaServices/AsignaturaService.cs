@@ -1,10 +1,12 @@
 ﻿using AkademicReport.Data;
 using AkademicReport.Dto.AsignaturaDto;
+using AkademicReport.Dto.DocentesDto;
 using AkademicReport.Dto.NivelDto;
 using AkademicReport.Models;
 using AkademicReport.Utilities;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using System.Drawing;
 using System.Linq;
 
 namespace AkademicReport.Service.AsignaturaServices
@@ -67,12 +69,21 @@ namespace AkademicReport.Service.AsignaturaServices
             return Data;
         }
 
-        public async Task<ServiceResponseDataPaginacion<List<AsignaturaGetDto>>> GetAllPaginacion(AsignaturaPaginacionDto paginacion)
+        public async Task<ServiceResponseDataPaginacion<List<AsignaturaGetDto>>> GetAllPaginacion(FiltroDocentesDto filtro)
         {
             try
             {
                 var codigos = await _dataContext.Codigos.Include(c => c.IdConceptoNavigation).ToListAsync();
-                var CodigoMap = _mapper.Map<List<AsignaturaGetDto>>(codigos).OrderBy(c=>c.Id).Skip(paginacion.paginaActual).Take(paginacion.elementosPorPagina).ToList();
+                var CodigoMap = _mapper.Map<List<AsignaturaGetDto>>(codigos).OrderBy(c=>c.Id).Skip(filtro.paginaActual.Value-1 * filtro.elementosPorPagina.Value).Take(filtro.elementosPorPagina.Value).ToList();
+                //int CantReg = Docentes.Data.Count;
+                //int CantRegistrosSolicitado = filtro.elementosPorPagina.Value;
+                //decimal TotalPage = Convert.ToDecimal(CantReg) / Convert.ToDecimal(CantRegistrosSolicitado);
+                //var result = Docentes.Data.Where(c => c.identificacion.Contains(filtro.Filtro)).OrderBy(c => c.nombre).Skip((filtro.paginaActual.Value - 1) * CantRegistrosSolicitado).Take(CantRegistrosSolicitado).ToList();
+                //decimal ParteEntera = Math.Truncate(TotalPage);
+                //if (TotalPage > ParteEntera && (CantRegistrosSolicitado / CantReg) > 1)
+                //{ TotalPage = TotalPage + 1; }
+                //valor = result.Count;
+
                 foreach (var item in CodigoMap)
                 {
                     item.Modalida = codigos.Where(c => c.Id == int.Parse(item.Id)).First().Modalida.Split(',').ToList();
@@ -80,7 +91,7 @@ namespace AkademicReport.Service.AsignaturaServices
             
                 if (codigos.Count < 1)
                     return new ServiceResponseDataPaginacion<List<AsignaturaGetDto>>() { Status = 204 };
-                return new ServiceResponseDataPaginacion<List<AsignaturaGetDto>>() { Status = 200, Data = CodigoMap, TotalPaginas=codigos.Count / paginacion.elementosPorPagina };
+                return new ServiceResponseDataPaginacion<List<AsignaturaGetDto>>() { Status = 200, Data = CodigoMap, TotalPaginas=codigos.Count / filtro.elementosPorPagina, TotalRegistros = codigos.Count };
             }
             catch (Exception ex)
             {

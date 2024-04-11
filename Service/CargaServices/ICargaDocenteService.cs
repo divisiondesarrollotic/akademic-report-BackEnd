@@ -11,5 +11,6 @@ namespace AkademicReport.Service.CargaServices
         Task<ServicesResponseMessage<string>> Insert(CargaAddDto item);
         Task<ServicesResponseMessage<string>> Update(CargaUpdateDto item);
         Task<ServicesResponseMessage<string>> Delete(int id);
+        Task<ServiceResponseData<List<TipoDeCargaDto>>> GetTipoCarga();
     }
 }

@@ -1,4 +1,5 @@
 ﻿using AkademicReport.Dto.AsignaturaDto;
+using AkademicReport.Dto.DocentesDto;
 using AkademicReport.Dto.NivelDto;
 using AkademicReport.Service.AsignaturaServices;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +23,7 @@ namespace AkademicReport.Controllers
         }
         [HttpPost]
         [Route("pag")]
-        public async Task<ActionResult> GetAllPaginacion(AsignaturaPaginacionDto paginacion)
+        public async Task<ActionResult> GetAllPaginacion(FiltroDocentesDto paginacion)
         {
             return Ok(await _service.GetAllPaginacion(paginacion));
         }

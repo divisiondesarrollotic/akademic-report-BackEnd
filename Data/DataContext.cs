@@ -37,6 +37,7 @@ namespace AkademicReport.Data
         public virtual DbSet<Planestudio> Planestudios { get; set; } = null!;
         public virtual DbSet<PlanestudioDocente> PlanestudioDocentes { get; set; } = null!;
         public virtual DbSet<Recinto> Recintos { get; set; } = null!;
+        public virtual DbSet<TipoCarga> TipoCargas { get; set; } = null!;
         public virtual DbSet<Usuario> Usuarios { get; set; } = null!;
         public virtual DbSet<Vinculo> Vinculos { get; set; } = null!;
 
@@ -218,6 +219,11 @@ namespace AkademicReport.Data
                     .HasMaxLength(50)
                     .IsUnicode(false)
                     .HasColumnName("seccion");
+
+                entity.HasOne(d => d.CurricularNavigation)
+                    .WithMany(p => p.CargaDocentes)
+                    .HasForeignKey(d => d.Curricular)
+                    .HasConstraintName("TipoCarga_CargaDocente");
 
                 entity.HasOne(d => d.DiasNavigation)
                     .WithMany(p => p.CargaDocentes)
@@ -498,6 +504,18 @@ namespace AkademicReport.Data
                     .HasMaxLength(100)
                     .IsUnicode(false)
                     .HasColumnName("recinto");
+            });
+
+            modelBuilder.Entity<TipoCarga>(entity =>
+            {
+                entity.ToTable("tipo_carga");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+
+                entity.Property(e => e.Nombre)
+                    .HasMaxLength(500)
+                    .IsUnicode(false)
+                    .HasColumnName("nombre");
             });
 
             modelBuilder.Entity<Usuario>(entity =>

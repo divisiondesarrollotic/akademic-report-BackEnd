@@ -1,7 +1,9 @@
 ﻿using AkademicReport.Data;
+using AkademicReport.Dto.CargaDto;
 using AkademicReport.Dto.DocentesDto;
 using AkademicReport.Utilities;
 using AutoMapper;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft;
 using Newtonsoft.Json;
@@ -144,14 +146,33 @@ namespace AkademicReport.Service.DocenteServices
 
             var Docentes = await GetAll();
             int valor = Docentes.Data.Count;
-            var DataFilter = Docentes.Data = Docentes.Data.OrderBy(c => c.nombre).Skip(filtro.paginaActual.Value).Take(filtro.elementosPorPagina.Value).ToList();
-            if (filtro.Filtro != "" && filtro.Filtro!=null)
-            {
-                DataFilter = DataFilter.Where(c => c.identificacion.Contains(filtro.Filtro)).ToList();
-                valor = DataFilter.Count;
 
+
+            int CantReg = Docentes.Data.Count;
+            int CantRegistrosSolicitado = filtro.elementosPorPagina.Value;
+            decimal TotalPage = Convert.ToDecimal(CantReg) / Convert.ToDecimal(CantRegistrosSolicitado);
+            foreach (var dpcente in Docentes.Data)
+            {
+                dpcente.identificacion = dpcente.identificacion == null ? string.Empty : dpcente.identificacion;
             }
-            return new ServiceResponseDataPaginacion<List<DocenteGetDto>>(){Data = DataFilter, Status = 200, TotalPaginas = valor/filtro.elementosPorPagina};
+
+            if (filtro.Filtro != null && filtro.Filtro.Trim() != string.Empty)
+            {
+                var result = Docentes.Data.Where(c => c.identificacion.Contains(filtro.Filtro)).OrderBy(c => c.nombre).Skip((filtro.paginaActual.Value - 1) * CantRegistrosSolicitado).Take(CantRegistrosSolicitado).ToList();
+                decimal ParteEntera = Math.Truncate(TotalPage);
+                if (TotalPage > ParteEntera && (CantRegistrosSolicitado / CantReg) > 1)
+                { TotalPage = TotalPage + 1; }
+                valor = result.Count;
+                return new ServiceResponseDataPaginacion<List<DocenteGetDto>>() { Data = result, Status = 200, TotalPaginas = Convert.ToInt32(TotalPage), TotalRegistros = CantReg };
+            }
+
+            var resultNoFilter = Docentes.Data.OrderBy(c => c.nombre).Skip((filtro.paginaActual.Value - 1) * CantRegistrosSolicitado).Take(CantRegistrosSolicitado).ToList();
+            decimal ParteEnteraNoFilter = Math.Truncate(TotalPage);
+            if (TotalPage > ParteEnteraNoFilter && (CantRegistrosSolicitado / CantReg) > 1)
+            { TotalPage = TotalPage + 1; }
+            valor = resultNoFilter.Count;
+            return new ServiceResponseDataPaginacion<List<DocenteGetDto>>() { Data = resultNoFilter, Status = 200, TotalPaginas = Convert.ToInt32(TotalPage), TotalRegistros = CantReg };
+
         }
 
         public async Task<ServiceResponseData<List<DocenteGetDto>>> GetAllRecinto(FiltroDocentesDto filtro, int id)
@@ -202,5 +223,7 @@ namespace AkademicReport.Service.DocenteServices
             return new ServiceResponseData<List<NacionalidadDto>>() { Data = DataFilter, Status = 200};
 
         }
+
+      
     }
 }

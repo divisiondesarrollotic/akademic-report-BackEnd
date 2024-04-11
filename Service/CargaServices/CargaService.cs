@@ -6,6 +6,7 @@ using AkademicReport.Models;
 using AkademicReport.Service.DocenteServices;
 using AkademicReport.Utilities;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace AkademicReport.Service.CargaServices
@@ -43,7 +44,8 @@ namespace AkademicReport.Service.CargaServices
         public async Task<ServiceResponseCarga<DocenteCargaDto, string>> GetCarga(string Cedula, string Periodo, List<DocenteGetDto> Docentes)
         {   
             var ResulData = new DocenteCargaDto();
-            var carga = await _dataContext.CargaDocentes.Where(c => c.Cedula.Contains(Cedula) && c.Periodo==Periodo).Include(c=>c.DiasNavigation).OrderBy(c=>c.DiasNavigation.Id).OrderBy(c=>c.HoraInicio) .ToListAsync();
+            var carga = await _dataContext.CargaDocentes.Where(c => c.Cedula.Contains(Cedula) && c.Periodo==Periodo)
+                .Include(c=>c.DiasNavigation).Include(c=>c.CurricularNavigation).OrderBy(c=>c.DiasNavigation.Id).OrderBy(c=>c.HoraInicio) .ToListAsync();
             var docentes = Docentes;
             var DocenteFilter = docentes.Where(c => c.identificacion==Cedula).FirstOrDefault();
            
@@ -80,6 +82,15 @@ namespace AkademicReport.Service.CargaServices
             var Result = await GetCarga(cedula, periodo, Docentes.Data);
             return Result;
 
+        }
+
+        public async Task<ServiceResponseData<List<TipoDeCargaDto>>> GetTipoCarga()
+        {
+
+            var TipoCargas = await _dataContext.TipoCargas.ProjectTo<TipoDeCargaDto>(_mapper.ConfigurationProvider).ToListAsync();     
+            return new ServiceResponseData<List<TipoDeCargaDto>>() { Status = 200, Data = TipoCargas};
+           
+           
         }
 
         public async Task<ServicesResponseMessage<string>> Insert(CargaAddDto item)

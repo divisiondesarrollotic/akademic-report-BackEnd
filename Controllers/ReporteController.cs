@@ -50,6 +50,15 @@ namespace AkademicReport.Controllers
 
         }
         [HttpPost]
+        [Route("recinto/reporte-diplomado")]
+        public async Task<ActionResult> ReporteDiplomado(ReportePorRecintoDto filtro)
+        {
+            var response = await _reposteService.ReporteDiplomado(filtro);
+            return Ok(response);
+
+
+        }
+        [HttpPost]
         [Route("consolidar")]
         public async Task<ActionResult> ReporteConsolidado(FiltroReporteConsolidado filtro)
         {

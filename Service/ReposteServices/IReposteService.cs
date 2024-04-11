@@ -9,6 +9,7 @@ namespace AkademicReport.Service.ReposteServices
         Task<ServiceResponseData<DocenteCargaReporteDto>> PorDocente(ReporteDto filtro, List<DocenteGetDto>DocentesAmilca);
         Task<ServiceResponseData<DocenteCargaReporteDto>> PorDocenteCall(ReporteDto filtro);
         Task<ServiceResponseReporte<List<DocenteCargaReporteDto>>> PorRecinto(ReportePorRecintoDto filtro);
+        Task<ServiceResponseReporte<List<DocenteCargaReporteDto>>> ReporteDiplomado(ReportePorRecintoDto filtro);
         Task<ServiceResponseReporte<List<ReporteConsolidadoResponseDto>>>ReporteConsolidado(FiltroReporteConsolidado filtro);
     }
 }

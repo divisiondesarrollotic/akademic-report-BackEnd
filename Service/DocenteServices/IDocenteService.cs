@@ -1,4 +1,5 @@
-﻿using AkademicReport.Dto.DocentesDto;
+﻿using AkademicReport.Dto.CargaDto;
+using AkademicReport.Dto.DocentesDto;
 using AkademicReport.Dto.NivelDto;
 
 namespace AkademicReport.Service.DocenteServices
@@ -10,5 +11,6 @@ namespace AkademicReport.Service.DocenteServices
         Task<ServiceResponseData<List<DocenteGetDto>>> GetAllRecinto(FiltroDocentesDto filtro, int idRecinto);
         Task<ServiceResponseDataDocentes<List<DocenteCantidadDto>>> GetDocentexRecinto();
         Task<ServiceResponseData<List<NacionalidadDto>>> GetNacionalidades(FiltroDto filtro);
+       
     }
 }
