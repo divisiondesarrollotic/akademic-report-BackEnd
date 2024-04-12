@@ -38,6 +38,7 @@ namespace AkademicReport.Data
         public virtual DbSet<PlanestudioDocente> PlanestudioDocentes { get; set; } = null!;
         public virtual DbSet<Recinto> Recintos { get; set; } = null!;
         public virtual DbSet<TipoCarga> TipoCargas { get; set; } = null!;
+        public virtual DbSet<TipoCargaCodigo> TipoCargaCodigos { get; set; } = null!;
         public virtual DbSet<Usuario> Usuarios { get; set; } = null!;
         public virtual DbSet<Vinculo> Vinculos { get; set; } = null!;
 
@@ -516,6 +517,32 @@ namespace AkademicReport.Data
                     .HasMaxLength(500)
                     .IsUnicode(false)
                     .HasColumnName("nombre");
+            });
+
+            modelBuilder.Entity<TipoCargaCodigo>(entity =>
+            {
+                entity.ToTable("tipo_carga_codigo");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+
+                entity.Property(e => e.IdCodigo).HasColumnName("idCodigo");
+
+                entity.Property(e => e.IdTipoCarga).HasColumnName("idTipo_carga");
+
+                entity.HasOne(d => d.IdCodigoNavigation)
+                    .WithMany(p => p.TipoCargaCodigos)
+                    .HasForeignKey(d => d.IdCodigo)
+                    .HasConstraintName("FK__tipo_carg__idCod__625A9A57");
+
+                entity.HasOne(d => d.IdCodigo1)
+                    .WithMany(p => p.TipoCargaCodigoIdCodigo1s)
+                    .HasForeignKey(d => d.IdCodigo)
+                    .HasConstraintName("FK__tipo_carg__idTip__634EBE90");
+
+                entity.HasOne(d => d.IdTipoCargaNavigation)
+                    .WithMany(p => p.TipoCargaCodigoIdTipoCargaNavigations)
+                    .HasForeignKey(d => d.IdTipoCarga)
+                    .HasConstraintName("codigo_Tipo_carga");
             });
 
             modelBuilder.Entity<Usuario>(entity =>

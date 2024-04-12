@@ -5,6 +5,11 @@ namespace AkademicReport.Models
 {
     public partial class Codigo
     {
+        public Codigo()
+        {
+            TipoCargaCodigos = new HashSet<TipoCargaCodigo>();
+        }
+
         public int Id { get; set; }
         public int? IdConcepto { get; set; }
         public string? Codigo1 { get; set; }
@@ -14,5 +19,6 @@ namespace AkademicReport.Models
         public string? Descripcion { get; set; }
 
         public virtual Concepto? IdConceptoNavigation { get; set; }
+        public virtual ICollection<TipoCargaCodigo> TipoCargaCodigos { get; set; }
     }
 }

@@ -29,6 +29,12 @@ namespace AkademicReport.Data
             CreateMap<PeriodoAddDto, PeriodoAcademico>();
             CreateMap<PeriodoUpdateDto, PeriodoAcademico>();
             CreateMap<Configuracion, ConfiguracionGetDto>();
+           
+            CreateMap<TipoCargaCodigo, TipoCargaDto>();
+            CreateMap<TipoCargaDto, TipoCargaCodigo>();
+
+
+
 
             CreateMap<NivelAddDto, NivelAcademico>();
             CreateMap<NivelUpdateDto, NivelAcademico>();
@@ -43,17 +49,19 @@ namespace AkademicReport.Data
             CreateMap<TipoCarga, TipoDeCargaDto>();
 
 
-            CreateMap<AsignaturaAddDto, Codigo>();
-            CreateMap<AsignaturaUpdateDto, Codigo>();
+            CreateMap<AsignaturaAddDto, Codigo>().ForMember(c=>c.Codigo1, opt=>opt.MapFrom(c=>c.Codigo));
+            CreateMap<AsignaturaUpdateDto, Codigo>().ForMember(c => c.Codigo1, opt => opt.MapFrom(c => c.Codigo));
             CreateMap<Codigo, AsignaturaGetDto>()
-                .ForMember(c=>c.NombreConcepto, opt=>opt
-                .MapFrom(c=>c.IdConceptoNavigation.Nombre))
-                .ForMember(c=>c.Id_concepto, opt=>opt
-                .MapFrom(c=>c.IdConcepto)) 
-                .ForMember(c=>c.Codigo, opt=>opt.MapFrom(c=>c.Codigo1))
-                .ForMember(c=>c.Modalida, opt=>opt.Ignore());
+                .ForMember(c => c.NombreConcepto, opt => opt
+                .MapFrom(c => c.IdConceptoNavigation.Nombre))
+                .ForMember(c => c.Id_concepto, opt => opt
+                .MapFrom(c => c.IdConcepto))
+                .ForMember(c => c.Codigo, opt => opt.MapFrom(c => c.Codigo1))
+                .ForMember(c => c.Modalida, opt => opt.Ignore())
+                .ForMember(c => c.TiposCargas, opt => opt.MapFrom(c=>c.TipoCargaCodigos));
 
-            
+
+
             CreateMap<CargaAddDto, CargaDocente>().ForMember(c=>c.CodAsignatura, o=>o.MapFrom(c=>c.cod_asignatura))
                 .ForMember(c=>c.NombreAsignatura, o=>o.MapFrom(c=>c.nombre_asignatura))
                 .ForMember(c => c.CodUniversitas, o => o.MapFrom(c => c.cod_universitas))
