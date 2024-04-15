@@ -1,8 +1,10 @@
-﻿namespace AkademicReport.Dto.CargaDto
+﻿using AkademicReport.Dto.AsignaturaDto;
+using System.ComponentModel.DataAnnotations;
+
+namespace AkademicReport.Dto.CargaDto
 {
     public class CargaAddDto
     {
-        public int curricular { get; set; }
         public string periodo { get; set; } = null!;
         public int recinto { get; set; } 
         public string cod_asignatura { get; set; } = null!;
@@ -20,5 +22,7 @@
         public int credito { get; set; }
         public string nombre_profesor { get; set; } = null!;
         public string Cedula { get; set; } = null!;
+        [Required]
+        public TipoCargaDto TiposCargas { get; set; }
     }
 }

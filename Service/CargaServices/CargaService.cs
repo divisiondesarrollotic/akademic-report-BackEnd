@@ -1,4 +1,5 @@
 ﻿using AkademicReport.Data;
+using AkademicReport.Dto.AsignaturaDto;
 using AkademicReport.Dto.CargaDto;
 using AkademicReport.Dto.DocentesDto;
 using AkademicReport.Dto.UsuarioDto;
@@ -8,6 +9,7 @@ using AkademicReport.Utilities;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace AkademicReport.Service.CargaServices
 {
@@ -31,6 +33,12 @@ namespace AkademicReport.Service.CargaServices
                 var carga = await _dataContext.CargaDocentes.FirstOrDefaultAsync(c => c.Id == id);
                 if (carga == null)
                     return new ServicesResponseMessage<string>() { Status = 204, Message = Msj.MsjNoRegistros };
+
+                // Eliminar el tipo de carga de la tabla pivot
+                var tipoCargas = await _dataContext.TipoCargaCodigos.Where(c => c.IdCodigo == int.Parse(carga.CodAsignatura)).ToArrayAsync();
+                _dataContext.TipoCargaCodigos.RemoveRange(tipoCargas);
+
+
                 _dataContext.CargaDocentes.Remove(carga);
                 await _dataContext.SaveChangesAsync();
                 return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjDelete };
@@ -42,38 +50,50 @@ namespace AkademicReport.Service.CargaServices
         }
 
         public async Task<ServiceResponseCarga<DocenteCargaDto, string>> GetCarga(string Cedula, string Periodo, List<DocenteGetDto> Docentes)
-        {   
-            var ResulData = new DocenteCargaDto();
-            var carga = await _dataContext.CargaDocentes.Where(c => c.Cedula.Contains(Cedula) && c.Periodo==Periodo)
-                .Include(c=>c.DiasNavigation).Include(c=>c.CurricularNavigation).OrderBy(c=>c.DiasNavigation.Id).OrderBy(c=>c.HoraInicio) .ToListAsync();
-            var docentes = Docentes;
-            var DocenteFilter = docentes.Where(c => c.identificacion==Cedula).FirstOrDefault();
-           
-            if (DocenteFilter == null)
+        {
+            try
             {
-                ResulData.Carga = null;
-                return new ServiceResponseCarga<DocenteCargaDto, string>() { Status = 204, Data = (ResulData, "Docente no existe") };
-            }
-            if (carga==null)
-            {
-                ResulData.Carga = new List<CargaGetDto>();
-                ResulData.Docente = DocenteFilter;
-                return new ServiceResponseCarga<DocenteCargaDto, string>() { Status = 200, Data = (ResulData, "No hay carga") };
-            }
-            var CargaMap = _mapper.Map<List<CargaGetDto>>(carga);
-            foreach (var i in CargaMap)
-            {
-               
-                var codigo = await _dataContext.Codigos.Where(c => c.Codigo1.Contains(i.cod_asignatura)).FirstOrDefaultAsync();
-               if(codigo!=null)
+                var ResulData = new DocenteCargaDto();
+                var carga = await _dataContext.CargaDocentes.Where(c => c.Cedula.Contains(Cedula) && c.Periodo == Periodo)
+                    .Include(c => c.DiasNavigation).Include(c => c.CurricularNavigation).OrderBy(c => c.DiasNavigation.Id).OrderBy(c => c.HoraInicio).ToListAsync();
+                var docentes = Docentes;
+                var DocenteFilter = docentes.Where(c => c.identificacion == Cedula).FirstOrDefault();
+
+                if (DocenteFilter == null)
                 {
-                    i.id_asignatura = codigo.Id.ToString();
-                    i.id_concepto = codigo.IdConcepto.ToString();
-                }   
+                    ResulData.Carga = null;
+                    return new ServiceResponseCarga<DocenteCargaDto, string>() { Status = 204, Data = (ResulData, "Docente no existe") };
+                }
+                if (carga == null)
+                {
+                    ResulData.Carga = new List<CargaGetDto>();
+                    ResulData.Docente = DocenteFilter;
+                    return new ServiceResponseCarga<DocenteCargaDto, string>() { Status = 200, Data = (ResulData, "No hay carga") };
+                }
+                var CargaMap = _mapper.Map<List<CargaGetDto>>(carga);
+                foreach (var i in CargaMap)
+                {
+                    i.TiposCarga = new TipoCargaDto();
+                    i.TiposCarga.Id = carga.FirstOrDefault(c => c.Id == i.Id).CurricularNavigation.Id;
+                    i.TiposCarga.Nombre = carga.FirstOrDefault(c => c.Id == i.Id).CurricularNavigation.Nombre;
+                    var codigo = await _dataContext.Codigos.Where(c => c.Codigo1.Contains(i.cod_asignatura)).FirstOrDefaultAsync();
+                    if (codigo != null)
+                    {
+                        i.id_asignatura = codigo.Id.ToString();
+                        i.id_concepto = codigo.IdConcepto.ToString();
+                    }
+                }
+                ResulData.Carga = CargaMap.OrderBy(c => c.dia_id).ThenBy(c => c.hora_inicio).ToList();
+                ResulData.Docente = DocenteFilter;
+                return new ServiceResponseCarga<DocenteCargaDto, string> { Data = (ResulData, ""), Status = 200 };
             }
-            ResulData.Carga = CargaMap.OrderBy(c=>c.dia_id).ThenBy(c=>c.hora_inicio).ToList();
-            ResulData.Docente = DocenteFilter;
-            return new ServiceResponseCarga<DocenteCargaDto, string> {Data=(ResulData, ""),Status = 200};
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+          
         }
 
         public async Task<ServiceResponseCarga<DocenteCargaDto, string>> GetCargaCall(string cedula, string periodo)
@@ -97,8 +117,9 @@ namespace AkademicReport.Service.CargaServices
         {
             try
             {
+
                 CargaDocente carga = new CargaDocente();
-                carga.Curricular = item.curricular;
+                carga.Curricular = item.TiposCargas.Id;
                 carga.Periodo = item.periodo;
                 carga.Recinto = item.recinto.ToString();
                 carga.CodAsignatura = item.cod_asignatura;
@@ -116,9 +137,15 @@ namespace AkademicReport.Service.CargaServices
                 carga.Credito = item.credito;
                 carga.NombreProfesor = item.nombre_profesor;
                 carga.Cedula = item.Cedula;
+                EntityEntry<CargaDocente> result =  _dataContext.CargaDocentes.Add(carga);
+                await _dataContext.SaveChangesAsync();
+                // Agregamos el tipo de carga de la tabla pivot
 
-
-                _dataContext.CargaDocentes.Add(carga);
+                var tipoCargaCodigo = new TipoCargaCodigo();
+                tipoCargaCodigo.IdTipoCarga = item.TiposCargas.Id;
+                tipoCargaCodigo.IdCodigo =int.Parse(item.cod_asignatura);
+                _dataContext.TipoCargaCodigos.Add(tipoCargaCodigo);
+                
                 await _dataContext.SaveChangesAsync();
                 return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjInsert };
             }
@@ -134,7 +161,19 @@ namespace AkademicReport.Service.CargaServices
             {
                 var carga = await _dataContext.CargaDocentes.AsNoTracking().FirstOrDefaultAsync(c => c.Id == Convert.ToInt32(item.Id));
                 carga = _mapper.Map<CargaDocente>(item);
+                carga.Curricular = item.TiposCargas.Id;
                 _dataContext.Entry(carga).State = EntityState.Modified;
+
+
+                // Eliminar el tipo de carga de la tabla pivot
+                var tipoCargas = await _dataContext.TipoCargaCodigos.Where(c => c.IdCodigo == int.Parse(carga.CodAsignatura)).ToArrayAsync();
+                _dataContext.TipoCargaCodigos.RemoveRange(tipoCargas);
+
+                var tipoCargaCodigo = new TipoCargaCodigo();
+                tipoCargaCodigo.IdTipoCarga = item.TiposCargas.Id;
+                tipoCargaCodigo.IdCodigo = int.Parse(item.cod_asignatura);
+                 _dataContext.TipoCargaCodigos.Add(tipoCargaCodigo);
+
                 await _dataContext.SaveChangesAsync();
                 return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjUpdate };
             }

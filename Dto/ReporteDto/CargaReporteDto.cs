@@ -1,10 +1,11 @@
-﻿namespace AkademicReport.Dto.ReporteDto
+﻿using AkademicReport.Dto.AsignaturaDto;
+
+namespace AkademicReport.Dto.ReporteDto
 {
     public class CargaReporteDto
     {
         public string Periodo { get; set; } = null!;
-        public int curricular { get; set; }
-        public string? curricularName { get; set; }
+        public TipoCargaDto TiposCarga { get; set; }
         public string codigo_asignatura { get; set; } = null!;
         public string nombre_asignatura { get; set; } = null!;
         public int id { get; set; }

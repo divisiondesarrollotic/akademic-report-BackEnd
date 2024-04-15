@@ -100,8 +100,7 @@ namespace AkademicReport.Service.ReposteServices
                         }
 
                         var c = new CargaReporteDto();
-                        c.curricularName = item.curricularName;
-                        c.curricular = item.Curricular;
+                        c.TiposCarga = item.TiposCarga;
                         c.Periodo = item.Periodo;
                         c.codigo_asignatura = item.cod_asignatura;
                         c.nombre_asignatura = item.nombre_asignatura;
@@ -154,9 +153,8 @@ namespace AkademicReport.Service.ReposteServices
                             Monto += (item.credito * nivelAcademico.PagoHora);
                         }
                         var c = new CargaReporteDto();
-                        c.curricular = item.Curricular;
+                        c.TiposCarga = item.TiposCarga;
                         c.Periodo = item.Periodo;
-                        c.curricularName = item.curricularName;
                         c.codigo_asignatura = item.cod_asignatura;
                         c.nombre_asignatura = item.nombre_asignatura;
                         c.id = item.Id;
@@ -208,8 +206,7 @@ namespace AkademicReport.Service.ReposteServices
  
                         var c = new CargaReporteDto();
                         c.Periodo = item.Periodo;
-                        c.curricular = item.Curricular;
-                        c.curricularName = item.curricularName;
+                        c.TiposCarga = item.TiposCarga;
                         c.codigo_asignatura = item.cod_asignatura;
                         c.nombre_asignatura = item.nombre_asignatura;
                         c.id = item.Id;
@@ -297,7 +294,7 @@ namespace AkademicReport.Service.ReposteServices
                             List<CargaReporteDto> CargaFilter = new List<CargaReporteDto>();
                             if(filtro.Curricular!="0")
                             {
-                                CargaFilter = DocenteConSuCarga.Data.Carga.Where(c => c.curricular == int.Parse(filtro.Curricular)).ToList();
+                                CargaFilter = DocenteConSuCarga.Data.Carga.Where(c => c.TiposCarga.Id == int.Parse(filtro.Curricular)).ToList();
                             }
                             else
                             {

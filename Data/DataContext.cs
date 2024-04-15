@@ -527,22 +527,17 @@ namespace AkademicReport.Data
 
                 entity.Property(e => e.IdCodigo).HasColumnName("idCodigo");
 
-                entity.Property(e => e.IdTipoCarga).HasColumnName("idTipo_carga");
+                entity.Property(e => e.IdTipoCarga).HasColumnName("idTipoCarga");
 
                 entity.HasOne(d => d.IdCodigoNavigation)
                     .WithMany(p => p.TipoCargaCodigos)
                     .HasForeignKey(d => d.IdCodigo)
-                    .HasConstraintName("FK__tipo_carg__idCod__625A9A57");
-
-                entity.HasOne(d => d.IdCodigo1)
-                    .WithMany(p => p.TipoCargaCodigoIdCodigo1s)
-                    .HasForeignKey(d => d.IdCodigo)
-                    .HasConstraintName("FK__tipo_carg__idTip__634EBE90");
+                    .HasConstraintName("FK__tipo_carg__idCod__7E02B4CC");
 
                 entity.HasOne(d => d.IdTipoCargaNavigation)
-                    .WithMany(p => p.TipoCargaCodigoIdTipoCargaNavigations)
+                    .WithMany(p => p.TipoCargaCodigos)
                     .HasForeignKey(d => d.IdTipoCarga)
-                    .HasConstraintName("codigo_Tipo_carga");
+                    .HasConstraintName("FK__tipo_carg__idTip__7D0E9093");
             });
 
             modelBuilder.Entity<Usuario>(entity =>

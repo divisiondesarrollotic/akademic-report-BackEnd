@@ -2,8 +2,8 @@
 {
     public class AsignaturaGetDto
     {
-        public string? Id { get; set; }
-        public string? Id_concepto { get; set; }
+        public int? Id { get; set; }
+        public int? Id_concepto { get; set; }
         public string? NombreConcepto { get; set; }
         public string? Codigo { get; set; }
         public List<TipoCargaDto>? TiposCargas { get; set; }

@@ -51,17 +51,30 @@ namespace AkademicReport.Service.AsignaturaServices
         {
             try
             {
-                var codigos = await _dataContext.Codigos.Include(c=>c.TipoCargaCodigos).ThenInclude(c=>c.IdTipoCargaNavigation).Include(c=>c.IdConceptoNavigation).ToListAsync();
+                var codigos = await _dataContext.Codigos.Include(c => c.TipoCargaCodigos).ThenInclude(c => c.IdTipoCargaNavigation).Include(c => c.IdConceptoNavigation).ToListAsync();
+
                 var CodigoMap = _mapper.Map<List<AsignaturaGetDto>>(codigos);
                 foreach (var item in CodigoMap)
                 {
-                    var a = codigos.FirstOrDefault(c => c.Id == int.Parse(item.Id)).TipoCargaCodigos.FirstOrDefault(c=>c.IdTipoCarga==int.Parse(item.Id));
-                    item.Modalida = codigos.Where(c => c.Id == int.Parse(item.Id)).First().Modalida.Split(',').ToList();
-                    if(item.TiposCargas.Count>0)
-                    {
-                        item.TiposCargas.FirstOrDefault(c => c.Id == a.IdTipoCarga).Nombre = a.IdTipoCargaNavigation.Nombre;
+                 
 
-                    }
+                        var a = codigos.FirstOrDefault(c => c.Id == item.Id).TipoCargaCodigos.Where(c=>c.IdCodigo==item.Id);
+                        item.Modalida = codigos.Where(c => c.Id == item.Id).First().Modalida.Split(',').ToList();
+                        if (item.TiposCargas != null && item.TiposCargas.Any())
+                        {
+                            foreach (var item1 in item.TiposCargas)
+                            {
+                                item1.Nombre = a.FirstOrDefault(c => c.IdTipoCarga == item1.Id).IdTipoCargaNavigation.Nombre;
+                            }
+                        }
+                        else
+                        {
+                            var tipos = new List<TipoCargaDto>();
+                            var tipo = new TipoCargaDto() { Id = 0, Nombre = "NO ASIGNADO" };
+                            tipos.Add(tipo);
+                            item.TiposCargas = tipos;
+                        }
+                    
 
                 }
 
@@ -78,7 +91,7 @@ namespace AkademicReport.Service.AsignaturaServices
         public async Task<ServiceResponseData<List<AsignaturaGetDto>>> GetAllByIdConcepto(int idConcepto)
         {
             var Data = await GetAll();
-            Data.Data = Data.Data.Where(c => c.Id_concepto == idConcepto.ToString()).ToList();
+            Data.Data = Data.Data.Where(c => c.Id_concepto == idConcepto).ToList();
             return Data;
         }
 
@@ -94,13 +107,13 @@ namespace AkademicReport.Service.AsignaturaServices
                 var result = new List<AsignaturaGetDto>();
                 if(filtro.Filtro!=string.Empty)
                 {
-                    result = _mapper.Map<List<AsignaturaGetDto>>(codigos.Data).Where(c=>c.Codigo.ToUpper().Contains(filtro.Filtro.ToUpper().Trim())
-                    || c.Nombre.ToUpper().Contains(filtro.Filtro.ToUpper().ToUpper().Trim()) || c.NombreConcepto.ToUpper().Contains(filtro.Filtro.Trim())).OrderBy(c => c.Nombre).Skip((filtro.paginaActual.Value - 1) * CantRegistrosSolicitado).Take(CantRegistrosSolicitado).ToList();
+                    result = _mapper.Map<List<AsignaturaGetDto>>(codigos.Data).Where(c=>c.Codigo!.ToUpper().Contains(filtro.Filtro!.ToUpper().Trim())
+                    || c.Nombre!.ToUpper().Contains(filtro.Filtro.ToUpper().ToUpper().Trim()) || c.NombreConcepto!.ToUpper().Contains(filtro.Filtro.Trim())).OrderBy(c => c.Nombre).Skip((filtro.paginaActual!.Value - 1) * CantRegistrosSolicitado).Take(CantRegistrosSolicitado).ToList();
 
                 }
                 else
                 {
-                    result = _mapper.Map<List<AsignaturaGetDto>>(codigos.Data).OrderBy(c => c.Nombre).Skip((filtro.paginaActual.Value - 1) * CantRegistrosSolicitado).Take(CantRegistrosSolicitado).ToList();
+                    result = _mapper.Map<List<AsignaturaGetDto>>(codigos.Data).OrderBy(c => c.Nombre).Skip((filtro.paginaActual!.Value - 1) * CantRegistrosSolicitado).Take(CantRegistrosSolicitado).ToList();
 
                 }
                 decimal ParteEntera = Math.Truncate(TotalPage);
@@ -126,7 +139,7 @@ namespace AkademicReport.Service.AsignaturaServices
             try
             {
                 var codigos = await GetAll();
-                 var data  = codigos.Data.Where(c => c.Id==id.ToString()).ToList();
+                 var data  = codigos.Data.Where(c => c.Id==id).ToList();
                 var CodigoMap = _mapper.Map<List<AsignaturaGetDto>>(data);
                 //foreach (var item in CodigoMap)
                 //{
@@ -135,7 +148,7 @@ namespace AkademicReport.Service.AsignaturaServices
 
                 if (CodigoMap.Count < 1)
                     return new ServiceResponseData<List<AsignaturaGetDto>>() { Status = 204 };
-                return new ServiceResponseData<List<AsignaturaGetDto>>() { Status = 200, Data = _mapper.Map<List<AsignaturaGetDto>>(CodigoMap.Where(c => c.Id ==  id.ToString())) };
+                return new ServiceResponseData<List<AsignaturaGetDto>>() { Status = 200, Data = _mapper.Map<List<AsignaturaGetDto>>(CodigoMap.Where(c => c.Id ==  id)) };
             }
             catch (Exception ex)
             {
@@ -151,10 +164,10 @@ namespace AkademicReport.Service.AsignaturaServices
                 await _dataContext.SaveChangesAsync();
                 foreach (var i in item.TiposCargas)
                 {
-                    TipoCargaCodigo Privot = new TipoCargaCodigo();
+                    TipoCargaPivot Privot = new TipoCargaPivot();
                     Privot.IdTipoCarga = i.Id;
                     Privot.IdCodigo = result.Entity.Id;
-                    _dataContext.TipoCargaCodigos.Add( Privot );
+                    _dataContext.TipoCargaCodigos.Add(_mapper.Map<TipoCargaCodigo>(Privot));
 
 
                 }
