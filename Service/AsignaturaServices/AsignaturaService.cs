@@ -56,16 +56,20 @@ namespace AkademicReport.Service.AsignaturaServices
                 var CodigoMap = _mapper.Map<List<AsignaturaGetDto>>(codigos);
                 foreach (var item in CodigoMap)
                 {
-                 
-
-                        var a = codigos.FirstOrDefault(c => c.Id == item.Id).TipoCargaCodigos.Where(c=>c.IdCodigo==item.Id);
+                    
+                        var a = codigos.FirstOrDefault(c => c.Id == item.Id).TipoCargaCodigos.Where(c => c.IdCodigo == item.Id).ToList();
                         item.Modalida = codigos.Where(c => c.Id == item.Id).First().Modalida.Split(',').ToList();
                         if (item.TiposCargas != null && item.TiposCargas.Any())
                         {
-                            foreach (var item1 in item.TiposCargas)
+                            item.TiposCargas = new List<TipoCargaDto>();
+                            foreach (var element in a)
                             {
-                                item1.Nombre = a.FirstOrDefault(c => c.IdTipoCarga == item1.Id).IdTipoCargaNavigation.Nombre;
+                                var tipoCarg = new TipoCargaDto();
+                                tipoCarg.Id = element.IdTipoCargaNavigation.Id;
+                                tipoCarg.Nombre = element.IdTipoCargaNavigation.Nombre;
+                                item.TiposCargas.Add(tipoCarg);
                             }
+                            
                         }
                         else
                         {
@@ -75,7 +79,7 @@ namespace AkademicReport.Service.AsignaturaServices
                             item.TiposCargas = tipos;
                         }
                     
-
+                    
                 }
 
                 if (codigos.Count < 1)
@@ -184,11 +188,12 @@ namespace AkademicReport.Service.AsignaturaServices
         {
             try
             {
-                var nivel = await _dataContext.Codigos.FirstOrDefaultAsync(c => c.Id == Convert.ToInt32(item.Id));
-                var tipoCargas = await _dataContext.TipoCargaCodigos.Where(c => c.IdCodigo == item.TiposCargas[0].Id).ToListAsync();
+                var nivel = await _dataContext.Codigos.AsNoTracking().FirstOrDefaultAsync(c => c.Id == Convert.ToInt32(item.Id));
+                var tipoCargas = await _dataContext.TipoCargaCodigos.Where(c => c.IdCodigo == item.Id).ToListAsync();
                if(tipoCargas.Count>0)
                 {
                     _dataContext.TipoCargaCodigos.RemoveRange(tipoCargas);
+
                 }
                 
 

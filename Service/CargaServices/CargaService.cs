@@ -34,10 +34,6 @@ namespace AkademicReport.Service.CargaServices
                 if (carga == null)
                     return new ServicesResponseMessage<string>() { Status = 204, Message = Msj.MsjNoRegistros };
 
-                // Eliminar el tipo de carga de la tabla pivot
-                var tipoCargas = await _dataContext.TipoCargaCodigos.Where(c => c.IdCodigo == int.Parse(carga.CodAsignatura)).ToArrayAsync();
-                _dataContext.TipoCargaCodigos.RemoveRange(tipoCargas);
-
 
                 _dataContext.CargaDocentes.Remove(carga);
                 await _dataContext.SaveChangesAsync();
@@ -79,8 +75,8 @@ namespace AkademicReport.Service.CargaServices
                     var codigo = await _dataContext.Codigos.Where(c => c.Codigo1.Contains(i.cod_asignatura)).FirstOrDefaultAsync();
                     if (codigo != null)
                     {
-                        i.id_asignatura = codigo.Id.ToString();
-                        i.id_concepto = codigo.IdConcepto.ToString();
+                        i.id_asignatura = codigo.Id;
+                        i.id_concepto = codigo.IdConcepto;
                     }
                 }
                 ResulData.Carga = CargaMap.OrderBy(c => c.dia_id).ThenBy(c => c.hora_inicio).ToList();
@@ -127,7 +123,7 @@ namespace AkademicReport.Service.CargaServices
                 carga.CodUniversitas = item.cod_universitas;
                 carga.Seccion = item.seccion.ToString();
                 carga.Aula = item.aula;
-                carga.Modalidad = item.modalidad;
+                carga.Modalidad = item.modalida;
                 carga.Dias = item.dia_id;
                 carga.HoraInicio = item.hora_inicio;
                 carga.MinutoInicio = item.minuto_inicio;
@@ -139,12 +135,7 @@ namespace AkademicReport.Service.CargaServices
                 carga.Cedula = item.Cedula;
                 EntityEntry<CargaDocente> result =  _dataContext.CargaDocentes.Add(carga);
                 await _dataContext.SaveChangesAsync();
-                // Agregamos el tipo de carga de la tabla pivot
-
-                var tipoCargaCodigo = new TipoCargaCodigo();
-                tipoCargaCodigo.IdTipoCarga = item.TiposCargas.Id;
-                tipoCargaCodigo.IdCodigo =int.Parse(item.cod_asignatura);
-                _dataContext.TipoCargaCodigos.Add(tipoCargaCodigo);
+               
                 
                 await _dataContext.SaveChangesAsync();
                 return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjInsert };
@@ -163,16 +154,6 @@ namespace AkademicReport.Service.CargaServices
                 carga = _mapper.Map<CargaDocente>(item);
                 carga.Curricular = item.TiposCargas.Id;
                 _dataContext.Entry(carga).State = EntityState.Modified;
-
-
-                // Eliminar el tipo de carga de la tabla pivot
-                var tipoCargas = await _dataContext.TipoCargaCodigos.Where(c => c.IdCodigo == int.Parse(carga.CodAsignatura)).ToArrayAsync();
-                _dataContext.TipoCargaCodigos.RemoveRange(tipoCargas);
-
-                var tipoCargaCodigo = new TipoCargaCodigo();
-                tipoCargaCodigo.IdTipoCarga = item.TiposCargas.Id;
-                tipoCargaCodigo.IdCodigo = int.Parse(item.cod_asignatura);
-                 _dataContext.TipoCargaCodigos.Add(tipoCargaCodigo);
 
                 await _dataContext.SaveChangesAsync();
                 return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjUpdate };
