@@ -55,6 +55,7 @@ namespace AkademicReport.Service.ReposteServices
                 Docente.Id_nivel_academico = cargas.Data.Value.Item1.Docente.id_nivel_academico;
                 Docente.Nivel = cargas.Data.Value.Item1.Docente.nivel;
                 DataResult.Docente = Docente;
+                
             }
             if (cargas.Data.Value.Item1.Carga==null)
             {
@@ -115,10 +116,12 @@ namespace AkademicReport.Service.ReposteServices
                         c.precio_hora = nivelAcademico.PagoHora;
                         c.pago_asignatura = c.precio_hora * c.credito;
                         DataResult.Carga.Add(c);
+                        
                     }
 
                     Response.Data = DataResult;
                   Response.Status= 200;
+                    
                   return Response;
                 }
                 else if(DataResult.Docente.TiempoDedicacion == "MT")
@@ -229,7 +232,18 @@ namespace AkademicReport.Service.ReposteServices
                         Monto += (item.credito * nivelAcademico.PagoHora);
                     }
 
+                    int CantCreditos = 0;
+                    Response.Data = DataResult;
+                    foreach (var item in DataResult.Carga)
+                    {
+                        CantCreditos += item.credito;
+                    }
+                    
+
+
+
                     DataResult.Monto = Monto;
+                    
                     Response.Data = DataResult;
                     Response.Status = 200;
                     return Response;

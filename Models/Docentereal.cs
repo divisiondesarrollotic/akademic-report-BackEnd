@@ -16,11 +16,14 @@ namespace AkademicReport.Models
         public string? Nombre { get; set; }
         public string? Nacionalidad { get; set; }
         public string? Sexo { get; set; }
-        public string? IdVinculo { get; set; }
+        public int? IdVinculo { get; set; }
         public string? IdRecinto { get; set; }
-        public string? IdNivelAcademico { get; set; }
+        public int? IdNivelAcademico { get; set; }
         public string? TipoIdentificacion { get; set; }
+        public int? IdRecinto1 { get; set; }
 
+        public virtual Recinto? IdRecinto1Navigation { get; set; }
+        public virtual Vinculo? IdVinculoNavigation { get; set; }
         public virtual ICollection<AreaDocente> AreaDocentes { get; set; }
     }
 }

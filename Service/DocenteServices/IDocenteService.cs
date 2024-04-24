@@ -7,6 +7,7 @@ namespace AkademicReport.Service.DocenteServices
     public interface IDocenteService
     {
         Task<ServiceResponseData<List<DocenteGetDto>>> GetAll();
+        Task<ServiceResponseData<List<DocenteGetDto>>> GetAllFilter(FiltroDocentesDto filtro);
         Task<ServiceResponseDataPaginacion<List<DocenteGetDto>>> GetAllPaginacion(FiltroDocentesDto filtro);
         Task<ServiceResponseData<List<DocenteGetDto>>> GetAllRecinto(FiltroDocentesDto filtro, int idRecinto);
         Task<ServiceResponseDataDocentes<List<DocenteCantidadDto>>> GetDocentexRecinto();

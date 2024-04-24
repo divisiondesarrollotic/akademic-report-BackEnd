@@ -25,7 +25,7 @@ namespace AkademicReport.Service.DocenteServices
 
         }
 
-        public async Task<ServiceResponseData<List<DocenteGetDto>>> GetAll()
+        public async Task<ServiceResponseData<List<DocenteGetDto>>> GetAllAmilca()
         {
 
             FiltroDocentesDto filtro = new FiltroDocentesDto();
@@ -141,6 +141,60 @@ namespace AkademicReport.Service.DocenteServices
 
         }
 
+        public async Task<ServiceResponseData<List<DocenteGetDto>>> GetAll()
+        {
+
+            try
+            {
+                var DocentesList = await _dataContext.Docentereals.ToListAsync();
+                List<DocenteGetDto> Docentes = new List<DocenteGetDto>();
+                foreach (var d in DocentesList)
+                {
+                    var docente = new DocenteGetDto();
+                    docente.id = d.Id.ToString();
+                    docente.tiempoDedicacion = d.TiempoDedicacion;
+                    docente.tipoIdentificacion = d.TipoIdentificacion;
+                    docente.identificacion = d.Identificacion;
+                    docente.nombre = d.Nombre;
+                    docente.nacionalidad = d.Nacionalidad;
+                    docente.sexo= d.Sexo;
+                    docente.id_vinculo = d.IdVinculo.ToString();
+                    docente.id_recinto = d.IdRecinto;
+                    docente.id_nivel_academico = d.IdNivelAcademico.ToString();
+                   
+                    Docentes.Add(docente);
+
+                }
+
+                    return new ServiceResponseData<List<DocenteGetDto>>() { Data = Docentes, Status = 200 };
+             }
+                
+            catch (Exception)
+            {
+
+                return new ServiceResponseData<List<DocenteGetDto>>() { Status = 500 };
+            }
+
+            
+
+             }
+      
+        public async Task<ServiceResponseData<List<DocenteGetDto>>> GetAllFilter(FiltroDocentesDto filtro)
+        {
+            try
+            {
+                var Docentes = await GetAll();
+                var DocentesClean = Docentes.Data.Where(c => c.identificacion != null && c.nombre != null && c.tiempoDedicacion!=null);
+                var d = DocentesClean.Where(c => c.nombre.ToUpper().Contains(filtro.Filtro.ToUpper()) ||c.identificacion.Contains(filtro.Filtro)).ToList();
+                return new ServiceResponseData<List<DocenteGetDto>>() { Data =d, Status=200 };
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
         public async Task<ServiceResponseDataPaginacion<List<DocenteGetDto>>> GetAllPaginacion(FiltroDocentesDto filtro)
         {
 
@@ -158,7 +212,7 @@ namespace AkademicReport.Service.DocenteServices
 
             if (filtro.Filtro != null && filtro.Filtro.Trim() != string.Empty)
             {
-                var result = Docentes.Data.Where(c => c.identificacion.Contains(filtro.Filtro)).OrderBy(c => c.nombre).Skip((filtro.paginaActual.Value - 1) * CantRegistrosSolicitado).Take(CantRegistrosSolicitado).ToList();
+                var result = Docentes.Data.Where(c => c.identificacion.Contains(filtro.Filtro) || c.nombre.ToUpper().Contains(filtro.Filtro.ToUpper())).OrderBy(c => c.nombre).Skip((filtro.paginaActual.Value - 1) * CantRegistrosSolicitado).Take(CantRegistrosSolicitado).ToList();
                 decimal ParteEntera = Math.Truncate(TotalPage);
                 if (TotalPage > ParteEntera && (CantRegistrosSolicitado / CantReg) > 1)
                 { TotalPage = TotalPage + 1; }
