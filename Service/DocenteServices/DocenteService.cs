@@ -25,7 +25,7 @@ namespace AkademicReport.Service.DocenteServices
 
         }
 
-        public async Task<ServiceResponseData<List<DocenteGetDto>>> GetAllAmilca()
+        public async Task<ServiceResponseData<List<DocenteGetDto>>> GetAlla()
         {
 
             FiltroDocentesDto filtro = new FiltroDocentesDto();
@@ -146,21 +146,36 @@ namespace AkademicReport.Service.DocenteServices
 
             try
             {
-                var DocentesList = await _dataContext.Docentereals.ToListAsync();
+                var DocentesList = await _dataContext.Docentereals.Include(c => c.IdRecintoNavigation).Include(c => c.IdVinculoNavigation).Include(c=>c.IdNivelAcademicoNavigation) .ToListAsync();
                 List<DocenteGetDto> Docentes = new List<DocenteGetDto>();
                 foreach (var d in DocentesList)
                 {
                     var docente = new DocenteGetDto();
                     docente.id = d.Id.ToString();
+                    if(d.Identificacion.Length > 9)
+                    {
+                        docente.tipoIdentificacion = "Cédula";
+                    }
+                    else
+                    {
+                        docente.tipoIdentificacion = "Pasaporte";
+                    }
+                   
                     docente.tiempoDedicacion = d.TiempoDedicacion;
-                    docente.tipoIdentificacion = d.TipoIdentificacion;
+                  
                     docente.identificacion = d.Identificacion;
                     docente.nombre = d.Nombre;
                     docente.nacionalidad = d.Nacionalidad;
                     docente.sexo= d.Sexo;
                     docente.id_vinculo = d.IdVinculo.ToString();
-                    docente.id_recinto = d.IdRecinto;
+                    docente.id_recinto = d.IdRecinto.ToString();
                     docente.id_nivel_academico = d.IdNivelAcademico.ToString();
+                    docente.id_recinto = d.IdRecinto.ToString();
+                    docente.recinto = d.IdRecintoNavigation.Recinto1;
+                    docente.nombre_corto = d.IdRecintoNavigation.NombreCorto;
+                    docente.id_vinculo = d.IdVinculoNavigation.Id.ToString();
+                    docente.nombreVinculo = d.IdVinculoNavigation.Nombre;
+                    docente.nivel = d.IdNivelAcademicoNavigation.Nivel;
                    
                     Docentes.Add(docente);
 

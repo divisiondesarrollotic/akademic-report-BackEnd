@@ -348,12 +348,7 @@ namespace AkademicReport.Data
 
                 entity.Property(e => e.IdNivelAcademico).HasColumnName("id_nivel_academico");
 
-                entity.Property(e => e.IdRecinto)
-                    .HasMaxLength(11)
-                    .IsUnicode(false)
-                    .HasColumnName("id_recinto");
-
-                entity.Property(e => e.IdRecinto1).HasColumnName("idRecinto");
+                entity.Property(e => e.IdRecinto).HasColumnName("id_recinto");
 
                 entity.Property(e => e.IdVinculo).HasColumnName("id_vinculo");
 
@@ -388,10 +383,15 @@ namespace AkademicReport.Data
                     .IsUnicode(false)
                     .HasColumnName("tipoIdentificacion");
 
-                entity.HasOne(d => d.IdRecinto1Navigation)
+                entity.HasOne(d => d.IdNivelAcademicoNavigation)
                     .WithMany(p => p.Docentereals)
-                    .HasForeignKey(d => d.IdRecinto1)
-                    .HasConstraintName("FK_recinto_docente");
+                    .HasForeignKey(d => d.IdNivelAcademico)
+                    .HasConstraintName("FK_nivelAcademico_docentereal");
+
+                entity.HasOne(d => d.IdRecintoNavigation)
+                    .WithMany(p => p.Docentereals)
+                    .HasForeignKey(d => d.IdRecinto)
+                    .HasConstraintName("FK_recinto_docentereal");
 
                 entity.HasOne(d => d.IdVinculoNavigation)
                     .WithMany(p => p.Docentereals)
