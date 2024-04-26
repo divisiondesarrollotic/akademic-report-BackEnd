@@ -274,7 +274,7 @@ namespace AkademicReport.Service.ReposteServices
                 if (docente.identificacion != null)
                 {
                     List<Models.CargaDocente> carga = new List<Models.CargaDocente>();
-                    if(filtro.Curricular!="0")
+                    if(filtro.Curricular!="0" && filtro.Curricular!=null)
                     {
                         carga = await _dataContext.CargaDocentes.Where(c => c.Cedula == docente.identificacion && c.Curricular == int.Parse(filtro.Curricular)).ToListAsync();
 
@@ -306,7 +306,7 @@ namespace AkademicReport.Service.ReposteServices
                         if(DocenteConSuCarga.Data!=null && DocenteConSuCarga.Data.Carga!=null)
                         {
                             List<CargaReporteDto> CargaFilter = new List<CargaReporteDto>();
-                            if(filtro.Curricular!="0")
+                            if(filtro.Curricular!="0" && filtro.Curricular!=null)
                             {
                                 CargaFilter = DocenteConSuCarga.Data.Carga.Where(c => c.TiposCarga.Id == int.Parse(filtro.Curricular)).ToList();
                             }
