@@ -178,7 +178,7 @@ namespace AkademicReport.Service.ReposteServices
                     Response.Status = 200;
                     return Response;
                 }
-                else if (DataResult.Docente.TiempoDedicacion == "A")
+                else if (DataResult.Docente.TiempoDedicacion == "A" || DataResult.Docente.TiempoDedicacion=="M" || DataResult.Docente.TiempoDedicacion=="F")
                 {
                  
                     var nivelAcademico = await _dataContext.NivelAcademicos
