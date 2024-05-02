@@ -118,6 +118,12 @@ namespace AkademicReport.Service.ReposteServices
                         DataResult.Carga.Add(c);
                         
                     }
+                    int CantCreditos = 0;
+                    foreach (var item in DataResult.Carga)
+                    {
+                        CantCreditos += item.credito;
+                    }
+                    DataResult.CantCreditos = CantCreditos;
 
                     Response.Data = DataResult;
                   Response.Status= 200;
@@ -173,8 +179,15 @@ namespace AkademicReport.Service.ReposteServices
                         DataResult.Carga.Add(c);
 
                     }
+                    int CantCreditos = 0;
+                    foreach (var item in DataResult.Carga)
+                    {
+                        CantCreditos += item.credito;
+                    }
+                    DataResult.CantCreditos = CantCreditos;
                     DataResult.Monto = Monto;
                     Response.Data = DataResult;
+                   
                     Response.Status = 200;
                     return Response;
                 }
@@ -238,12 +251,10 @@ namespace AkademicReport.Service.ReposteServices
                     {
                         CantCreditos += item.credito;
                     }
-                    
 
-
-
+                    DataResult.CantCreditos = CantCreditos;
                     DataResult.Monto = Monto;
-                    
+             
                     Response.Data = DataResult;
                     Response.Status = 200;
                     return Response;
@@ -273,9 +284,11 @@ namespace AkademicReport.Service.ReposteServices
             {
                 if (docente.identificacion != null)
                 {
+                   
                     List<Models.CargaDocente> carga = new List<Models.CargaDocente>();
                     if(filtro.Curricular!="0" && filtro.Curricular!=null)
                     {
+   
                         carga = await _dataContext.CargaDocentes.Where(c => c.Cedula == docente.identificacion && c.Curricular == int.Parse(filtro.Curricular)).ToListAsync();
 
                     }
@@ -302,7 +315,7 @@ namespace AkademicReport.Service.ReposteServices
                                                                 .Replace("ó", "o")
                                                                 .Replace("ú", "u")))
                         .FirstOrDefaultAsync();
-                        var DocenteConSuCarga = await PorDocente(filter, docentes.Data);
+                        ServiceResponseData<DocenteCargaReporteDto> DocenteConSuCarga = await PorDocente(filter, docentes.Data);
                         if(DocenteConSuCarga.Data!=null && DocenteConSuCarga.Data.Carga!=null)
                         {
                             List<CargaReporteDto> CargaFilter = new List<CargaReporteDto>();
@@ -314,18 +327,27 @@ namespace AkademicReport.Service.ReposteServices
                             {
                                 CargaFilter = DocenteConSuCarga.Data.Carga;
                             }
-                            CargaFilter.ForEach(c =>
-                            {
-                                Monto += c.precio_hora * c.credito;
-                            });
 
+                            if(docente.tiempoDedicacion!="TC" && docente.tiempoDedicacion!="MD")
+                            {
+                                CargaFilter.ForEach(c =>
+                                {
+                                    Monto += c.precio_hora * c.credito;
+                                });
+                            }
+                            else
+                            {
+                                Monto = DocenteConSuCarga.Data.Monto;
+                            }
+                           
                             var DocenteCargaListo = new DocenteCargaReporteDto()
                             {
                                 Docente = DocenteConSuCarga.Data.Docente,
                                 Carga = CargaFilter,
-                                Monto = Monto
-                                
-                           };
+                                Monto = Monto,
+                                CantCreditos = DocenteConSuCarga.Data.CantCreditos
+
+                            };
                             Total += Monto;
                             Monto = 0;
                             if (DocenteCargaListo.Carga.Count>0)
@@ -370,6 +392,7 @@ namespace AkademicReport.Service.ReposteServices
                      Monto+= item.Monto;
                 }
                 Data.monto = Monto;
+                
                 DataList.Add(Data);
                 TotalRecintos += Monto;
 

@@ -34,6 +34,9 @@ namespace AkademicReport.Controllers
             Uni.Docente = response.Data.Docente;
             Uni.Carga = response.Data.Carga;
             Uni.Monto = response.Data.Monto;
+            Uni.CantCreditos = response.Data.CantCreditos;
+
+
             ResponseDone.Data.Add(Uni);
 
 
