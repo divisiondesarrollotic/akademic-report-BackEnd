@@ -1,4 +1,5 @@
 ﻿using AkademicReport.Dto.AsignaturaDto;
+using AkademicReport.Dto.ConceptoDto;
 using System.ComponentModel.DataAnnotations;
 
 namespace AkademicReport.Dto.CargaDto
@@ -26,6 +27,7 @@ namespace AkademicReport.Dto.CargaDto
         public string nombre_profesor { get; set; } = null!;
         public string Cedula { get; set; } = null!;
         public int?  id_concepto { get; set; }
+        public ConceptoGetDto? Concepto { get; set; }
         [Required]
         public TipoCargaDto TiposCarga { get; set; }
 

@@ -200,7 +200,7 @@ namespace AkademicReport.Service.DocenteServices
             {
                 var Docentes = await GetAll();
                 var DocentesClean = Docentes.Data.Where(c => c.identificacion != null && c.nombre != null && c.tiempoDedicacion!=null);
-                var d = DocentesClean.Where(c => c.nombre.ToUpper().Contains(filtro.Filtro.ToUpper()) ||c.identificacion.Contains(filtro.Filtro)).ToList();
+                var d = DocentesClean.Where(c => c.nombre.ToUpper().Contains(filtro.Filtro.ToUpper()) ||c.identificacion.Contains(filtro.Filtro.ToUpper())).ToList();
                 return new ServiceResponseData<List<DocenteGetDto>>() { Data =d, Status=200 };
             }
             catch (Exception)

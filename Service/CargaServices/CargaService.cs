@@ -51,7 +51,7 @@ namespace AkademicReport.Service.CargaServices
             {
                 var ResulData = new DocenteCargaDto();
                 var carga = await _dataContext.CargaDocentes.Where(c => c.Cedula.Contains(Cedula) && c.Periodo == Periodo)
-                    .Include(c => c.DiasNavigation).Include(c => c.CurricularNavigation).OrderBy(c => c.DiasNavigation.Id).OrderBy(c => c.HoraInicio).ToListAsync();
+                    .Include(c => c.DiasNavigation).Include(c => c.CurricularNavigation).ToListAsync();
                 var docentes = Docentes;
                 var DocenteFilter = docentes.Where(c => c.identificacion == Cedula).FirstOrDefault();
 
@@ -67,8 +67,20 @@ namespace AkademicReport.Service.CargaServices
                     return new ServiceResponseCarga<DocenteCargaDto, string>() { Status = 200, Data = (ResulData, "No hay carga") };
                 }
                 var CargaMap = _mapper.Map<List<CargaGetDto>>(carga);
+                var CargaLista = new List<CargaGetDto>();
                 foreach (var i in CargaMap)
                 {
+                    var existe = CargaLista.Where(c => c.cod_asignatura == i.cod_asignatura && c.Seccion == i.Seccion && i.cod_universitas==i.cod_universitas).FirstOrDefault();
+                    var concepto = await _dataContext.Codigos.Where(c => c.Codigo1 == i.cod_asignatura ).Include(c=>c.IdConceptoNavigation).FirstOrDefaultAsync();
+                    if(concepto!=null)
+                    {
+                        i.Concepto = new Dto.ConceptoDto.ConceptoGetDto() { Id = concepto.IdConceptoNavigation.Id, Nombre = concepto.IdConceptoNavigation.Nombre };
+                    }
+                    else
+                    {
+                        i.Concepto = new Dto.ConceptoDto.ConceptoGetDto() { Id = 0, Nombre = "" };
+                    }
+                   
                     i.TiposCarga = new TipoCargaDto();
                     i.TiposCarga.Id = carga.FirstOrDefault(c => c.Id == i.Id).CurricularNavigation.Id;
                     i.TiposCarga.Nombre = carga.FirstOrDefault(c => c.Id == i.Id).CurricularNavigation.Nombre;
@@ -78,8 +90,43 @@ namespace AkademicReport.Service.CargaServices
                         i.id_asignatura = codigo.Id;
                         i.id_concepto = codigo.IdConcepto;
                     }
+                    if (existe == null)
+                    {
+                        CargaLista.Add(i);
+                    }
+                    else
+                    {
+                        if (existe==null)
+                        {
+                            CargaLista.Add(i);
+                        }
+                        else if (existe.cod_asignatura[0].ToString()=="P" && existe.cod_asignatura[1].ToString() == "D")
+                        {
+                            if(CargaLista.Where(c => c.cod_asignatura == i.cod_asignatura && c.Seccion == i.Seccion && c.dia_id == i.dia_id && c.hora_inicio == i.hora_inicio && c.minuto_inicio == i.minuto_inicio && c.hora_fin == i.hora_fin && c.minuto_fin == i.minuto_fin && c.Aula==i.Aula).FirstOrDefault()==null)
+                            {
+                                CargaLista.Add(i);
+                            }
+                            else
+                            {
+                                i.credito = 0;
+                                CargaLista.Add(i);
+
+                            }
+                               
+                        }
+                        else
+                        {
+                            i.credito = 0;
+                            CargaLista.Add(i);
+                        }
+                      
+
+                    }
+
+
+
                 }
-                ResulData.Carga = CargaMap.OrderBy(c => c.dia_id).ThenBy(c => c.hora_inicio).ToList();
+                ResulData.Carga = CargaLista.OrderBy(c => c.dia_id).ThenBy(c => int.Parse(c.hora_inicio)).ToList();
                 ResulData.Docente = DocenteFilter;
                 return new ServiceResponseCarga<DocenteCargaDto, string> { Data = (ResulData, ""), Status = 200 };
             }

@@ -99,6 +99,51 @@ namespace AkademicReport.Service.AsignaturaServices
             return Data;
         }
 
+        public async Task<ServiceResponseData<List<AsignaturaGetDto>>> GetAllFilter(FiltroDocentesDto filtro)
+        {
+            try
+            {
+                var codigos = await _dataContext.Codigos.Where(c => c.Codigo1.ToUpper().Contains(filtro.Filtro.ToUpper().Trim()) || c.Nombre.ToUpper().Contains(filtro.Filtro.ToUpper())).Include(c => c.TipoCargaCodigos).ThenInclude(c=>c.IdTipoCargaNavigation).Include(c => c.IdConceptoNavigation).ToListAsync();
+
+                var CodigoMap = _mapper.Map<List<AsignaturaGetDto>>(codigos);
+                foreach (var item in CodigoMap)
+                {
+
+                    var a = codigos.FirstOrDefault(c => c.Id == item.Id).TipoCargaCodigos.Where(c => c.IdCodigo == item.Id).ToList();
+                    item.Modalida = codigos.Where(c => c.Id == item.Id).First().Modalida.Split(',').ToList();
+                    if (item.TiposCargas != null && item.TiposCargas.Any())
+                    {
+                        item.TiposCargas = new List<TipoCargaDto>();
+                        foreach (var element in a)
+                        {
+                            var tipoCarg = new TipoCargaDto();
+                            tipoCarg.Id = element.IdTipoCargaNavigation.Id;
+                            tipoCarg.Nombre = element.IdTipoCargaNavigation.Nombre;
+                            item.TiposCargas.Add(tipoCarg);
+                        }
+
+                    }
+                    else
+                    {
+                        var tipos = new List<TipoCargaDto>();
+                        var tipo = new TipoCargaDto() { Id = 0, Nombre = "NO ASIGNADO" };
+                        tipos.Add(tipo);
+                        item.TiposCargas = tipos;
+                    }
+
+
+                }
+
+                if (codigos.Count < 1)
+                    return new ServiceResponseData<List<AsignaturaGetDto>>() { Status = 204 };
+                return new ServiceResponseData<List<AsignaturaGetDto>>() { Status = 200, Data = CodigoMap };
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponseData<List<AsignaturaGetDto>>() { Status = 500 };
+            }
+        }
+
         public async Task<ServiceResponseDataPaginacion<List<AsignaturaGetDto>>> GetAllPaginacion(FiltroDocentesDto filtro)
         {
             try

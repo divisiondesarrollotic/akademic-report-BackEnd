@@ -7,6 +7,7 @@ namespace AkademicReport.Service.AsignaturaServices
     public interface IAsignaturaService
     {
         Task<ServiceResponseData<List<AsignaturaGetDto>>> GetAll();
+        Task<ServiceResponseData<List<AsignaturaGetDto>>> GetAllFilter(FiltroDocentesDto filtro);
         Task<ServiceResponseDataPaginacion<List<AsignaturaGetDto>>> GetAllPaginacion(FiltroDocentesDto filtro);
         Task<ServiceResponseData<List<AsignaturaGetDto>>> GetAllByIdConcepto(int idConcepto);
         Task<ServiceResponseData<List<AsignaturaGetDto>>> GetById(int id);
