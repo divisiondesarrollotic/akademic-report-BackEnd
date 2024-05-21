@@ -12,5 +12,8 @@
         public static string MsjNoData { get; set; } = "No se ha encontrado ningun registro.";
         public static string MsjUpdate { get; set; } = "Se actualizo un registro de manera satisfactoria.";
         public static string MsjSucces { get; set; } = "se ha realizado una operación con exito.";
+        public static string MsjHorarioIncorrecto { get; set; } = "El calculo de las horas en el horario no puede dar decimal.";
+        public static string MsjPasoDeCredito { get; set; } = "La carga no puede exceder de los 40 creditos.";
+        public static string MsjPasoDeCreditoMedioTimepo { get; set; } = "La carga no puede exceder de los 32 creditos, si el docente es de medio tiempo.";
     }
 }

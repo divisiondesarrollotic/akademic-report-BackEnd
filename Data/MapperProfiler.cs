@@ -49,6 +49,8 @@ namespace AkademicReport.Data
             CreateMap<TipoCarga, TipoDeCargaDto>();
              CreateMap<TipoCargaPivot, TipoCargaCodigo>();
 
+            CreateMap<TipoModalidad, TipoModalidadDto>();
+
 
             CreateMap<AsignaturaAddDto, Codigo>().ForMember(c=>c.Codigo1, opt=>opt.MapFrom(c=>c.Codigo)).ForMember(c=>c.IdConcepto, opt=>opt.MapFrom(c=>c.id_concepto));
             CreateMap<AsignaturaUpdateDto, Codigo>().ForMember(c => c.Codigo1, opt => opt.MapFrom(c => c.Codigo)).ForMember(c => c.IdConcepto, opt => opt.MapFrom(c => c.id_concepto));
@@ -58,7 +60,7 @@ namespace AkademicReport.Data
                 .ForMember(c => c.Id_concepto, opt => opt
                 .MapFrom(c => c.IdConcepto))
                 .ForMember(c => c.Codigo, opt => opt.MapFrom(c => c.Codigo1))
-                .ForMember(c => c.Modalida, opt => opt.Ignore())
+                .ForMember(a => a.Modalidades, opt => opt.MapFrom(c=>c.TipoModalidadCodigos.FirstOrDefault(c=>c.Idcodigo==c.Idcodigo).IdTipoModalidadNavigation))
                 .ForMember(c => c.TiposCargas, opt => opt.MapFrom(c=>c.TipoCargaCodigos));
 
 
@@ -72,7 +74,7 @@ namespace AkademicReport.Data
                 .ForMember(c => c.MinutoInicio, o => o.MapFrom(c => c.minuto_inicio))
                 .ForMember(c => c.MinutoFin, o => o.MapFrom(c => c.minuto_fin))
                 .ForMember(c => c.NumeroHora, o => o.MapFrom(c => c.numero_hora))
-                .ForMember(c => c.Modalidad, o => o.MapFrom(c => c.modalida))
+                .ForMember(c => c.Modalidad, o => o.MapFrom(c => c.idModalidad))
                 .ForMember(c => c.NombreProfesor, o => o.MapFrom(c => c.nombre_profesor));
            
             CreateMap<CargaUpdateDto, CargaDocente>().ForMember(c => c.CodAsignatura, o => o.MapFrom(c => c.cod_asignatura))
@@ -84,7 +86,7 @@ namespace AkademicReport.Data
                .ForMember(c => c.MinutoInicio, o => o.MapFrom(c => c.minuto_inicio))
                .ForMember(c => c.MinutoFin, o => o.MapFrom(c => c.minuto_fin))
                .ForMember(c => c.NumeroHora, o => o.MapFrom(c => c.numero_hora))
-                    .ForMember(c => c.Modalidad, o => o.MapFrom(c => c.Modalida))
+                    .ForMember(c => c.Modalidad, o => o.MapFrom(c => c.idModalidad))
                .ForMember(c => c.NombreProfesor, o => o.MapFrom(c => c.nombre_profesor));
 
             CreateMap<CargaDocente, CargaGetDto>().ForMember(c => c.cod_asignatura, o => o.MapFrom(c => c.CodAsignatura))
@@ -96,7 +98,7 @@ namespace AkademicReport.Data
              .ForMember(c => c.hora_fin, o => o.MapFrom(c => c.HoraFin))
              .ForMember(c => c.minuto_fin, o => o.MapFrom(c => c.MinutoFin))
              .ForMember(c => c.numero_hora, o => o.MapFrom(c => c.NumeroHora))
-                  .ForMember(c => c.Modalida, o => o.MapFrom(c => c.Modalidad))
+                  .ForMember(c => c.TipoModalidad, o => o.Ignore())
              .ForMember(c => c.nombre_profesor, o => o.MapFrom(c => c.NombreProfesor))
              .ForMember(c => c.dia_nombre, o => o.MapFrom(c => c.DiasNavigation.Nombre));
             // .ForMember(c => c.TiposCarga, o => o.MapFrom(c => c.CurricularNavigation));

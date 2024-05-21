@@ -126,12 +126,14 @@ namespace AkademicReport.Service.UsuarioServices
         {
             try
             {
-                var usuariodb = await _dataContext.Usuarios.AsNoTracking().Where(c => c.Correo == usuario.Correo && c.Id==int.Parse(usuario.Id)).ToListAsync();
+                var usuariodb = await _dataContext.Usuarios.AsNoTracking().Where(c => c.Correo == usuario.Correo && c.Id==usuario.Id).ToListAsync();
                 if (usuariodb.Count>1)
                     return new ServicesResponseMessage<string>() { Status = 204, Message = Msj.MsjUsuarioExiste };
-                var usuariodbForUpdate = await _dataContext.Usuarios.AsNoTracking().Where(c=>c.Id == int.Parse(usuario.Id)).FirstOrDefaultAsync();
+                var usuariodbForUpdate = await _dataContext.Usuarios.AsNoTracking().Where(c=>c.Id == usuario.Id).FirstOrDefaultAsync();
+                string beforePasswor = usuariodbForUpdate.Contra;
                 int idRecinto = usuariodbForUpdate.IdRecinto;
                 usuariodbForUpdate = _mapper.Map<Usuario>(usuario);
+                usuariodbForUpdate.Contra = beforePasswor;
                 usuariodbForUpdate.IdRecinto = idRecinto;
 
                 // _dataContext.Usuarios.Add(_mapper.Map<Usuario>(usuariodbForUpdate));
@@ -150,6 +152,45 @@ namespace AkademicReport.Service.UsuarioServices
         {
            
             return await _dataContext.Usuarios.Where(c=>c.SoftDelete==0).Include(c => c.IdRecintoNavigation).Include(c => c.NivelNavigation).ToListAsync();
+        }
+
+        public async Task<ServicesResponseMessage<string>> UpdatePassword(UpdatePasswordDto password)
+        {
+            try
+            {
+                var usuariodb = await _dataContext.Usuarios.AsNoTracking().Where(c => c.Id == password.IdUusario && c.Contra == password.CurrentPassword).FirstOrDefaultAsync();
+                if (usuariodb==null)
+                    return new ServicesResponseMessage<string>() { Status = 204, Message = "la contraseña que inserto es incorrecta" };
+                if(password.NewPassword!=password.ConfirmPassword)
+                    return new ServicesResponseMessage<string>() { Status = 204, Message = "Las contraseñas no coinciden" };
+                usuariodb.Contra = password.NewPassword;
+                // _dataContext.Usuarios.Add(_mapper.Map<Usuario>(usuariodbForUpdate));
+                _dataContext.Entry(usuariodb).State = EntityState.Modified;
+                await _dataContext.SaveChangesAsync();
+
+                return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjUsuarioInsertado };
+            }
+            catch (Exception ex)
+            {
+                return new ServicesResponseMessage<string>() { Status = 500, Message = Msj.MsjUsuarioExiste + ex.ToString() };
+            }
+        }
+
+        public async Task<ServicesResponseMessage<string>> ResetPassword(int idUsuario)
+        {
+            try
+            {
+                var usuariodb = await _dataContext.Usuarios.AsNoTracking().Where(c => c.Id == idUsuario).FirstOrDefaultAsync();
+                usuariodb.Contra = "Issu1234";
+                _dataContext.Entry(usuariodb).State = EntityState.Modified;
+                await _dataContext.SaveChangesAsync();
+
+                return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjUsuarioInsertado };
+            }
+            catch (Exception ex)
+            {
+                return new ServicesResponseMessage<string>() { Status = 500, Message = Msj.MsjUsuarioExiste + ex.ToString() };
+            }
         }
     }
 }

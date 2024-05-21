@@ -9,7 +9,7 @@ namespace AkademicReport.Dto.AsignaturaDto
         [Required]
         public int? id_concepto { get; set; }
         public string? Codigo { get; set; }
-        public string? Modalida { get; set; }
+        public List<TipoModalidadDto>? Modalidades { get; set; }
         [Required]
         public List<TipoCargaDto> TiposCargas { get; set; }
         public string? Nombre { get; set; }

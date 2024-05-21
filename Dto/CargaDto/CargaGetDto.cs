@@ -13,9 +13,10 @@ namespace AkademicReport.Dto.CargaDto
         public string cod_asignatura { get; set; } = null!;
         public string nombre_asignatura { get; set; } = null!;
         public string cod_universitas { get; set; } = null!;
+        public string CodUniversitas { get; set; } = null!;
         public int Seccion { get; set; }
         public string Aula { get; set; } = null!;
-        public string Modalida { get; set; } = null!;
+        public TipoModalidadDto TipoModalidad { get; set; } = null!;
         public int dia_id { get; set; }
         public string dia_nombre { get; set; }=null!;
         public string hora_inicio { get; set; } = null!;

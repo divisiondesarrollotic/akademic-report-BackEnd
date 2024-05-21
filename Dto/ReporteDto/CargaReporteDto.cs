@@ -10,6 +10,7 @@ namespace AkademicReport.Dto.ReporteDto
         public string nombre_asignatura { get; set; } = null!;
         public int id { get; set; }
         public int seccion { get; set; }
+        public string? CodUniversitas { get; set; }
         public string Horario_dia { get; set; } = null!;
         public string Horario_inicio { get; set; } = null!;
         public string Horario_final { get; set; } = null!;

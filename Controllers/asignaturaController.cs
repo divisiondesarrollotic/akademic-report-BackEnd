@@ -21,10 +21,16 @@ namespace AkademicReport.Controllers
         {
             return Ok(await _service.GetAll());
         }
+        [HttpGet]
+        [Route("gettipomodalidad")]
+        public async Task<ActionResult> GetAllTipoModalidad()
+        {
+            return Ok(await _service.GetAllTipoModalid());
+        }
 
-        [HttpPost]
-        [Route("codigo-filter")]
-        public async Task<ActionResult> GetAllFilter(FiltroDocentesDto filtro)
+        [HttpGet]
+        [Route("codigo-filter/{filtro}")]
+        public async Task<ActionResult> GetAllFilter( string filtro)
         {
             return Ok(await _service.GetAllFilter(filtro));
         }

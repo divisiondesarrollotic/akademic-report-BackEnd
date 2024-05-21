@@ -14,7 +14,7 @@ namespace AkademicReport.Models
         public string CodUniversitas { get; set; } = null!;
         public string Seccion { get; set; } = null!;
         public string Aula { get; set; } = null!;
-        public string Modalidad { get; set; } = null!;
+        public int? Modalidad { get; set; }
         public int Dias { get; set; }
         public string? HoraInicio { get; set; }
         public string? MinutoInicio { get; set; }
@@ -27,5 +27,6 @@ namespace AkademicReport.Models
 
         public virtual TipoCarga? CurricularNavigation { get; set; }
         public virtual Dia DiasNavigation { get; set; } = null!;
+        public virtual TipoModalidad? ModalidadNavigation { get; set; }
     }
 }

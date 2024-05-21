@@ -39,6 +39,19 @@ namespace AkademicReport.Controllers
         {
             return Ok(await _service.Update(usuario));
         }
+
+        [HttpPost]
+        [Route("updatepassword")]
+        public async Task<ActionResult> UpdatePassword(UpdatePasswordDto password)
+        {
+            return Ok(await _service.UpdatePassword(password));
+        }
+        [HttpPost]
+        [Route("resetpassword")]
+        public async Task<ActionResult> ResetPassword([FromBody] int idUsuario)
+        {
+            return Ok(await _service.ResetPassword(idUsuario));
+        }
         [HttpGet]
         [Route("delete")]
         public async Task<ActionResult> Delete(int id)

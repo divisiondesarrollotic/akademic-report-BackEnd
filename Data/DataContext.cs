@@ -39,6 +39,8 @@ namespace AkademicReport.Data
         public virtual DbSet<Recinto> Recintos { get; set; } = null!;
         public virtual DbSet<TipoCarga> TipoCargas { get; set; } = null!;
         public virtual DbSet<TipoCargaCodigo> TipoCargaCodigos { get; set; } = null!;
+        public virtual DbSet<TipoModalidad> TipoModalidads { get; set; } = null!;
+        public virtual DbSet<TipoModalidadCodigo> TipoModalidadCodigos { get; set; } = null!;
         public virtual DbSet<Usuario> Usuarios { get; set; } = null!;
         public virtual DbSet<Vinculo> Vinculos { get; set; } = null!;
 
@@ -189,10 +191,7 @@ namespace AkademicReport.Data
                     .IsUnicode(false)
                     .HasColumnName("minuto_inicio");
 
-                entity.Property(e => e.Modalidad)
-                    .HasMaxLength(50)
-                    .IsUnicode(false)
-                    .HasColumnName("modalidad");
+                entity.Property(e => e.Modalidad).HasColumnName("modalidad");
 
                 entity.Property(e => e.NombreAsignatura)
                     .HasMaxLength(500)
@@ -231,6 +230,11 @@ namespace AkademicReport.Data
                     .HasForeignKey(d => d.Dias)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Dias_cargaDocente");
+
+                entity.HasOne(d => d.ModalidadNavigation)
+                    .WithMany(p => p.CargaDocentes)
+                    .HasForeignKey(d => d.Modalidad)
+                    .HasConstraintName("FK_modalidad_cargaDocente");
             });
 
             modelBuilder.Entity<Codigo>(entity =>
@@ -255,11 +259,6 @@ namespace AkademicReport.Data
                     .HasColumnName("horas");
 
                 entity.Property(e => e.IdConcepto).HasColumnName("id_concepto");
-
-                entity.Property(e => e.Modalida)
-                    .HasMaxLength(500)
-                    .IsUnicode(false)
-                    .HasColumnName("modalida");
 
                 entity.Property(e => e.Nombre)
                     .HasMaxLength(100)
@@ -544,6 +543,39 @@ namespace AkademicReport.Data
                     .WithMany(p => p.TipoCargaCodigos)
                     .HasForeignKey(d => d.IdTipoCarga)
                     .HasConstraintName("FK__tipo_carg__idTip__7D0E9093");
+            });
+
+            modelBuilder.Entity<TipoModalidad>(entity =>
+            {
+                entity.ToTable("tipo_modalidad");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+
+                entity.Property(e => e.Nombre)
+                    .HasMaxLength(1000)
+                    .IsUnicode(false)
+                    .HasColumnName("nombre");
+            });
+
+            modelBuilder.Entity<TipoModalidadCodigo>(entity =>
+            {
+                entity.ToTable("tipo_modalidad_codigo");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+
+                entity.Property(e => e.IdTipoModalidad).HasColumnName("idTipoModalidad");
+
+                entity.Property(e => e.Idcodigo).HasColumnName("idcodigo");
+
+                entity.HasOne(d => d.IdTipoModalidadNavigation)
+                    .WithMany(p => p.TipoModalidadCodigos)
+                    .HasForeignKey(d => d.IdTipoModalidad)
+                    .HasConstraintName("FK_ModalidadTipoModalidad");
+
+                entity.HasOne(d => d.IdcodigoNavigation)
+                    .WithMany(p => p.TipoModalidadCodigos)
+                    .HasForeignKey(d => d.Idcodigo)
+                    .HasConstraintName("FK_codigoTipoModalidad");
             });
 
             modelBuilder.Entity<Usuario>(entity =>

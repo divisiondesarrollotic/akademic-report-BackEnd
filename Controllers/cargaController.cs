@@ -24,17 +24,18 @@ namespace AkademicReport.Controllers
         [Route("docente")]
         public async Task<ActionResult> GetCarga(DtoCarga filtro)
         {
+
             var result = await _service.GetCargaCall(filtro.Cedula, filtro.Periodo);
             if (result.Data.Value.Item1.Docente == null && result.Data.Value.Item1.Carga == null)
             {
                 return Ok(new ServicesResponseMessage<string>() { Status = 204, Message = "Docente no existe" });
             }
-            if (result.Data.Value.Item1.Carga==null)
+            if (result.Data.Value.Item1.Carga == null)
             {
                 return Ok(new ServiceResponseData<DocenteCargaDto>() { Status = 200, Data = result.Data.Value.Item1 });
             }
-          
-            return Ok(new ServiceResponseData<DocenteCargaDto>() { Status = 200, Data= result.Data.Value.Item1});
+
+            return Ok(new ServiceResponseData<DocenteCargaDto>() { Status = 200, Data = result.Data.Value.Item1 });
 
         }
         [HttpPost]
