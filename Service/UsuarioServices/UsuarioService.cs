@@ -113,8 +113,11 @@ namespace AkademicReport.Service.UsuarioServices
 
                 var usuariodb = await _dataContext.Usuarios.Where(c => c.Correo == credentials.correo && c.Contra == credentials.contra).Include(c => c.IdRecintoNavigation).Include(c => c.NivelNavigation).ToListAsync();
                 if (usuariodb == null)
-                    return new ServisResponseLogin<List<UsuarioGetDto>, string>() { Status = 204, Message = (_mapper.Map<List<UsuarioGetDto>>(usuariodb) , Msj.MsjCredencialesIncorrectas)};
-                return new ServisResponseLogin<List<UsuarioGetDto>, string>() { Status = 200, Message = (_mapper.Map<List<UsuarioGetDto>>(usuariodb), "") };
+                    return new ServisResponseLogin<List<UsuarioGetDto>, string>() { Status = 204, Message = (_mapper.Map<List<UsuarioGetDto>>(usuariodb), Msj.MsjCredencialesIncorrectas) };
+
+
+                return new ServisResponseLogin<List<UsuarioGetDto>, string>() { Status = 200, Message = (_mapper.Map<List<UsuarioGetDto>>(usuariodb), "")};
+            
             }
             catch (Exception ex)
             {

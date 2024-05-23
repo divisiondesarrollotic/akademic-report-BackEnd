@@ -4,5 +4,6 @@
     {
         public int? Status { get; set; }
         public T? Message { get; set; }
+        public bool LoginResetPassword { get; set; }
     }
 }

@@ -22,7 +22,7 @@ namespace AkademicReport.Controllers
             var result = await _service.Login(credentials);
             if(result.Message.Value.Item1.Count>0)
             {
-                return Ok(new ServicesResponseMessage<List<UsuarioGetDto>>(){Status=200, Message = result.Message.Value.Item1} );
+                return Ok(new ServicesResponseMessage<List<UsuarioGetDto>>(){Status=200, Message = result.Message.Value.Item1, LoginResetPassword=credentials.contra=="Issu1234"? true : false });
             }
             return Ok(new ServicesResponseMessage<string>() { Status = 204, Message = Msj.MsjCredencialesIncorrectas }); 
         
