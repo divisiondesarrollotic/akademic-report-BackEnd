@@ -44,4 +44,5 @@ C:\Users\jonas.diaz\Source\Repos\JonasDiazDuran\akademic-report\obj\Release\net6
 C:\Users\jonas.diaz\Source\Repos\JonasDiazDuran\akademic-report\obj\Release\net6.0\PubTmp\Out\runtimes\win\lib\netstandard2.0\System.Runtime.Caching.dll
 C:\Users\jonas.diaz\Source\Repos\JonasDiazDuran\akademic-report\obj\Release\net6.0\PubTmp\Out\runtimes\win\lib\netstandard2.0\System.Security.Cryptography.ProtectedData.dll
 C:\Users\jonas.diaz\Source\Repos\JonasDiazDuran\akademic-report\obj\Release\net6.0\PubTmp\Out\runtimes\win\lib\netcoreapp3.0\System.Windows.Extensions.dll
+C:\Users\jonas.diaz\Source\Repos\JonasDiazDuran\akademic-report\obj\Release\net6.0\PubTmp\Out\AkademicReport.xml
 C:\Users\jonas.diaz\Source\Repos\JonasDiazDuran\akademic-report\obj\Release\net6.0\PubTmp\Out\AkademicReport.deps.json

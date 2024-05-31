@@ -17,12 +17,19 @@ namespace AkademicReport.Service.PeriodoServices
             _dataContext = dataContext;
         }
 
-        public async Task<ServicesResponseMessage<string>> ActualizarActual(PeriodoActualActualizarDto periodo)
+        public async Task<ServicesResponseMessage<string>> ActualizarActual(PeriodoActualUpdateDto periodo)
         {
             try
             {
-                var periododb = await _dataContext.Configuracions.AsNoTracking().FirstOrDefaultAsync(c => c.Nombre.ToUpper() == "PERIODO");
-                periododb.Valor = periodo.periodo;
+                var periodosdb = await _dataContext.PeriodoAcademicos.AsNoTracking().ToListAsync();
+                foreach (var item in periodosdb)
+                {
+                    item.Estado = false;
+                    _dataContext.Entry(item).State = EntityState.Modified;
+                }
+                await _dataContext.SaveChangesAsync();
+                var periododb = await _dataContext.PeriodoAcademicos.FirstOrDefaultAsync(c =>c.Id == periodo.Id);
+                periododb.Estado = true;
                 _dataContext.Entry(periododb).State = EntityState.Modified;
                 await _dataContext.SaveChangesAsync();
                 return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjUpdate };
@@ -40,6 +47,9 @@ namespace AkademicReport.Service.PeriodoServices
                 var periodo = await _dataContext.PeriodoAcademicos.FirstOrDefaultAsync(c => c.Id == id);
                 if (periodo == null)
                     return new ServicesResponseMessage<string>() { Status = 204, Message = Msj.MsjNoRegistros };
+                var carga = await _dataContext.CargaDocentes.Where(c=>c.Periodo.Contains(periodo.Periodo)).ToListAsync();
+                if (carga.Count>0)
+                    return new ServicesResponseMessage<string>() { Status = 204, Message = Msj.MsjNoEliminarPeriodo };
                 _dataContext.Remove(periodo);
                 await _dataContext.SaveChangesAsync();
                 return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjDelete };
@@ -91,17 +101,17 @@ namespace AkademicReport.Service.PeriodoServices
             }
         }
 
-        public async Task<ServiceResponseData<List<ConfiguracionGetDto>>> PeriodoActual()
+        public async Task<ServiceResponseData<List<PeriodoGetDto>>> PeriodoActual()
         {
             try
             {
-                var periodo = await _dataContext.Configuracions.Where(c=>c.Nombre== "periodo").ToListAsync();
+                var periodo = await _dataContext.PeriodoAcademicos.Where(c=>c.Estado== true).ToListAsync();
                
-                return new ServiceResponseData<List<ConfiguracionGetDto>>() { Status = 200, Data = _mapper.Map<List<ConfiguracionGetDto>>(periodo) };
+                return new ServiceResponseData<List<PeriodoGetDto>>() { Status = 200, Data = _mapper.Map<List<PeriodoGetDto>>(periodo) };
             }
             catch (Exception ex)
             {
-                return new ServiceResponseData<List<ConfiguracionGetDto>>() { Status = 500};
+                return new ServiceResponseData<List<PeriodoGetDto>>() { Status = 500};
             }
       
         }

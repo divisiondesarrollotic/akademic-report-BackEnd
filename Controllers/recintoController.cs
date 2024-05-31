@@ -13,6 +13,10 @@ namespace AkademicReport.Controllers
         {
             _service = service;
         }
+        /// <summary>
+        /// --Este get trae todos los recintos
+        /// </summary>
+        /// <returns></returns>
 
         [HttpGet]
         public async Task<ActionResult<RecintoGetDto>>GetAll()

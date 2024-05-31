@@ -10,8 +10,8 @@ namespace AkademicReport.Service.PeriodoServices
         Task<ServicesResponseMessage<string>> Insert(PeriodoAddDto item);
         Task<ServicesResponseMessage<string>> Update(PeriodoUpdateDto item);
         Task<ServicesResponseMessage<string>> Delete(int id);
-        Task<ServiceResponseData<List<ConfiguracionGetDto>>> PeriodoActual();
-        Task<ServicesResponseMessage<string>> ActualizarActual(PeriodoActualActualizarDto periodo);
+        Task<ServiceResponseData<List<PeriodoGetDto>>> PeriodoActual();
+        Task<ServicesResponseMessage<string>> ActualizarActual(PeriodoActualUpdateDto periodo);
 
 
     }

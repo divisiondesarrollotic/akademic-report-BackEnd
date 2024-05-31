@@ -15,6 +15,10 @@ namespace AkademicReport.Controllers
         {
             _service = service;
         }
+        /// <summary>
+        /// --Este es un post de inicio de sesión
+        ///  </summary>
+        /// <returns></returns>
         [HttpPost]
         [Route("login")]
         public async Task<ActionResult> Login(UsuarioCredentialsDto credentials)
@@ -27,18 +31,30 @@ namespace AkademicReport.Controllers
             return Ok(new ServicesResponseMessage<string>() { Status = 204, Message = Msj.MsjCredencialesIncorrectas }); 
         
         }
+        /// <summary>
+        /// --Este es un post crea un nuevo usuario
+        ///  </summary>
+        /// <returns></returns>
         [HttpPost]
         [Route("insert")]
         public  async Task<ActionResult>Create(UsuarioAddDto usuario)
         {
             return Ok(await _service.Create(usuario));
         }
+        /// <summary>
+        /// --Este es un post actualiza un usuario
+        ///  </summary>
+        /// <returns></returns>
         [HttpPost]
         [Route("update")]
         public async Task<ActionResult> Update(UsuarioUpdateDto usuario)
         {
             return Ok(await _service.Update(usuario));
         }
+        // <summary>
+        /// --Este es un post actualiza la contraseña
+        ///  </summary>
+        /// <returns></returns>
 
         [HttpPost]
         [Route("updatepassword")]
@@ -46,29 +62,53 @@ namespace AkademicReport.Controllers
         {
             return Ok(await _service.UpdatePassword(password));
         }
+
+        // <summary>
+        /// --Este es un post para resetear la contraseña a una por default (Issu1234)
+        ///  </summary>
+        /// <returns></returns>
         [HttpPost]
         [Route("resetpassword")]
         public async Task<ActionResult> ResetPassword([FromBody] int idUsuario)
         {
             return Ok(await _service.ResetPassword(idUsuario));
         }
+
+        // <summary>
+        /// --Este es un post elimina un usuario
+        ///  </summary>
+        /// <returns></returns>
         [HttpGet]
-        [Route("delete")]
+        [Route("delete/{id}")]
         public async Task<ActionResult> Delete(int id)
         {
             return Ok(await _service.Delete(id));
         }
+
+        // <summary>
+        /// --Este get trae los usuarios por recinto
+        ///  </summary>
+        /// <returns></returns>
         [HttpGet]
         [Route("recinto/{id}")]
         public async Task<ActionResult> GetByIdRectino(int id)
         {
             return Ok(await _service.GetByIdRecinto(id));
         }
+        // <summary>
+        /// --Este get trae los usuarios por id
+        ///  </summary>
+        /// <returns></returns>
         [HttpGet("{id}")]
         public async Task<ActionResult> GetById(int id)
         {
             return Ok(await _service.GetById(id));
         }
+
+        // <summary>
+        /// --Este get trae todos los usuarios
+        ///  </summary>
+        /// <returns></returns>
         [HttpGet]
         public async Task<ActionResult> GetAll()
         {

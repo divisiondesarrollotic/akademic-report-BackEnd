@@ -139,3 +139,5 @@ C:\Users\jonas.diaz\Source\Repos\JonasDiazDuran\akademic-report\obj\Debug\net6.0
 C:\Users\jonas.diaz\Source\Repos\JonasDiazDuran\akademic-report\obj\Debug\net6.0\AkademicReport.pdb
 C:\Users\jonas.diaz\Source\Repos\JonasDiazDuran\akademic-report\obj\Debug\net6.0\AkademicReport.genruntimeconfig.cache
 C:\Users\jonas.diaz\Source\Repos\JonasDiazDuran\akademic-report\obj\Debug\net6.0\ref\AkademicReport.dll
+C:\Users\jonas.diaz\Source\Repos\JonasDiazDuran\akademic-report\bin\Debug\net6.0\AkademicReport.xml
+C:\Users\jonas.diaz\Source\Repos\JonasDiazDuran\akademic-report\obj\Debug\net6.0\AkademicReport.xml

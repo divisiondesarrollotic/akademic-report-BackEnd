@@ -42,12 +42,14 @@ namespace AkademicReport.Data
 
             CreateMap<ConceptoAddDto, Concepto>();
             CreateMap<Concepto, ConceptoGetDto>();
+            CreateMap<ConceptoGetDto, Concepto>();
 
             CreateMap<Aula, AulaGettDto>();
             CreateMap<Paisesnacionalidade, NacionalidadDto>();
 
             CreateMap<TipoCarga, TipoDeCargaDto>();
-             CreateMap<TipoCargaPivot, TipoCargaCodigo>();
+            CreateMap<TipoCarga, TipoCargaDto>();
+            CreateMap<TipoCargaPivot, TipoCargaCodigo>();
 
             CreateMap<TipoModalidad, TipoModalidadDto>();
 

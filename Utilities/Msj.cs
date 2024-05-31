@@ -2,6 +2,7 @@
 {
     public class Msj
     {
+        public static string MsjResetPassword { get; set; } = "Se ha reseteado su contraseña satisfactoria.";
         public static string MsjUsuarioExiste { get; set; } = "Usuario existente";
         public static string MsjUsuarioInsertado { get; set; } = "Usuario Insertado Correctamente";
         public static string MsjInsert { get; set; } = "Se inerto un registro correctamente.";
@@ -15,5 +16,9 @@
         public static string MsjHorarioIncorrecto { get; set; } = "El calculo de las horas en el horario no puede dar decimal.";
         public static string MsjPasoDeCredito { get; set; } = "La carga no puede exceder de los 40 creditos.";
         public static string MsjPasoDeCreditoMedioTimepo { get; set; } = "La carga no puede exceder de los 32 creditos, si el docente es de medio tiempo.";
+        public static string MsjNoEliminarCodigo { get; set; } = "No se puede eliminar este concepto, porque hay códigos que dependen de él.";
+        public static string MsjNoEliminarPeriodo { get; set; } = "No se puede eliminar este periodo, porque hay una carga que dependen de él.";
+
+
     }
 }

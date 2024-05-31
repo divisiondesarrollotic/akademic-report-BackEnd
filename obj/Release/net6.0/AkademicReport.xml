@@ -1,0 +1,278 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>AkademicReport</name>
+    </assembly>
+    <members>
+        <member name="M:AkademicReport.Controllers.asignaturaController.GetAll">
+            <summary>
+            --Este get trae todos los codigos con todas sus caracteristicas
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.asignaturaController.GetAllTipoModalidad">
+            <summary>
+            --Este get trae las modalidades existentes en el sistema
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.asignaturaController.GetAllFilter(System.String)">
+            <summary>
+            --Este get es un filtro el cual trae los codigos por nombre y por codigo
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.asignaturaController.GetAllPaginacion(AkademicReport.Dto.DocentesDto.FiltroDocentesDto)">
+            <summary>
+            --Este post trael todas los codigos/asignaturas con una paginacion
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.asignaturaController.GetAllByIdConcepto(System.Int32)">
+            <summary>
+            --Este get  busca un concepto por id
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.asignaturaController.GetById(System.Int32)">
+            <summary>
+            --Este get  busca un codigo/asignatura por id
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.asignaturaController.Create(AkademicReport.Dto.AsignaturaDto.AsignaturaAddDto)">
+            <summary>
+            --Este post crea un codigo/asignatura
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.asignaturaController.Update(AkademicReport.Dto.AsignaturaDto.AsignaturaUpdateDto)">
+            <summary>
+            --Este post actualiza un codigo/asignatura
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.asignaturaController.Delete(System.Int32)">
+            <summary>
+            --Este post elimina un codigo/asignatura
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.aulasRecintoController.GetAllAylasByIdRecinto(System.Int32)">
+            <summary>
+            --Este get trae todas las aula de un recinto
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.cargaController.GetCarga(AkademicReport.Dto.CargaDto.DtoCarga)">
+            <summary>
+            --Este post trea la carga del docente expecificado en los parametros
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.cargaController.Insert(AkademicReport.Dto.CargaDto.CargaAddDto)">
+            <summary>
+            --Este post inserta una carga a un docente x
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.cargaController.Update(AkademicReport.Dto.CargaDto.CargaUpdateDto)">
+            <summary>
+            --Este post actualiza una carga a un docente x
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.cargaController.Delete(System.Int32)">
+            <summary>
+            --Este post elimina una carga a un docente x
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.cargaController.GetTipoCarga">
+            <summary>
+            --Este get trae todos los tipo de carga que puede tener un codigo
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.conceptoController.GetAll">
+            <summary>
+            --Este get trae todos los conceptos
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.conceptoController.GetById(System.Int32)">
+            <summary>
+            --Este get un concepto por id
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.conceptoController.Create(AkademicReport.Dto.ConceptoDto.ConceptoAddDto)">
+            <summary>
+            --Este post agrega un nuevo concepto
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.conceptoController.Delete(System.Int32)">
+            <summary>
+            --Este get elimina un concepto
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.conceptoController.Update(AkademicReport.Dto.ConceptoDto.ConceptoGetDto)">
+            <summary>
+            --Este post actualiza un concepto
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.docenteController.GetAll(AkademicReport.Dto.DocentesDto.FiltroDocentesDto)">
+            <summary>
+            --Este post trae filtrados por nombre y identificacion.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.docenteController.GetAllPaginacion(AkademicReport.Dto.DocentesDto.FiltroDocentesDto)">
+            <summary>
+            --Este get trae los docentes con una pagincacion.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.docenteController.GetAllCntDocentesxRecinto">
+            <summary>
+            --Este get trea le cantidad de docentes por recinto
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.docenteController.GetAllNacionalidadesFilter(AkademicReport.Dto.DocentesDto.FiltroDto)">
+            <summary>
+            --Este post filtra nacionalidades
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.nivelController.GetAll">
+            <summary>
+            --Este get trae los niveles academico  y sus precios { "id": "1", "nivel": "Maestria", "pagoHora": "780"}
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.nivelController.GetById(System.Int32)">
+            <summary>
+            --Este get trae los niveles academico  y sus precios  por id.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.nivelController.Create(AkademicReport.Dto.NivelDto.NivelAddDto)">
+            <summary>
+            --Este post crea un nuevo nivel
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.nivelController.Update(AkademicReport.Dto.NivelDto.NivelUpdateDto)">
+            <summary>
+            --Este post actualiza un  nivel
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.nivelController.Delete(System.Int32)">
+            <summary>
+            --Este elimina un nivel
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.periodoController.GetAll">
+            <summary>
+            --Este get trae todos los periodos {"id": "1","periodo": "2023-03"}
+            /// </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.periodoController.GetById(System.Int32)">
+            <summary>
+            --Este get trae un periodos por id  {"id": "1","periodo": "2023-03"}
+            /// </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.periodoController.GetPeriodoActual">
+            <summary>
+            --Este get trae el periodo actual establecido
+            /// </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.periodoController.Create(AkademicReport.Dto.PeriodoDto.PeriodoAddDto)">
+            <summary>
+            --Este post crea un nuevo periodo
+            /// </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.periodoController.UpdatePeriodoActual(AkademicReport.Dto.PeriodoDto.PeriodoActualUpdateDto)">
+            <summary>
+            --Este post actualiza el periodo actual
+            /// </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.periodoController.Update(AkademicReport.Dto.PeriodoDto.PeriodoUpdateDto)">
+            <summary>
+            --Este post actualiza un periodo
+            /// </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.periodoController.Delete(System.Int32)">
+            <summary>
+            --Este post elimina un periodo
+            /// </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.recintoController.GetAll">
+            <summary>
+            --Este get trae todos los recintos
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.reporteController.PorDocente(AkademicReport.Dto.ReporteDto.ReporteDto)">
+            <summary>
+            --Este post trae un docente y su carga
+            /// </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.reporteController.PorRecinto(AkademicReport.Dto.ReporteDto.ReportePorRecintoDto)">
+            <summary>
+            --Este post trae la los docentes y su carga de un recinto
+            /// </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.reporteController.ReporteDiplomado(AkademicReport.Dto.ReporteDto.ReportePorRecintoDto)">
+            <summary>
+            --Este post trae la los docentes y su carga de un recinto
+            /// </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.reporteController.ReporteConsolidado(AkademicReport.Dto.ReporteDto.FiltroReporteConsolidado)">
+            <summary>
+            --Este post trae el reporte consolidado de todos los recintos
+            /// </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.usuarioController.Login(AkademicReport.Dto.UsuarioDto.UsuarioCredentialsDto)">
+            <summary>
+            --Este es un post de inicio de sesión
+             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.usuarioController.Create(AkademicReport.Dto.UsuarioDto.UsuarioAddDto)">
+            <summary>
+            --Este es un post crea un nuevo usuario
+             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:AkademicReport.Controllers.usuarioController.Update(AkademicReport.Dto.UsuarioDto.UsuarioUpdateDto)">
+            <summary>
+            --Este es un post actualiza un usuario
+             </summary>
+            <returns></returns>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:AkademicReport.Controllers.usuarioController.UpdatePassword(AkademicReport.Dto.UsuarioDto.UpdatePasswordDto)" -->
+        <!-- Badly formed XML comment ignored for member "M:AkademicReport.Controllers.usuarioController.ResetPassword(System.Int32)" -->
+        <!-- Badly formed XML comment ignored for member "M:AkademicReport.Controllers.usuarioController.Delete(System.Int32)" -->
+        <!-- Badly formed XML comment ignored for member "M:AkademicReport.Controllers.usuarioController.GetByIdRectino(System.Int32)" -->
+        <!-- Badly formed XML comment ignored for member "M:AkademicReport.Controllers.usuarioController.GetById(System.Int32)" -->
+        <!-- Badly formed XML comment ignored for member "M:AkademicReport.Controllers.usuarioController.GetAll" -->
+    </members>
+</doc>

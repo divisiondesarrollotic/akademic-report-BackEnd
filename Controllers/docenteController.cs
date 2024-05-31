@@ -21,12 +21,21 @@ namespace AkademicReport.Controllers
 
             
         }
+        /// <summary>
+        /// --Este post trae filtrados por nombre y identificacion.
+        /// </summary>
+        /// <returns></returns>
         [HttpPost]
         [Route("filter_docente")]
         public async Task<ActionResult> GetAll(FiltroDocentesDto filter)
         {
             return Ok(await _service.GetAllFilter(filter));
         }
+
+        /// <summary>
+        /// --Este get trae los docentes con una pagincacion.
+        /// </summary>
+        /// <returns></returns>
         [HttpPost]
         [Route("pag")]
         public async Task<ActionResult> GetAllPaginacion(FiltroDocentesDto filtro)
@@ -34,6 +43,11 @@ namespace AkademicReport.Controllers
             var response = await _service.GetAllPaginacion(filtro);
             return Ok(response);
         }
+
+        /// <summary>
+        /// --Este get trea le cantidad de docentes por recinto
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [Route("cantidadxrecinto")]
         public async Task<ActionResult> GetAllCntDocentesxRecinto()
@@ -48,6 +62,11 @@ namespace AkademicReport.Controllers
             var response = await _service.GetAllRecinto(filtro, id);
             return Ok(response);
         }
+
+        /// <summary>
+        /// --Este post filtra nacionalidades
+        /// </summary>
+        /// <returns></returns>
         [HttpPost]
         [Route("nacionalidad")]
         public async Task<ActionResult> GetAllNacionalidadesFilter(FiltroDto filtro)

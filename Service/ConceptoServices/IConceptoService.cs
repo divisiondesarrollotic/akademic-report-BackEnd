@@ -8,7 +8,7 @@ namespace AkademicReport.Service.ConceptoServices
         Task<ServiceResponseData<List<ConceptoGetDto>>> GetAll();
         Task<ServiceResponseData<List<ConceptoGetDto>>> GetById(int id);
         Task<ServicesResponseMessage<string>> Insert(ConceptoAddDto item);
-       // Task<ServicesResponseMessage<string>> Update(NivelUpdateDto item);
+        Task<ServicesResponseMessage<string>> Update(ConceptoGetDto item);
         Task<ServicesResponseMessage<string>> Delete(int id);
     }
 }

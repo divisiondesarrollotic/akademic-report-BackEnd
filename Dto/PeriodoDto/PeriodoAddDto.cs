@@ -6,5 +6,6 @@ namespace AkademicReport.Dto.PeriodoDto
     {
         [Required]
         public string Periodo { get; set; } = null!;
+        public bool estado { get; set; }
     }
 }

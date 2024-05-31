@@ -13,6 +13,11 @@ namespace AkademicReport.Controllers
         {
             _service = service;
         }
+
+        /// <summary>
+        /// --Este get trae todas las aula de un recinto
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [Route("{id}")]
         public async Task<ActionResult> GetAllAylasByIdRecinto(int id) 

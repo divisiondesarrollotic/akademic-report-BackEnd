@@ -18,6 +18,8 @@ namespace AkademicReport.Service.CargaServices
         private readonly IMapper _mapper;
         private readonly DataContext _dataContext;
         private readonly IDocenteService _docenteService;
+        public List<string> CodigosIngles = new List<string> { "ING-201", "ING-302", "ING-403", "ING-504", "ING-605", "IOP-01", "IOP-02", "IOP-03", "ING-220", "ING-100", "ING-110", "ING-200", "ING-210", "FRP-201", "FRP-301", "FRP-601", "FRP-701", "FRP-801", "PVS-300", "PVS-305" };
+
 
         //  private readonly ICargaDocenteService _cargaDocenteService;
 
@@ -90,7 +92,8 @@ namespace AkademicReport.Service.CargaServices
                     }
                     else
                     {
-                        i.Concepto = new Dto.ConceptoDto.ConceptoGetDto() { Id = 0, Nombre = "" };
+                        var Docencia = await _dataContext.Conceptos.FirstAsync(c => c.Nombre.Contains("Docencia"));
+                        i.Concepto =  new Dto.ConceptoDto.ConceptoGetDto() { Id = Docencia.Id, Nombre = Docencia.Nombre };
                     }
                    
                     i.TiposCarga = new TipoCargaDto();
@@ -109,48 +112,30 @@ namespace AkademicReport.Service.CargaServices
                         Creditos += i.credito;
                         CargaLista.Add(i);
                     
-                    //else
-                    //{
-                    //    if (existe==null)
-                    //    {
-
-                    //        decimal Horas = CalculoTiempoHoras.Calcular(int.Parse(i.hora_inicio), int.Parse(i.minuto_inicio), int.Parse(i.hora_fin), int.Parse(i.minuto_fin));
-                    //        i.credito = Convert.ToInt32(Horas);
-                    //        Creditos += i.credito;
-                    //        CargaLista.Add(i);
-                    //    }
-                    //    //else if (existe.cod_asignatura[0].ToString()=="P" && existe.cod_asignatura[1].ToString() == "D")
-                    //    //{
-                    //    //    if(CargaLista.Where(c => c.cod_asignatura == i.cod_asignatura && c.Seccion == i.Seccion && c.dia_id == i.dia_id && c.hora_inicio == i.hora_inicio && c.minuto_inicio == i.minuto_inicio && c.hora_fin == i.hora_fin && c.minuto_fin == i.minuto_fin && c.Aula==i.Aula).FirstOrDefault()==null)
-                    //    //    {
-
-                    //    //        decimal Horas = CalculoTiempoHoras.Ca lcular(int.Parse(i.hora_inicio), int.Parse(i.minuto_inicio), int.Parse(i.hora_fin), int.Parse(i.minuto_fin));
-                    //    //        i.credito = Convert.ToInt32(Horas);
-                    //    //        Creditos += i.credito;
-                    //    //        CargaLista.Add(i);
-                    //    //    }
-                    //    //    else
-                    //    //    {
-                    //    //        i.credito = 0;
-                    //    //        CargaLista.Add(i);
-
-                    //    //    }        
-                    //    //}
-                    //    //else
-                    //    //{
-                    //    //    i.credito = 0;
-                    //    //    CargaLista.Add(i);
-                    //    //}
-                     
-                    //}
 
                 }
+                //Este codig
+               
+                foreach (var codigo in CodigosIngles)
+                {
+                    foreach (var cargaDiplomado in CargaLista)
+                    {
+                        if(cargaDiplomado.cod_asignatura.Trim().Contains(codigo.Trim()))
+                        {
+                            var tipoCarga = await _dataContext.TipoCargas.FirstOrDefaultAsync(c => c.Nombre!.Contains("Diplomado"));
+                            cargaDiplomado.TiposCarga =_mapper.Map<TipoCargaDto>(tipoCarga);
+                        }
+                        
+                    }
+                  
+                }
+
                 ResulData.Carga = CargaLista.OrderBy(c => c.dia_id).ThenBy(c => int.Parse(c.hora_inicio)).ToList();
                 ResulData.Docente = DocenteFilter;
                 ResulData.CantCredito = Creditos;
                 return new ServiceResponseCarga<DocenteCargaDto, string> { Data = (ResulData, ""), Status = 200 };
             }
-            catch (Exception)
+            catch (Exception ex)
             {
 
                 throw;

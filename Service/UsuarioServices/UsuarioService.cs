@@ -28,9 +28,9 @@ namespace AkademicReport.Service.UsuarioServices
                 var usuariodb = usuarios.Where(c => c.Correo == usuario.Correo).FirstOrDefault();
                 if (usuariodb != null)
                     return new ServicesResponseMessage<string>() { Status = 204, Message = Msj.MsjUsuarioExiste };
-
-
-                _dataContext.Usuarios.Add(_mapper.Map<Usuario>(usuario));
+                var userReady = _mapper.Map<Usuario>(usuario);
+                 userReady.Contra = "Issu1234";
+                _dataContext.Usuarios.Add(userReady);
                 await _dataContext.SaveChangesAsync();
                 return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjUsuarioInsertado };
             }
@@ -161,7 +161,7 @@ namespace AkademicReport.Service.UsuarioServices
         {
             try
             {
-                var usuariodb = await _dataContext.Usuarios.AsNoTracking().Where(c => c.Id == password.IdUusario && c.Contra == password.CurrentPassword).FirstOrDefaultAsync();
+                var usuariodb = await _dataContext.Usuarios.AsNoTracking().Where(c => c.Id == password.IdUsuario && c.Contra == password.CurrentPassword).FirstOrDefaultAsync();
                 if (usuariodb==null)
                     return new ServicesResponseMessage<string>() { Status = 204, Message = "la contraseña que inserto es incorrecta" };
                 if(password.NewPassword!=password.ConfirmPassword)
@@ -171,7 +171,7 @@ namespace AkademicReport.Service.UsuarioServices
                 _dataContext.Entry(usuariodb).State = EntityState.Modified;
                 await _dataContext.SaveChangesAsync();
 
-                return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjUsuarioInsertado };
+                return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjUpdate };
             }
             catch (Exception ex)
             {
@@ -188,11 +188,11 @@ namespace AkademicReport.Service.UsuarioServices
                 _dataContext.Entry(usuariodb).State = EntityState.Modified;
                 await _dataContext.SaveChangesAsync();
 
-                return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjUsuarioInsertado };
+                return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjResetPassword };
             }
             catch (Exception ex)
             {
-                return new ServicesResponseMessage<string>() { Status = 500, Message = Msj.MsjUsuarioExiste + ex.ToString() };
+                return new ServicesResponseMessage<string>() { Status = 500, Message = Msj.MsjError + ex.ToString() };
             }
         }
     }

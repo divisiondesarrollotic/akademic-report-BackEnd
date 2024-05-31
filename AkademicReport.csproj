@@ -21,4 +21,7 @@
     <Folder Include="Models\" />
   </ItemGroup>
 
+	<PropertyGroup>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
 </Project>

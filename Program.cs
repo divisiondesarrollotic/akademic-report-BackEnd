@@ -10,6 +10,7 @@ using AkademicReport.Service.RecintoServices;
 using AkademicReport.Service.ReposteServices;
 using AkademicReport.Service.UsuarioServices;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<DataContext>(options =>
@@ -23,7 +24,12 @@ builder.Services.AddDbContext<DataContext>(options =>
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(option=>
+{
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    option.IncludeXmlComments(xmlPath);
+});
 
 builder.Services.AddScoped<IRecintoService, RecintoService>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();

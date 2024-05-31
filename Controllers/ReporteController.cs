@@ -15,6 +15,10 @@ namespace AkademicReport.Controllers
         {
             _reposteService = reposteService;
         }
+        /// <summary>
+        /// --Este post trae un docente y su carga
+        /// /// </summary>
+        /// <returns></returns>
         [HttpPost]
         [Route("docente")]
         public async Task<ActionResult>PorDocente(ReporteDto filtro)
@@ -33,16 +37,16 @@ namespace AkademicReport.Controllers
             var Uni = new DocenteCargaReporteDtoPorDocente();
             Uni.Docente = response.Data.Docente;
             Uni.Carga = response.Data.Carga;
-            Uni.Monto = response.Data.Monto;
+            Uni.Monto = response.Data.MontoSemanal;
             Uni.CantCreditos = response.Data.CantCreditos;
-
-
             ResponseDone.Data.Add(Uni);
-
-
             return Ok(ResponseDone);
 
         }
+        /// <summary>
+        /// --Este post trae la los docentes y su carga de un recinto
+        /// /// </summary>
+        /// <returns></returns>
         [HttpPost]
         [Route("recinto")]
         public async Task<ActionResult> PorRecinto(ReportePorRecintoDto filtro)
@@ -52,6 +56,11 @@ namespace AkademicReport.Controllers
            
 
         }
+
+        /// <summary>
+        /// --Este post trae la los docentes y su carga de un recinto
+        /// /// </summary>
+        /// <returns></returns>
         [HttpPost]
         [Route("recinto/reporte-diplomado")]
         public async Task<ActionResult> ReporteDiplomado(ReportePorRecintoDto filtro)
@@ -61,6 +70,10 @@ namespace AkademicReport.Controllers
 
 
         }
+        /// <summary>
+        /// --Este post trae el reporte consolidado de todos los recintos
+        /// /// </summary>
+        /// <returns></returns>
         [HttpPost]
         [Route("consolidar")]
         public async Task<ActionResult> ReporteConsolidado(FiltroReporteConsolidado filtro)

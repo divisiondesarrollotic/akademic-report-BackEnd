@@ -14,16 +14,29 @@ namespace AkademicReport.Controllers
         {
             _service = service;
         }
+        /// <summary>
+        /// --Este get trae todos los conceptos
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public async Task<ActionResult> GetAll()
         {
             return Ok(await _service.GetAll());
         }
+        /// <summary>
+        /// --Este get un concepto por id
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("{id}")]
         public async Task<ActionResult> GetById(int id)
         {
             return Ok(await _service.GetById(id));
         }
+
+        /// <summary>
+        /// --Este post agrega un nuevo concepto
+        /// </summary>
+        /// <returns></returns>
 
         [HttpPost]
         [Route("insert")]
@@ -31,12 +44,25 @@ namespace AkademicReport.Controllers
         {
             return Ok(await _service.Insert(concepto));
         }
-       
+        /// <summary>
+        /// --Este get elimina un concepto
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [Route("delete/{id}")]
         public async Task<ActionResult> Delete(int id)
         {
             return Ok(await _service.Delete(id));
+        }
+        /// <summary>
+        /// --Este post actualiza un concepto
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("update")]
+        public async Task<ActionResult> Update(ConceptoGetDto concepto)
+        {
+            return Ok(await _service.Update(concepto));
         }
     }
 }

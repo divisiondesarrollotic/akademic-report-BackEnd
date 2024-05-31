@@ -15,43 +15,74 @@ namespace AkademicReport.Controllers
         {
             _service = service;
         }
-
+        /// <summary>
+        /// --Este get trae todos los codigos con todas sus caracteristicas
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public async Task<ActionResult> GetAll()
         {
             return Ok(await _service.GetAll());
         }
+        /// <summary>
+        /// --Este get trae las modalidades existentes en el sistema
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [Route("gettipomodalidad")]
         public async Task<ActionResult> GetAllTipoModalidad()
         {
             return Ok(await _service.GetAllTipoModalid());
         }
-
+        /// <summary>
+        /// --Este get es un filtro el cual trae los codigos por nombre y por codigo
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [Route("codigo-filter/{filtro}")]
         public async Task<ActionResult> GetAllFilter( string filtro)
         {
             return Ok(await _service.GetAllFilter(filtro));
         }
+
+        /// <summary>
+        /// --Este post trael todas los codigos/asignaturas con una paginacion
+        /// </summary>
+        /// <returns></returns>
         [HttpPost]
         [Route("pag")]
         public async Task<ActionResult> GetAllPaginacion(FiltroDocentesDto paginacion)
         {
             return Ok(await _service.GetAllPaginacion(paginacion));
         }
+
+
+
+        /// <summary>
+        /// --Este get  busca un concepto por id
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [Route("concepto/{id}")]
         public async Task<ActionResult> GetAllByIdConcepto(int id)
         {
             return Ok(await _service.GetAllByIdConcepto(id));
         }
+
+        /// <summary>
+        /// --Este get  busca un codigo/asignatura por id
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("{id}")]
         public async Task<ActionResult> GetById(int id)
         {
             return Ok(await _service.GetById(id));
         }
 
+        /// <summary>
+        /// --Este post crea un codigo/asignatura
+        /// </summary>
+        /// <returns></returns>
         [HttpPost]
         [Route("insert")]
         public async Task<ActionResult> Create(AsignaturaAddDto asignatura)
@@ -59,12 +90,21 @@ namespace AkademicReport.Controllers
             return Ok(await _service.Insert(asignatura));
         }
 
+
+        /// <summary>
+        /// --Este post actualiza un codigo/asignatura
+        /// </summary>
+        /// <returns></returns>
         [HttpPost]
         [Route("update")]
         public async Task<ActionResult> Update(AsignaturaUpdateDto asignatura)
         {
             return Ok(await _service.Update(asignatura));
         }
+        /// <summary>
+        /// --Este post elimina un codigo/asignatura
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [Route("delete/{id}")]
         public async Task<ActionResult> Delete(int id)

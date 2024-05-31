@@ -25,6 +25,10 @@ namespace AkademicReport.Service.ConceptoServices
                 var nivel = await _dataContext.Conceptos.FirstOrDefaultAsync(c => c.Id == id);
                 if (nivel == null)
                     return new ServicesResponseMessage<string>() { Status = 204, Message = Msj.MsjNoRegistros };
+
+                var codigodb = await _dataContext.Codigos.Where(c => c.IdConcepto == id).ToListAsync();
+                if (codigodb.Count>0)
+                    return new ServicesResponseMessage<string>() { Status = 204, Message = Msj.MsjNoEliminarCodigo };
                 _dataContext.Conceptos.Remove(nivel);
                 await _dataContext.SaveChangesAsync();
                 return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjDelete };
@@ -69,7 +73,6 @@ namespace AkademicReport.Service.ConceptoServices
         {
             try
             {
-               
                 _dataContext.Conceptos.Add(_mapper.Map<Concepto>(item));
                 await _dataContext.SaveChangesAsync();
                 return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjInsert };
@@ -77,6 +80,24 @@ namespace AkademicReport.Service.ConceptoServices
             catch (Exception ex)
             {
                 return new ServicesResponseMessage<string>() { Status = 500, Message = Msj.MsjError + ex.ToString() };
+            }
+        }
+
+        public async Task<ServicesResponseMessage<string>> Update(ConceptoGetDto item)
+        {
+            try
+            {
+                var concepto = await _dataContext.Conceptos.AsNoTracking().FirstOrDefaultAsync(c=>c.Id==item.Id);
+                concepto = _mapper.Map<Concepto>(item);
+                _dataContext.Entry(concepto).State = EntityState.Modified;
+                _dataContext.SaveChangesAsync();
+                if (concepto==null)
+                    return new ServicesResponseMessage<string>() { Status = 204 };
+                return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjUpdate};
+            }
+            catch (Exception ex)
+            {
+                return new ServicesResponseMessage< string>() { Status = 500 , Message=Msj.MsjError + ex.ToString() };
             }
         }
     }
