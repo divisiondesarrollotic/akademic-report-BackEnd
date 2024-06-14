@@ -21,6 +21,7 @@ namespace AkademicReport.Dto.ReporteDto
         public int credito { get; set; }
         public int precio_hora { get; set; }
         public int pago_asignatura { get; set; }
+        public string Aula { get; set; }
         public int pago_asignaturaMensual { get 
             { 
                if(Vinculacion=="TC")

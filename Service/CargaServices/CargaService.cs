@@ -10,6 +10,7 @@ using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.VisualBasic;
 
 namespace AkademicReport.Service.CargaServices
 {
@@ -19,7 +20,7 @@ namespace AkademicReport.Service.CargaServices
         private readonly DataContext _dataContext;
         private readonly IDocenteService _docenteService;
         public List<string> CodigosIngles = new List<string> { "ING-201", "ING-302", "ING-403", "ING-504", "ING-605", "IOP-01", "IOP-02", "IOP-03", "ING-220", "ING-100", "ING-110", "ING-200", "ING-210", "FRP-201", "FRP-301", "FRP-601", "FRP-701", "FRP-801", "PVS-300", "PVS-305" };
-
+        public int contado = 0;
 
         //  private readonly ICargaDocenteService _cargaDocenteService;
 
@@ -53,6 +54,13 @@ namespace AkademicReport.Service.CargaServices
         {
             try
             {
+                contado++;
+                if (contado == 56)
+                {
+                
+                }
+
+                
                 var ResulData = new DocenteCargaDto();
                 var carga = await _dataContext.CargaDocentes.Where(c => c.Cedula.Contains(Cedula) && c.Periodo == Periodo)
                     .Include(c => c.DiasNavigation).Include(c => c.CurricularNavigation).Include(c=>c.ModalidadNavigation).ToListAsync();
@@ -71,6 +79,8 @@ namespace AkademicReport.Service.CargaServices
                     ResulData.Docente = DocenteFilter;
                     return new ServiceResponseCarga<DocenteCargaDto, string>() { Status = 200, Data = (ResulData, "No hay carga") };
                 }
+               
+                 
                 var CargaMap = _mapper.Map<List<CargaGetDto>>(carga);
                 var CargaLista = new List<CargaGetDto>();
                 foreach (var i in CargaMap)
@@ -81,6 +91,11 @@ namespace AkademicReport.Service.CargaServices
                         var TipoModalida = new TipoModalidadDto();
                         TipoModalida = _mapper.Map<TipoModalidadDto>(o.ModalidadNavigation);
                         i.TipoModalidad = TipoModalida;
+                    }
+                    var recinto = await _dataContext.Recintos.FirstOrDefaultAsync(c => c.Id == int.Parse(i.Recinto));
+                    if(recinto!=null)
+                    {
+                        i.RecintoNombre = recinto.NombreCorto;
                     }
 
                     var existe = CargaLista.Where(c => c.cod_asignatura == i.cod_asignatura && c.Seccion == i.Seccion && i.cod_universitas==i.cod_universitas).FirstOrDefault();
@@ -95,11 +110,12 @@ namespace AkademicReport.Service.CargaServices
                         var Docencia = await _dataContext.Conceptos.FirstAsync(c => c.Nombre.Contains("Docencia"));
                         i.Concepto =  new Dto.ConceptoDto.ConceptoGetDto() { Id = Docencia.Id, Nombre = Docencia.Nombre };
                     }
-                   
+                
                     i.TiposCarga = new TipoCargaDto();
                     i.TiposCarga.Id = carga.FirstOrDefault(c => c.Id == i.Id).CurricularNavigation.Id;
                     i.TiposCarga.Nombre = carga.FirstOrDefault(c => c.Id == i.Id).CurricularNavigation.Nombre;
                     var codigo = await _dataContext.Codigos.Where(c => c.Codigo1.Contains(i.cod_asignatura)).FirstOrDefaultAsync();
+                    
                     if (codigo != null)
                     {
                         i.id_asignatura = codigo.Id;
@@ -123,7 +139,11 @@ namespace AkademicReport.Service.CargaServices
                         if(cargaDiplomado.cod_asignatura.Trim().Contains(codigo.Trim()))
                         {
                             var tipoCarga = await _dataContext.TipoCargas.FirstOrDefaultAsync(c => c.Nombre!.Contains("Diplomado"));
-                            cargaDiplomado.TiposCarga =_mapper.Map<TipoCargaDto>(tipoCarga);
+                            if(tipoCarga!=null)
+                            {
+                                cargaDiplomado.TiposCarga = _mapper.Map<TipoCargaDto>(tipoCarga);
+                            }
+                           
                         }
                         
                     }
@@ -136,8 +156,8 @@ namespace AkademicReport.Service.CargaServices
                 return new ServiceResponseCarga<DocenteCargaDto, string> { Data = (ResulData, ""), Status = 200 };
             }
             catch (Exception ex)
-            {
-
+             {
+                
                 throw;
             }
 
@@ -210,11 +230,15 @@ namespace AkademicReport.Service.CargaServices
             try
             {
                 var carga = await _dataContext.CargaDocentes.AsNoTracking().FirstOrDefaultAsync(c => c.Id == Convert.ToInt32(item.Id));
-                carga = _mapper.Map<CargaDocente>(item);
-                carga.Curricular = item.idTipoCarga;
-                _dataContext.Entry(carga).State = EntityState.Modified;
+                if(carga!=null)
+                {
+                    carga = _mapper.Map<CargaDocente>(item);
+                    carga.Curricular = item.idTipoCarga;
+                    _dataContext.Entry(carga).State = EntityState.Modified;
 
-                await _dataContext.SaveChangesAsync();
+                    await _dataContext.SaveChangesAsync();
+                }
+               
                 return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjUpdate };
             }
             catch (Exception ex)

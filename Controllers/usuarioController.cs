@@ -85,6 +85,18 @@ namespace AkademicReport.Controllers
             return Ok(await _service.Delete(id));
         }
 
+
+        // <summary>
+        /// --Este es un get que trae todos los niveles de acceso del sistema
+        ///  </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("getniveles")]
+        public async Task<ActionResult> GetNiveles()
+        {
+            return Ok(await _service.GetNiveles());
+        }
+
         // <summary>
         /// --Este get trae los usuarios por recinto
         ///  </summary>

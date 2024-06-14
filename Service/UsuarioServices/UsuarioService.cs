@@ -111,7 +111,7 @@ namespace AkademicReport.Service.UsuarioServices
             try
             {
 
-                var usuariodb = await _dataContext.Usuarios.Where(c => c.Correo == credentials.correo && c.Contra == credentials.contra).Include(c => c.IdRecintoNavigation).Include(c => c.NivelNavigation).ToListAsync();
+                var usuariodb = await _dataContext.Usuarios.Where(c => c.Correo == credentials.correo && c.Contra == credentials.contra && c.SoftDelete==0).Include(c => c.IdRecintoNavigation).Include(c => c.NivelNavigation).ToListAsync();
                 if (usuariodb == null)
                     return new ServisResponseLogin<List<UsuarioGetDto>, string>() { Status = 204, Message = (_mapper.Map<List<UsuarioGetDto>>(usuariodb), Msj.MsjCredencialesIncorrectas) };
 
@@ -193,6 +193,19 @@ namespace AkademicReport.Service.UsuarioServices
             catch (Exception ex)
             {
                 return new ServicesResponseMessage<string>() { Status = 500, Message = Msj.MsjError + ex.ToString() };
+            }
+        }
+
+        public async Task<ServiceResponseData<List<NivelUsuario>>> GetNiveles()
+        {
+              try
+            {
+                var niveles = await _dataContext.NivelUsuarios.ToListAsync();
+                return new ServiceResponseData<List<NivelUsuario>>() { Status = 200, Data = niveles };
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponseData<List<NivelUsuario>>() { Status = 500 };
             }
         }
     }

@@ -37,8 +37,11 @@ namespace AkademicReport.Controllers
             var Uni = new DocenteCargaReporteDtoPorDocente();
             Uni.Docente = response.Data.Docente;
             Uni.Carga = response.Data.Carga;
-            Uni.Monto = response.Data.MontoSemanal;
-            Uni.CantCreditos = response.Data.CantCreditos;
+            Uni.CantCreditos = response.Data.CantCreditos; ;
+            Uni.MontoSemanal = response.Data.MontoSemanal;
+            Uni.MontoMensual = response.Data.MontoMensual;
+            Uni.MontoVinculacion = response.Data.MontoVinculacion;
+
             ResponseDone.Data.Add(Uni);
             return Ok(ResponseDone);
 

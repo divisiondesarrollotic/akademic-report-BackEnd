@@ -64,7 +64,7 @@ namespace AkademicReport.Controllers
         }
 
         /// <summary>
-        /// --Este post filtra nacionalidades
+        /// --Este post filtra nacionalidades+
         /// </summary>
         /// <returns></returns>
         [HttpPost]
