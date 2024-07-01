@@ -19,6 +19,8 @@
         public static string MsjNoEliminarCodigo { get; set; } = "No se puede eliminar este concepto, porque hay códigos que dependen de él.";
         public static string MsjNoEliminarPeriodo { get; set; } = "No se puede eliminar este periodo, porque hay una carga que dependen de él.";
 
+        public static string MsjNoDelete { get; set; } = "No se puede eliminar  este registro, debido a que esta en uso.";
+
 
     }
 }

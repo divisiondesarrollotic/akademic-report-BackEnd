@@ -45,11 +45,16 @@ namespace AkademicReport.Data
             CreateMap<ConceptoGetDto, Concepto>();
 
             CreateMap<Aula, AulaGettDto>();
+            CreateMap<AulaDto, Aula>();
+          
             CreateMap<Paisesnacionalidade, NacionalidadDto>();
 
             CreateMap<TipoCarga, TipoDeCargaDto>();
             CreateMap<TipoCarga, TipoCargaDto>();
             CreateMap<TipoCargaPivot, TipoCargaCodigo>();
+
+
+
 
             CreateMap<TipoModalidad, TipoModalidadDto>();
 
