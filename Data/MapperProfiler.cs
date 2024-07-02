@@ -44,7 +44,7 @@ namespace AkademicReport.Data
             CreateMap<Concepto, ConceptoGetDto>();
             CreateMap<ConceptoGetDto, Concepto>();
 
-            CreateMap<Aula, AulaGettDto>();
+            CreateMap<Aula, AulaGettDto>().ForMember(c=>c.Recinto, o=>o.MapFrom(c=>c.IdrecintoNavigation));
             CreateMap<AulaDto, Aula>();
           
             CreateMap<Paisesnacionalidade, NacionalidadDto>();

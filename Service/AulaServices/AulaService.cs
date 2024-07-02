@@ -51,7 +51,7 @@ namespace AkademicReport.Service.AulaServices
         {
             try
             {
-                var aulas = await _dataContext.Aulas.Where(c=>c.Idrecinto==id).ToListAsync();
+                var aulas = await _dataContext.Aulas.Where(c=>c.Idrecinto==id).Include(c=>c.IdrecintoNavigation).ToListAsync();
                 if (aulas.Count < 1)
                     return new ServiceResponseData<List<AulaGettDto>>() { Status = 204 };
                 return new ServiceResponseData<List<AulaGettDto>>() { Status = 200, Data =_mapper.Map<List<AulaGettDto>>(aulas) };

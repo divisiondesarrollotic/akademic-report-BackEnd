@@ -9,5 +9,7 @@ namespace AkademicReport.Models
         public string? Nombre { get; set; }
         public string? Edificio { get; set; }
         public int? Idrecinto { get; set; }
+
+        public virtual Recinto? IdrecintoNavigation { get; set; }
     }
 }

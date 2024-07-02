@@ -137,6 +137,11 @@ namespace AkademicReport.Data
                     .HasMaxLength(500)
                     .IsUnicode(false)
                     .HasColumnName("nombre");
+
+                entity.HasOne(d => d.IdrecintoNavigation)
+                    .WithMany(p => p.Aulas)
+                    .HasForeignKey(d => d.Idrecinto)
+                    .HasConstraintName("FK__aula__idrecinto__6ABAD62E");
             });
 
             modelBuilder.Entity<CargaDocente>(entity =>
