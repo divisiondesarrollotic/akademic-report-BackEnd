@@ -841,15 +841,17 @@ namespace AkademicReport.Service.ReposteServices
 
         public async Task<ServiceResponseData<DocenteCargaReporteDto>> PorDocenteCall(ReporteDto filtro)
         {
-            var Docentes = await _docentesService.GetAll();
+            FiltroDocentesDto filtroD = new FiltroDocentesDto();
+            filtroD.Filtro = filtro.Cedula;
+            var Docentes = await _docentesService.GetAllFilter(filtroD);
             var Result = await PorDocente(filtro, Docentes.Data);
             return Result;
         }
 
         public async Task<ServiceResponseReporte<List<DocenteCargaReporteDto>>> PorRecinto(ReportePorRecintoDto filtro)
         {
-
-            var docentes = await _docentesService.GetAll();
+            var recintoActual = await _dataContext.Recintos.Where(c => c.Id == filtro.idRecinto).FirstOrDefaultAsync();
+            var docentes = await _docentesService.GetAllRecinto(new FiltroDocentesDto(), recintoActual.Id);
             var docentesRecinto = docentes.Data.Where(c => c.id_recinto == filtro.idRecinto.ToString()).ToList();
             List<DocenteCargaReporteDto> CargadDocentes = new List<DocenteCargaReporteDto>();
             var vinculacion = await _dataContext.Vinculos.ToListAsync();

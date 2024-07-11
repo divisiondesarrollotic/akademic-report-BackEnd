@@ -2,30 +2,27 @@
 {
     public class DocenteAmilcaDto
     {
-        public string? permiso_trabajo { get; set; }
-        public string? nivel_estudio { get; set; }
-        public string? categoria_docente { get; set; }
-        public string? jubilado { get; set; }
-        public string? areas_academicas { get; set; }
-        public string? area_academica_2 { get; set; }
-        public bool fallecido { get; set; }
-        public string? _id { get; set; }
-        public string? recinto { get; set; }
-        public string? nombre { get; set; }
-        public string? nacionalidad { get; set; }
-        public string? fecha_ingreso_isfodosu { get; set; }
-        public string? fecha_ingreso_minerd { get; set; }
-        public string? sexo { get; set; }
-        public string? cedula_pasaporte { get; set; }
-        public string? nombrado_contratado { get; set; }
-        public string? cargo { get; set; }
-        public string? area_curricular { get; set; }
-        public string? maximo_nivel_academico { get; set; }
-        public string? recinto_ingreso { get; set; }
-        public string? fecha_nacimiento { get; set; }
-        public string? email { get; set; }
-        public string? area_academica_1 { get; set; }
-        public string? tipo_vinculacion { get; set; }
-        public string? tiempo_dedicacion { get; set; }
+        public string? Id { get; set; }
+        public string? CedulaPasaporte { get; set; }
+        public string? Nombre { get; set; }
+        public string? Email { get; set; }
+        public string? Recinto { get; set; }
+        public string? Nacionalidad { get; set; }
+        public string? FechaIngresoIsfodosu { get; set; }
+        public  string? FechaIngresoMinerd { get; set; }
+        public string? Sexo { get; set; }
+        public string? Cargo { get; set; }
+        public string? NombradoContratado { get; set; }
+        public string? Rol { get; set; }
+        public string? MaximoNivelAcademico { get; set; }
+        public string? AreaDepartamento { get; set; }
+        public string? AreaAcademica1 { get; set; }
+        public string? AreaAcademica2 { get; set; }
+        public string? TipoVinculacion { get; set; }
+        public string? TipoDocente { get; set; }
+        public string? FechaNacimiento { get; set; }
+        public string? TiempoDedicacion { get; set; }
+        public string? Jubilado { get; set; }
+        public string? Fallecido { get; set; }
     }
 }

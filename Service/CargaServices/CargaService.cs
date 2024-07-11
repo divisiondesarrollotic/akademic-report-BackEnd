@@ -60,7 +60,6 @@ namespace AkademicReport.Service.CargaServices
                 
                 }
 
-                
                 var ResulData = new DocenteCargaDto();
                 var carga = await _dataContext.CargaDocentes.Where(c => c.Cedula.Contains(Cedula) && c.Periodo == Periodo)
                     .Include(c => c.DiasNavigation).Include(c => c.CurricularNavigation).Include(c=>c.ModalidadNavigation).ToListAsync();
@@ -166,7 +165,9 @@ namespace AkademicReport.Service.CargaServices
 
         public async Task<ServiceResponseCarga<DocenteCargaDto, string>> GetCargaCall(string cedula, string periodo)
         {
-            var Docentes = await _docenteService.GetAll();
+            FiltroDocentesDto filtro = new FiltroDocentesDto();
+            filtro.Filtro= cedula;
+            var Docentes = await _docenteService.GetAllFilter(filtro);
             var Result = await GetCarga(cedula, periodo, Docentes.Data);       
             return Result;
 

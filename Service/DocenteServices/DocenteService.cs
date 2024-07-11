@@ -18,6 +18,7 @@ namespace AkademicReport.Service.DocenteServices
         private readonly IMapper _mapper;
         private readonly DataContext _dataContext;
         private readonly HttpClient _httpClient = new HttpClient();
+        public List<DocenteGetDto> DocentesLimpios = new List<DocenteGetDto>();
         public DocenteService(IMapper mapper, DataContext dataContext)
         {
             _mapper = mapper;
@@ -25,123 +26,120 @@ namespace AkademicReport.Service.DocenteServices
 
         }
 
-        public async Task<ServiceResponseData<List<DocenteGetDto>>> GetAlla()
+
+        public async Task<ServiceResponseData<List<DocenteGetDto>>> CleanData(List<DocenteAmilcaDto> DocentesAmilca)
         {
-
-            FiltroDocentesDto filtro = new FiltroDocentesDto();
-            string b = "Maestría";
-            b = b.Replace('í', 'i');
-            string BaseUrl = "https://isfodosudocentes.herokuapp.com/get_docente_api";
-            var content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(filtro), Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await _httpClient.PostAsync(BaseUrl, content);
-            if (response.IsSuccessStatusCode)
+            List<DocenteGetDto> Docentes = new List<DocenteGetDto>();
+            foreach (var d in DocentesAmilca)
             {
-                string jsonResponse = await response.Content.ReadAsStringAsync();
-                var docentesApi = JsonConvert.DeserializeObject<List<DocenteAmilcaDto>>(jsonResponse);
-
-                List<DocenteGetDto> Docentes = new List<DocenteGetDto>();
-                foreach (var d in docentesApi)
+                var docente = new DocenteGetDto();
+                docente.id = d.Id;
+                docente.tiempoDedicacion = d.TiempoDedicacion;
+                docente.identificacion = d.CedulaPasaporte;
+                if (d.CedulaPasaporte != null && d.MaximoNivelAcademico != null)
                 {
-                    var docente = new DocenteGetDto();
-                    docente.id = d._id;
-                    docente.tiempoDedicacion = d.tiempo_dedicacion;
-                    docente.identificacion = d.cedula_pasaporte;
-                    if (d.cedula_pasaporte != null && d.maximo_nivel_academico!=null)
+                    if (d.CedulaPasaporte[0].ToString().Trim() == "0" && d.CedulaPasaporte[1].ToString().Trim() == "0" && d.CedulaPasaporte[2].ToString().Trim() == "-" || d.CedulaPasaporte.Length == 13)
                     {
-                        if (d.cedula_pasaporte[0].ToString().Trim() == "0" && d.cedula_pasaporte[1].ToString().Trim() == "0" && d.cedula_pasaporte[2].ToString().Trim() == "-" || d.cedula_pasaporte.Length == 13)
-                        {
-                            docente.identificacion = docente.identificacion.Replace("00-", "");
-                            docente.tipoIdentificacion = "Cedula";
-                        }
-                        else
-                        {
-                            docente.tipoIdentificacion = "Pasaporte";
-                        }
+                        docente.identificacion = docente.identificacion.Replace("00-", "");
+                        docente.tipoIdentificacion = "Cedula";
                     }
-                   
-                    //docente.tipoIdentificacion = d.ti
-                    
-                    docente.nombre = d.nombre;
-                    docente.nacionalidad = d.nacionalidad;
-                    docente.sexo = d.sexo;
-                    if (d.tiempo_dedicacion != null)
+                    else
                     {
-                        var vinculo = await _dataContext.Vinculos
-                            .Where(n => n.Corto.Replace("á", "a")
-                                                .Replace("é", "e")
-                                                .Replace("í", "i")
-                                                .Replace("ó", "o")
-                                                .Replace("ú", "u")
-                                                .Contains(d.tiempo_dedicacion.Replace("á", "a")
-                                                                    .Replace("é", "e")
-                                                                    .Replace("í", "i")
-                                                                    .Replace("ó", "o")
-                                                                    .Replace("ú", "u")))
-                            .FirstOrDefaultAsync();
-
-
-                        if (vinculo != null)
-                        {
-                            docente.id_vinculo = vinculo.Id.ToString();
-                            docente.nombreVinculo = vinculo.Nombre;
-                        }
+                        docente.tipoIdentificacion = "Pasaporte";
                     }
-                    if (d.recinto != null)
-                    {
-                        var recinto = await _dataContext.Recintos.FirstOrDefaultAsync(c => c.NombreCorto.ToUpper().Trim() == d.recinto.ToUpper().Trim());
-                        if (recinto != null)
-                        {
-                            docente.id_recinto = recinto.Id.ToString();
-                            docente.recinto = recinto.Recinto1;
-                            docente.nombre_corto = recinto.NombreCorto;
-                        }
-                    }
-
-                    if (d.maximo_nivel_academico != null)
-                    {
-                        var nivelA = d.maximo_nivel_academico.Split(" ");
-                        foreach (var item in nivelA)
-                        {
-                            var nivelAcademico = await _dataContext.NivelAcademicos
-                          .Where(n => n.Nivel.Replace("á", "a")
-                                              .Replace("é", "e")
-                                              .Replace("í", "i")
-                                              .Replace("ó", "o")
-                                              .Replace("ú", "u")
-                                              .Contains(item.Replace("á", "a")
-                                                                  .Replace("é", "e")
-                                                                  .Replace("í", "i")
-                                                                  .Replace("ó", "o")
-                                                                  .Replace("ú", "u")))
-                          .FirstOrDefaultAsync();
-
-                            if (nivelAcademico != null)
-                            {
-                                docente.id_nivel_academico = nivelAcademico.Id.ToString();
-                                docente.nivel = nivelAcademico.Nivel;
-                                break;
-                            }
-
-                        }
-
-
-
-                    }
-
-
-                    Docentes.Add(docente);
-
                 }
 
-                return new ServiceResponseData<List<DocenteGetDto>>() { Data = Docentes, Status = 200 };
-
+                docente.nombre = d.Nombre;
+                docente.nacionalidad = d.Nacionalidad;
+                docente.sexo = d.Sexo;
+                if (d.TiempoDedicacion != null)
+                {
+                    var vinculo = await _dataContext.Vinculos
+                        .Where(n => n.Corto.Replace("á", "a")
+                                            .Replace("é", "e")
+                                            .Replace("í", "i")
+                                            .Replace("ó", "o")
+                                            .Replace("ú", "u")
+                                            .Contains(d.TiempoDedicacion.Replace("á", "a")
+                                                                .Replace("é", "e")
+                                                                .Replace("í", "i")
+                                                                .Replace("ó", "o")
+                                                                .Replace("ú", "u")))
+                        .FirstOrDefaultAsync();
+                    if (vinculo != null)
+                    {
+                        docente.id_vinculo = vinculo.Id.ToString();
+                        docente.nombreVinculo = vinculo.Nombre;
+                    }
+                }
+                if (d.Recinto != null)
+                {
+                    var recinto = await _dataContext.Recintos.FirstOrDefaultAsync(c => c.NombreCorto.ToUpper().Trim() == d.Recinto.ToUpper().Trim());
+                    if (recinto != null)
+                    {
+                        docente.id_recinto = recinto.Id.ToString();
+                        docente.recinto = recinto.Recinto1;
+                        docente.nombre_corto = recinto.NombreCorto;
+                    }
+                }
+                if (d.MaximoNivelAcademico != null)
+                {
+                    var nivelA = d.MaximoNivelAcademico.Split(" ");
+                    foreach (var item in nivelA)
+                    {
+                        var nivelAcademico = await _dataContext.NivelAcademicos
+                      .Where(n => n.Nivel.Replace("á", "a")
+                                          .Replace("é", "e")
+                                          .Replace("í", "i")
+                                          .Replace("ó", "o")
+                                          .Replace("ú", "u")
+                                          .Contains(item.Replace("á", "a")
+                                                              .Replace("é", "e")
+                                                              .Replace("í", "i")
+                                                              .Replace("ó", "o")
+                                                              .Replace("ú", "u")))
+                      .FirstOrDefaultAsync();
+                        if (nivelAcademico != null)
+                        {
+                            docente.id_nivel_academico = nivelAcademico.Id.ToString();
+                            docente.nivel = nivelAcademico.Nivel;
+                            break;
+                        }
+                    }
+                }
+                Docentes.Add(docente);
             }
-            return new ServiceResponseData<List<DocenteGetDto>>() { Status = 500 };
-
+            return new ServiceResponseData<List<DocenteGetDto>>() { Data = Docentes, Status = 200 };
 
         }
+ 
 
         public async Task<ServiceResponseData<List<DocenteGetDto>>> GetAll()
+        {
+            try
+            {
+                FiltroDocentesDto filtro = new FiltroDocentesDto();
+                string b = "Maestría";
+                b = b.Replace('í', 'i');
+                string BaseUrl = "https://akademic.isfodosu.edu.do/apiDocente/Docente";
+                var content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(filtro), Encoding.UTF8, "application/json");
+                HttpResponseMessage response = await _httpClient.GetAsync(BaseUrl);
+                if (response.IsSuccessStatusCode)
+                {
+                    string jsonResponse = await response.Content.ReadAsStringAsync();
+                    var docentesApi = JsonConvert.DeserializeObject<List<DocenteAmilcaDto>>(jsonResponse);
+                    var DocentesLimpio =   await CleanData(docentesApi);
+                   return new ServiceResponseData<List<DocenteGetDto>>() { Data = DocentesLimpio.Data, Status = 200 };
+                }
+                return new ServiceResponseData<List<DocenteGetDto>>() { Status = 500 };
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponseData<List<DocenteGetDto>>() { Status = 500, Message = ex.ToString()};
+            }
+        }
+
+        public async Task<ServiceResponseData<List<DocenteGetDto>>> GetAlla()
         {
 
             try
@@ -196,27 +194,29 @@ namespace AkademicReport.Service.DocenteServices
       
         public async Task<ServiceResponseData<List<DocenteGetDto>>> GetAllFilter(FiltroDocentesDto filtro)
         {
-            try
-            {
-                var Docentes = await GetAll();
-                var DocentesClean = Docentes.Data.Where(c => c.identificacion != null && c.nombre != null && c.tiempoDedicacion!=null);
-                var d = DocentesClean.Where(c => c.nombre.ToUpper().Contains(filtro.Filtro.ToUpper()) ||c.identificacion.Contains(filtro.Filtro.ToUpper())).ToList();
-                return new ServiceResponseData<List<DocenteGetDto>>() { Data =d, Status=200 };
-            }
-            catch (Exception)
-            {
+             string b = "Maestría";
+             b = b.Replace('í', 'i');
+             string BaseUrl = "https://akademic.isfodosu.edu.do/apiDocente/Docente/filter";
+             var content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(filtro), Encoding.UTF8, "application/json");
+             HttpResponseMessage response = await _httpClient.PostAsync(BaseUrl, content);
+             if (response.IsSuccessStatusCode)
+             {
+                 string jsonResponse = await response.Content.ReadAsStringAsync();
+                 var docentesApi = JsonConvert.DeserializeObject<List<DocenteAmilcaDto>>(jsonResponse);
+                 var DocentesLimpio = await CleanData(docentesApi);
+                 return new ServiceResponseData<List<DocenteGetDto>>() { Data = DocentesLimpio.Data, Status = 200 };
+             }
+             else
+             {
+                return new ServiceResponseData<List<DocenteGetDto>>(){Status = 400 };
+             }
 
-                throw;
-            }
         }
 
         public async Task<ServiceResponseDataPaginacion<List<DocenteGetDto>>> GetAllPaginacion(FiltroDocentesDto filtro)
         {
-
             var Docentes = await GetAll();
             int valor = Docentes.Data.Count;
-
-
             int CantReg = Docentes.Data.Count;
             int CantRegistrosSolicitado = filtro.elementosPorPagina.Value;
             decimal TotalPage = Convert.ToDecimal(CantReg) / Convert.ToDecimal(CantRegistrosSolicitado);
@@ -224,7 +224,6 @@ namespace AkademicReport.Service.DocenteServices
             {
                 dpcente.identificacion = dpcente.identificacion == null ? string.Empty : dpcente.identificacion;
             }
-
             if (filtro.Filtro != null && filtro.Filtro.Trim() != string.Empty)
             {
                 var result = Docentes.Data.Where(c => c.identificacion.Contains(filtro.Filtro) || c.nombre.ToUpper().Contains(filtro.Filtro.ToUpper())).OrderBy(c => c.nombre).Skip((filtro.paginaActual.Value - 1) * CantRegistrosSolicitado).Take(CantRegistrosSolicitado).ToList();
@@ -246,16 +245,27 @@ namespace AkademicReport.Service.DocenteServices
 
         public async Task<ServiceResponseData<List<DocenteGetDto>>> GetAllRecinto(FiltroDocentesDto filtro, int id)
         {
-            List<DocenteGetDto> ResulDat = new List<DocenteGetDto>();
-            var Docentes = await GetAll();
-            var Recintos = await _dataContext.Recintos.ToListAsync();
-            string Nombre_Corto = Recintos.Where(c => c.Id == id).FirstOrDefault().NombreCorto;
-            ResulDat = Docentes.Data.Where(c => c.nombre_corto == Nombre_Corto).ToList();
-            if(filtro.Filtro!="" || filtro.Filtro!=string.Empty)
+            try
             {
-                ResulDat = ResulDat.Where(c => c.nombre.ToUpper().Contains(filtro.Filtro) || c.identificacion.ToUpper().Contains(filtro.Filtro)).ToList();
+                var recintoActual = await _dataContext.Recintos.Where(c => c.Id == id).FirstOrDefaultAsync();
+                string b = "Maestría";
+                b = b.Replace('í', 'i');
+                string BaseUrl = $"https://akademic.isfodosu.edu.do/apiDocente/Docente/docentesxrecinto/{recintoActual.NombreCorto}";
+                var content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(filtro), Encoding.UTF8, "application/json");
+                HttpResponseMessage response = await _httpClient.GetAsync(BaseUrl);
+                if (response.IsSuccessStatusCode)
+                {
+                    string jsonResponse = await response.Content.ReadAsStringAsync();
+                    var docentesApi = JsonConvert.DeserializeObject<List<DocenteAmilcaDto>>(jsonResponse);
+                    var DocentesLimpio = await CleanData(docentesApi);
+                    return new ServiceResponseData<List<DocenteGetDto>>() { Data = DocentesLimpio.Data, Status = 200 };
+                }
+                return new ServiceResponseData<List<DocenteGetDto>>() { Status = 500 };
             }
-            return new ServiceResponseData<List<DocenteGetDto>>() { Data = ResulDat, Status = 200 };
+            catch (Exception ex)
+            {
+                return new ServiceResponseData<List<DocenteGetDto>>() { Status = 500, Message = ex.ToString() };
+            }
 
         }
 
