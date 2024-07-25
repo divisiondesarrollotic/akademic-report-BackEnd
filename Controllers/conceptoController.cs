@@ -2,6 +2,7 @@
 using AkademicReport.Dto.NivelDto;
 using AkademicReport.Service.ConceptoServices;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace AkademicReport.Controllers
 {
@@ -18,10 +19,10 @@ namespace AkademicReport.Controllers
         /// --Este get trae todos los conceptos
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
-        public async Task<ActionResult> GetAll()
+        [HttpGet("idprograma")]
+        public async Task<ActionResult> GetAll([Required]int idprograma)
         {
-            return Ok(await _service.GetAll());
+            return Ok(await _service.GetAll(idprograma));
         }
         /// <summary>
         /// --Este get un concepto por id

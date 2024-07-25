@@ -42,7 +42,7 @@ namespace AkademicReport.Service.ReposteServices
                 var CargaMapeada = new List<CargaReporteDto>();
                 var CargaLista = new List<CargaGetDto>();
                 var Docente = new DocenteReporteDto();
-                var cargas = await _cargaService.GetCarga(filtro.Cedula, filtro.Periodo, DocentesAmilca);
+                var cargas = await _cargaService.GetCarga(filtro.Cedula, filtro.Periodo, filtro.idPrograma, DocentesAmilca);
                 if (cargas.Data.Value.Item1.Docente != null)
                 {
 
@@ -109,6 +109,7 @@ namespace AkademicReport.Service.ReposteServices
                             c.codigo_asignatura = item.cod_asignatura;
                             c.nombre_asignatura = item.nombre_asignatura;
                             c.id = item.Id;
+                            c.CodUniversitas = item.CodUniversitas;
                             c.seccion = item.Seccion;
                             c.Horario_dia = item.dia_nombre;
                             c.Horario_inicio = $"{item.hora_inicio} : {item.minuto_inicio}";
@@ -119,7 +120,6 @@ namespace AkademicReport.Service.ReposteServices
                             c.precio_hora = 0;
                             c.Concepto = item.Concepto;
                             c.pago_asignatura = 0;
-
                             DataResult.Carga.Add(c);
 
                         }
@@ -181,6 +181,7 @@ namespace AkademicReport.Service.ReposteServices
                             c.codigo_asignatura = item.cod_asignatura;
                             c.nombre_asignatura = item.nombre_asignatura;
                             c.id = item.Id;
+                            c.CodUniversitas = item.CodUniversitas;
                             c.seccion = item.Seccion;
                             c.Horario_dia = item.dia_nombre;
                             c.Horario_inicio = $"{item.hora_inicio} : {item.minuto_inicio}";
@@ -245,6 +246,7 @@ namespace AkademicReport.Service.ReposteServices
                             c.codigo_asignatura = item.cod_asignatura;
                             c.nombre_asignatura = item.nombre_asignatura;
                             c.id = item.Id;
+                            c.CodUniversitas = item.cod_universitas;
                             c.Concepto = item.Concepto;
                             c.seccion = item.Seccion;
                             c.Horario_dia = item.dia_nombre;
@@ -299,6 +301,7 @@ namespace AkademicReport.Service.ReposteServices
                             c.codigo_asignatura = item.cod_asignatura;
                             c.nombre_asignatura = item.nombre_asignatura;
                             c.id = item.Id;
+                            c.CodUniversitas = item.CodUniversitas;
                             c.Concepto = item.Concepto;
                             c.seccion = item.Seccion;
                             c.Horario_dia = item.dia_nombre;
@@ -359,6 +362,7 @@ namespace AkademicReport.Service.ReposteServices
                             c.codigo_asignatura = item.cod_asignatura;
                             c.nombre_asignatura = item.nombre_asignatura;
                             c.id = item.Id;
+                            c.CodUniversitas = item.CodUniversitas;
                             c.Concepto = item.Concepto;
                             c.seccion = item.Seccion;
                             c.Horario_dia = item.dia_nombre;
@@ -1109,7 +1113,7 @@ namespace AkademicReport.Service.ReposteServices
             //    }
 
 
-
+             
             //}
             //return DataPorRecinto;
             throw new NotImplementedException();

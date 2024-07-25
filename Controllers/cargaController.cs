@@ -30,7 +30,7 @@ namespace AkademicReport.Controllers
         public async Task<ActionResult> GetCarga(DtoCarga filtro)
         {
 
-            var result = await _service.GetCargaCall(filtro.Cedula, filtro.Periodo);
+            var result = await _service.GetCargaCall(filtro.Cedula, filtro.Periodo, filtro.idPrograma);
             if (result.Data.Value.Item1.Docente == null && result.Data.Value.Item1.Carga == null)
             {
                 return Ok(new ServicesResponseMessage<string>() { Status = 204, Message = "Docente no existe" });
@@ -54,9 +54,45 @@ namespace AkademicReport.Controllers
             return Ok(await _service.Insert(Carga));
         }
         /// <summary>
-        /// --Este post actualiza una carga a un docente x
+        /// --Este post inserta una carga a un docente  de posgradox
         /// </summary>
         /// <returns></returns>
+        [HttpPost]
+        [Route("insert_carga_posgrado")]
+        public async Task<ActionResult> InsertCargaPosgrado(CargaPosgradroDto Carga)
+        {
+            return Ok(await _service.InsertCargaPosgrado(Carga));
+        }
+        /// <summary>
+        /// --Este put actualiza la carga de posgrado una carga a un docente  de posgradox
+        /// </summary>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("update_carga_posgrado")]
+        public async Task<ActionResult> UpdateCargaPosgrado(CargaPosgradroDto Carga)
+        {
+            return Ok(await _service.UpdateCargaPosgrado(Carga));
+        }
+
+        /// <summary>
+        /// --Este  get trae todos los meses del ano
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("getmeses")]
+        public async Task<ActionResult<List<MesGetDto>>> GetMeses()
+        {
+            return Ok(await _service.GetMeses());
+        }
+        [HttpGet]
+        [Route("getdias")]
+        public async Task<ActionResult<List<MesGetDto>>> GetDias()
+        {
+            return Ok(await _service.GetDias());
+        }
+
+
+
         [HttpPost]
         [Route("update")]
         public async Task<ActionResult> Update(CargaUpdateDto Carga)

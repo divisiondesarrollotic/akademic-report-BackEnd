@@ -12,6 +12,7 @@ namespace AkademicReport.Dto.ReporteDto
         public TipoCargaDto TiposCarga { get; set; }
         public string codigo_asignatura { get; set; } = null!;
         public string nombre_asignatura { get; set; } = null!;
+      
         public int id { get; set; }
         public int seccion { get; set; }
         public string? CodUniversitas { get; set; }

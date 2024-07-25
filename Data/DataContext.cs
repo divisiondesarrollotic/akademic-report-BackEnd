@@ -29,6 +29,7 @@ namespace AkademicReport.Data
         public virtual DbSet<Dia> Dias { get; set; } = null!;
         public virtual DbSet<Diplomado> Diplomados { get; set; } = null!;
         public virtual DbSet<Docentereal> Docentereals { get; set; } = null!;
+        public virtual DbSet<Mese> Meses { get; set; } = null!;
         public virtual DbSet<NivelAcademico> NivelAcademicos { get; set; } = null!;
         public virtual DbSet<NivelUsuario> NivelUsuarios { get; set; } = null!;
         public virtual DbSet<PagoFijo> PagoFijos { get; set; } = null!;
@@ -36,6 +37,7 @@ namespace AkademicReport.Data
         public virtual DbSet<PeriodoAcademico> PeriodoAcademicos { get; set; } = null!;
         public virtual DbSet<Planestudio> Planestudios { get; set; } = null!;
         public virtual DbSet<PlanestudioDocente> PlanestudioDocentes { get; set; } = null!;
+        public virtual DbSet<ProgramasAcademico> ProgramasAcademicos { get; set; } = null!;
         public virtual DbSet<Recinto> Recintos { get; set; } = null!;
         public virtual DbSet<TipoCarga> TipoCargas { get; set; } = null!;
         public virtual DbSet<TipoCargaCodigo> TipoCargaCodigos { get; set; } = null!;
@@ -174,6 +176,8 @@ namespace AkademicReport.Data
 
                 entity.Property(e => e.Curricular).HasColumnName("curricular");
 
+                entity.Property(e => e.DiaMes).HasColumnName("diaMes");
+
                 entity.Property(e => e.Dias).HasColumnName("dias");
 
                 entity.Property(e => e.HoraFin)
@@ -185,6 +189,10 @@ namespace AkademicReport.Data
                     .HasMaxLength(50)
                     .IsUnicode(false)
                     .HasColumnName("hora_inicio");
+
+                entity.Property(e => e.IdMes).HasColumnName("idMes");
+
+                entity.Property(e => e.IdPrograma).HasColumnName("idPrograma");
 
                 entity.Property(e => e.MinutoFin)
                     .HasMaxLength(50)
@@ -236,6 +244,16 @@ namespace AkademicReport.Data
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Dias_cargaDocente");
 
+                entity.HasOne(d => d.IdMesNavigation)
+                    .WithMany(p => p.CargaDocentes)
+                    .HasForeignKey(d => d.IdMes)
+                    .HasConstraintName("FK__carga_doc__idMes__02925FBF");
+
+                entity.HasOne(d => d.IdProgramaNavigation)
+                    .WithMany(p => p.CargaDocentes)
+                    .HasForeignKey(d => d.IdPrograma)
+                    .HasConstraintName("FK__carga_doc__idPro__038683F8");
+
                 entity.HasOne(d => d.ModalidadNavigation)
                     .WithMany(p => p.CargaDocentes)
                     .HasForeignKey(d => d.Modalidad)
@@ -282,10 +300,17 @@ namespace AkademicReport.Data
 
                 entity.Property(e => e.Id).HasColumnName("id");
 
+                entity.Property(e => e.IdPrograma).HasColumnName("idPrograma");
+
                 entity.Property(e => e.Nombre)
                     .HasMaxLength(50)
                     .IsUnicode(false)
                     .HasColumnName("nombre");
+
+                entity.HasOne(d => d.IdProgramaNavigation)
+                    .WithMany(p => p.Conceptos)
+                    .HasForeignKey(d => d.IdPrograma)
+                    .HasConstraintName("FK__concepto__idProg__7DCDAAA2");
             });
 
             modelBuilder.Entity<Configuracion>(entity =>
@@ -403,6 +428,18 @@ namespace AkademicReport.Data
                     .HasConstraintName("FK_vinculo_docente");
             });
 
+            modelBuilder.Entity<Mese>(entity =>
+            {
+                entity.HasKey(e => e.IdMes)
+                    .HasName("PK__Meses__0D1357C0DA646C00");
+
+                entity.Property(e => e.IdMes).ValueGeneratedNever();
+
+                entity.Property(e => e.Nombre)
+                    .HasMaxLength(15)
+                    .IsUnicode(false);
+            });
+
             modelBuilder.Entity<NivelAcademico>(entity =>
             {
                 entity.ToTable("nivel_academico");
@@ -504,6 +541,19 @@ namespace AkademicReport.Data
                 entity.Property(e => e.IdPlanestudio).HasColumnName("id_planestudio");
             });
 
+            modelBuilder.Entity<ProgramasAcademico>(entity =>
+            {
+                entity.HasKey(e => e.IdPrograma)
+                    .HasName("PK__Programa__467DDFD621484A76");
+
+                entity.Property(e => e.IdPrograma).HasColumnName("idPrograma");
+
+                entity.Property(e => e.Nombre)
+                    .HasMaxLength(200)
+                    .IsUnicode(false)
+                    .HasColumnName("nombre");
+            });
+
             modelBuilder.Entity<Recinto>(entity =>
             {
                 entity.ToTable("recinto");
@@ -603,6 +653,8 @@ namespace AkademicReport.Data
                     .IsUnicode(false)
                     .HasColumnName("correo");
 
+                entity.Property(e => e.IdPrograma).HasColumnName("idPrograma");
+
                 entity.Property(e => e.IdRecinto)
                     .HasColumnName("id_recinto")
                     .HasDefaultValueSql("((1))");
@@ -615,6 +667,11 @@ namespace AkademicReport.Data
                     .HasColumnName("nombre");
 
                 entity.Property(e => e.SoftDelete).HasColumnName("soft_delete");
+
+                entity.HasOne(d => d.IdProgramaNavigation)
+                    .WithMany(p => p.Usuarios)
+                    .HasForeignKey(d => d.IdPrograma)
+                    .HasConstraintName("FK__usuario__idProgr__7CD98669");
 
                 entity.HasOne(d => d.IdRecintoNavigation)
                     .WithMany(p => p.Usuarios)

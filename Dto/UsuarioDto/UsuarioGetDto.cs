@@ -1,4 +1,6 @@
-﻿namespace AkademicReport.Dto.UsuarioDto
+﻿using AkademicReport.Dto.ProgramaDto;
+
+namespace AkademicReport.Dto.UsuarioDto
 {
     public class UsuarioGetDto
     {
@@ -10,5 +12,7 @@
         public string? recinto { get; set; }
         public string? id_recinto { get; set; }
         public string? nombre_corto { get; set; }
+        public int? IdPrograma { get; set; }
+        public ProgramaGetDto Programa { get; set; }
     }
 }

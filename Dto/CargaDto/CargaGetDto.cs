@@ -32,6 +32,9 @@ namespace AkademicReport.Dto.CargaDto
         public ConceptoGetDto? Concepto { get; set; }
         [Required]
         public TipoCargaDto TiposCarga { get; set; }
+        public int? DiaMes { get; set; }
+        public int? IdMes { get; set; }
+        public int? IdPrograma { get; set; }
 
 
 

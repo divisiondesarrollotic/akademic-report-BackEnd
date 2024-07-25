@@ -24,7 +24,7 @@ namespace AkademicReport.Service.UsuarioServices
         {
             try
             {
-                var usuarios = await CargarUsuarios();
+                var usuarios = await CargarUsuarios(usuario.IdPrograma.Value);
                 var usuariodb = usuarios.Where(c => c.Correo == usuario.Correo).FirstOrDefault();
                 if (usuariodb != null)
                     return new ServicesResponseMessage<string>() { Status = 204, Message = Msj.MsjUsuarioExiste };
@@ -59,13 +59,13 @@ namespace AkademicReport.Service.UsuarioServices
             }
         }
 
-        public async Task<ServiceResponseData<List<UsuarioGetDto>>> GetAll()
+        public async Task<ServiceResponseData<List<UsuarioGetDto>>> GetAll(int idPrograma)
         {
             try
             {
-                var usuariosdb = await CargarUsuarios();
+                var usuariosdb = await CargarUsuarios(idPrograma);
                 if (usuariosdb.Count<1)
-                    return new ServiceResponseData<List<UsuarioGetDto>>() {Status = 204};
+                    return new ServiceResponseData<List<UsuarioGetDto>>() { Data = _mapper.Map<List<UsuarioGetDto>>(usuariosdb), Message = Msj.MsjNoData,  Status = 204};
                 return new ServiceResponseData<List<UsuarioGetDto>>() { Status = 200, Data=  _mapper.Map<List<UsuarioGetDto>>(usuariosdb) };
             }
             catch (Exception ex)
@@ -78,7 +78,8 @@ namespace AkademicReport.Service.UsuarioServices
         {
             try
             {
-                var usuarios = await CargarUsuarios();
+                var usuarios = await _dataContext.Usuarios.Where(c => c.SoftDelete == 0).Include(c => c.IdRecintoNavigation).Include(c => c.NivelNavigation).Include(c => c.IdProgramaNavigation).ToListAsync();
+
                 var usuariodb = _mapper.Map<UsuarioGetDto>(usuarios.Where(c => c.Id == id).FirstOrDefault());
                 if (usuariodb==null)
                     return new ServiceResponseData<UsuarioGetDto>() { Status = 204 };
@@ -90,11 +91,11 @@ namespace AkademicReport.Service.UsuarioServices
             }
         }
 
-        public async Task<ServiceResponseData<List<UsuarioGetDto>>> GetByIdRecinto(int id)
+        public async Task<ServiceResponseData<List<UsuarioGetDto>>> GetByIdRecinto(int id, int idPrograma)
         {
             try
             {
-                var usuarios = await CargarUsuarios();
+                var usuarios = await CargarUsuarios(idPrograma);
                 var usuariodb = usuarios.Where(c => c.IdRecinto == id);
                 if (usuariodb == null)
                     return new ServiceResponseData<List<UsuarioGetDto>>() { Status = 204 };
@@ -111,7 +112,7 @@ namespace AkademicReport.Service.UsuarioServices
             try
             {
 
-                var usuariodb = await _dataContext.Usuarios.Where(c => c.Correo == credentials.correo && c.Contra == credentials.contra && c.SoftDelete==0).Include(c => c.IdRecintoNavigation).Include(c => c.NivelNavigation).ToListAsync();
+                var usuariodb = await _dataContext.Usuarios.Where(c => c.Correo == credentials.correo && c.Contra == credentials.contra && c.SoftDelete==0).Include(c => c.IdRecintoNavigation).Include(c => c.NivelNavigation).Include(c=>c.IdProgramaNavigation).ToListAsync();
                 if (usuariodb == null)
                     return new ServisResponseLogin<List<UsuarioGetDto>, string>() { Status = 204, Message = (_mapper.Map<List<UsuarioGetDto>>(usuariodb), Msj.MsjCredencialesIncorrectas) };
 
@@ -151,10 +152,10 @@ namespace AkademicReport.Service.UsuarioServices
             }
         }
 
-        public async Task<List<Usuario>>CargarUsuarios()
+        public async Task<List<Usuario>>CargarUsuarios(int idPrograma)
         {
            
-            return await _dataContext.Usuarios.Where(c=>c.SoftDelete==0).Include(c => c.IdRecintoNavigation).Include(c => c.NivelNavigation).ToListAsync();
+            return await _dataContext.Usuarios.Where(c=>c.SoftDelete==0 && c.IdPrograma==idPrograma).Include(c => c.IdRecintoNavigation).Include(c => c.NivelNavigation).Include(c=>c.IdProgramaNavigation) .ToListAsync();
         }
 
         public async Task<ServicesResponseMessage<string>> UpdatePassword(UpdatePasswordDto password)

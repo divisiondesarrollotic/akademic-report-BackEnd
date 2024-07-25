@@ -8,8 +8,10 @@ namespace AkademicReport.Dto.UsuarioDto
         public string? Nombre { get; set; }
         [EmailAddress]
         public string? Correo { get; set; }
+        [Required]
         public int? nivel { get; set; }
         public int? IdRecinto { get; set; }
-
+        [Required]
+        public int? IdPrograma { get; set; }
     }
 }

@@ -39,13 +39,13 @@ namespace AkademicReport.Service.ConceptoServices
             }
         }
 
-        public async Task<ServiceResponseData<List<ConceptoGetDto>>> GetAll()
+        public async Task<ServiceResponseData<List<ConceptoGetDto>>> GetAll(int idPrograma)
         {
             try
             {
-                var concepto = await _dataContext.Conceptos.ToListAsync();
+                var concepto = await _dataContext.Conceptos.Where(c => c.IdPrograma == idPrograma).Include(c=>c.IdProgramaNavigation).ToListAsync();
                 if (concepto.Count < 1)
-                    return new ServiceResponseData<List<ConceptoGetDto>>() { Status = 204 };
+                    return new ServiceResponseData<List<ConceptoGetDto>>() { Data =_mapper.Map<List<ConceptoGetDto>>(concepto), Status = 200, Message=Msj.MsjNoData };
                 return new ServiceResponseData<List<ConceptoGetDto>>() { Status = 200, Data = _mapper.Map<List<ConceptoGetDto>>(concepto) };
             }
             catch (Exception ex)

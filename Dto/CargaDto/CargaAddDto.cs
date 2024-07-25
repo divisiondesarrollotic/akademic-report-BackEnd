@@ -24,5 +24,6 @@ namespace AkademicReport.Dto.CargaDto
         public string Cedula { get; set; } = null!;
      
         public int? idTipoCarga { get; set; }
+
     }
 }

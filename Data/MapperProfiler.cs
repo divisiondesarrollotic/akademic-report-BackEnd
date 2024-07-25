@@ -5,6 +5,7 @@ using AkademicReport.Dto.ConceptoDto;
 using AkademicReport.Dto.DocentesDto;
 using AkademicReport.Dto.NivelDto;
 using AkademicReport.Dto.PeriodoDto;
+using AkademicReport.Dto.ProgramaDto;
 using AkademicReport.Dto.RecintoDto;
 using AkademicReport.Dto.UsuarioDto;
 using AkademicReport.Models;
@@ -23,6 +24,7 @@ namespace AkademicReport.Data
                .ForMember(c => c.nombre_corto, opt => opt.MapFrom(c => c.IdRecintoNavigation.NombreCorto))
                .ForMember(c => c.recinto, opt => opt.MapFrom(c => c.IdRecintoNavigation.Recinto1))
                .ForMember(c => c.id_recinto, opt => opt.MapFrom(c => c.IdRecinto))
+               .ForMember(c=>c.Programa, o=>o.MapFrom(c=>c.IdProgramaNavigation))
             .ForMember(c => c.nivelNombre, opt => opt.MapFrom(c => c.NivelNavigation.Nivel));
 
             CreateMap<PeriodoAcademico, PeriodoGetDto>();
@@ -33,6 +35,8 @@ namespace AkademicReport.Data
             CreateMap<TipoCargaCodigo, TipoCargaDto>();
             CreateMap<TipoCargaDto, TipoCargaCodigo>();
 
+            CreateMap<ProgramasAcademico, ProgramaGetDto>();
+
 
 
 
@@ -41,7 +45,7 @@ namespace AkademicReport.Data
             CreateMap<NivelAcademico, NivelGetDto>();
 
             CreateMap<ConceptoAddDto, Concepto>();
-            CreateMap<Concepto, ConceptoGetDto>();
+            CreateMap<Concepto, ConceptoGetDto>().ForMember(c=>c.Programa, o=>o.MapFrom(c=>c.IdProgramaNavigation));
             CreateMap<ConceptoGetDto, Concepto>();
 
             CreateMap<Aula, AulaGettDto>().ForMember(c=>c.Recinto, o=>o.MapFrom(c=>c.IdrecintoNavigation));

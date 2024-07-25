@@ -50,18 +50,14 @@ namespace AkademicReport.Service.CargaServices
             }
         }
 
-        public async Task<ServiceResponseCarga<DocenteCargaDto, string>> GetCarga(string Cedula, string Periodo, List<DocenteGetDto> Docentes)
+        public async Task<ServiceResponseCarga<DocenteCargaDto, string>> GetCarga(string Cedula, string Periodo, int idPrograma, List<DocenteGetDto> Docentes)
         {
             try
             {
-                contado++;
-                if (contado == 56)
-                {
-                
-                }
+               
 
                 var ResulData = new DocenteCargaDto();
-                var carga = await _dataContext.CargaDocentes.Where(c => c.Cedula.Contains(Cedula) && c.Periodo == Periodo)
+                var carga = await _dataContext.CargaDocentes.Where(c => c.Cedula.Contains(Cedula) && c.Periodo == Periodo && c.IdPrograma==idPrograma)
                     .Include(c => c.DiasNavigation).Include(c => c.CurricularNavigation).Include(c=>c.ModalidadNavigation).ToListAsync();
                 var docentes = Docentes;
                 int Creditos = 0;
@@ -129,7 +125,7 @@ namespace AkademicReport.Service.CargaServices
                     
 
                 }
-                //Este codig
+      
                
                 foreach (var codigo in CodigosIngles)
                 {
@@ -163,14 +159,44 @@ namespace AkademicReport.Service.CargaServices
           
         }
 
-        public async Task<ServiceResponseCarga<DocenteCargaDto, string>> GetCargaCall(string cedula, string periodo)
+        public async Task<ServiceResponseCarga<DocenteCargaDto, string>> GetCargaCall(string cedula, string periodo, int idPrograma)
         {
             FiltroDocentesDto filtro = new FiltroDocentesDto();
             filtro.Filtro= cedula;
             var Docentes = await _docenteService.GetAllFilter(filtro);
-            var Result = await GetCarga(cedula, periodo, Docentes.Data);       
+            var Result = await GetCarga(cedula, periodo, idPrograma, Docentes.Data);       
             return Result;
 
+        }
+
+        public async Task<ServiceResponseData<List<Dia>>> GetDias()
+        {
+            try
+            {
+                var diasDb = await _dataContext.Dias.ToListAsync();
+
+
+                return new ServiceResponseData<List<Dia>>() { Data = diasDb, Status = 200, Message = Msj.MsjSucces };
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponseData<List<Dia>>() { Status = 500, Message = Msj.MsjError + ex.ToString() };
+            }
+        }
+
+        public async Task<ServiceResponseData<List<MesGetDto>>> GetMeses()
+        {
+            try
+            {
+                var meses = await _dataContext.Meses.ToListAsync();
+              
+
+                return new ServiceResponseData<List<MesGetDto>>() { Data = _mapper.Map<List<MesGetDto>>(meses), Status = 200, Message = Msj.MsjSucces };
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponseData<List<MesGetDto>>() { Status = 500, Message = Msj.MsjError + ex.ToString() };
+            }
         }
 
         public async Task<ServiceResponseData<List<TipoDeCargaDto>>> GetTipoCarga()
@@ -216,9 +242,64 @@ namespace AkademicReport.Service.CargaServices
                 carga.Credito = item.credito;
                 carga.NombreProfesor = item.nombre_profesor;
                 carga.Cedula = item.Cedula;
+                carga.DiaMes = null;
+                carga.DiaMes = null;
+                carga.IdPrograma = 1;
                 _dataContext.CargaDocentes.Add(carga);
                 await _dataContext.SaveChangesAsync();
                 return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjInsert };
+            }
+            catch (Exception ex)
+            {
+                return new ServicesResponseMessage<string>() { Status = 500, Message = Msj.MsjError + ex.ToString() };
+            }
+        }
+
+        public async Task<ServicesResponseMessage<string>> InsertCargaPosgrado(CargaPosgradroDto item)
+        {
+            try
+            {
+                //// Validacion el calculo de las horas no puede dar decimal
+                //decimal Horas = CalculoTiempoHoras.Calcular(int.Parse(item.hora_inicio), int.Parse(item.minuto_inicio), int.Parse(item.hora_fin), int.Parse(item.minuto_fin));
+                //if(int.Parse(Horas.ToString().Split('.')[1])<1) return new ServicesResponseMessage<string>() { Status = 400, Message = Msj.MsjHorarioIncorrecto };
+
+                //var cargaDocente = await _cargaDocenteService.GetCargaCall(item.Cedula, item.periodo);
+                //if(cargaDocente.Data.Value.Item1.CantCredito+item.credito>40) return new ServicesResponseMessage<string>() { Status = 400, Message = (cargaDocente.Data.Value.Item1.Docente.tiempoDedicacion=="TC" 
+                //  || cargaDocente.Data.Value.Item1.Docente.tiempoDedicacion == "A" || cargaDocente.Data.Value.Item1.Docente.tiempoDedicacion == "F" 
+                //  || cargaDocente.Data.Value.Item1.Docente.tiempoDedicacion == "M") ?  Msj.MsjPasoDeCredito : Msj.MsjPasoDeCreditoMedioTimepo};
+
+                //if (cargaDocente.Data.Value.Item1.Docente.tiempoDedicacion == "MT" && cargaDocente.Data.Value.Item1.CantCredito + item.credito > 32) return new ServicesResponseMessage<string>() { Status = 400, Message = Msj.MsjPasoDeCreditoMedioTimepo};
+
+                var carga = _mapper.Map<CargaDocente>(item);
+                carga.Seccion = "N/A";
+                carga.Aula = "N/A";
+                carga.IdPrograma = 2;
+                _dataContext.CargaDocentes.Add(carga);
+                await _dataContext.SaveChangesAsync();
+                return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjInsert };
+            }
+            catch (Exception ex)
+            {
+                return new ServicesResponseMessage<string>() { Status = 500, Message = Msj.MsjError + ex.ToString() };
+            }
+        }
+        public async Task<ServicesResponseMessage<string>> UpdateCargaPosgrado(CargaPosgradroDto item)
+        {
+            try
+            {
+                var carga = await _dataContext.CargaDocentes.AsNoTracking().FirstOrDefaultAsync(c => c.Id == Convert.ToInt32(item.Id));
+                if (carga != null)
+                {
+                    carga = _mapper.Map<CargaDocente>(item);
+                    carga.Seccion = "N/A";
+                    carga.Aula = "N/A";
+                    carga.IdPrograma = 2;
+                    _dataContext.Entry(carga).State = EntityState.Modified;
+                    await _dataContext.SaveChangesAsync();
+                }
+
+                return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjUpdate };
+
             }
             catch (Exception ex)
             {

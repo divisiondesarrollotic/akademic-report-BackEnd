@@ -8,5 +8,7 @@ namespace AkademicReport.Dto.CargaDto
         public string? Cedula { get; set; }
         [Required]
         public string? Periodo { get; set; }
+        [Required]
+        public int idPrograma { get; set; }
     }
 }

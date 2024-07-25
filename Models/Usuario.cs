@@ -12,7 +12,9 @@ namespace AkademicReport.Models
         public int Nivel { get; set; }
         public int IdRecinto { get; set; }
         public int SoftDelete { get; set; }
+        public int? IdPrograma { get; set; }
 
+        public virtual ProgramasAcademico? IdProgramaNavigation { get; set; }
         public virtual Recinto IdRecintoNavigation { get; set; } = null!;
         public virtual NivelUsuario NivelNavigation { get; set; } = null!;
     }

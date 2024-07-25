@@ -6,10 +6,10 @@ namespace AkademicReport.Service.UsuarioServices
 {
     public interface IUsuarioService
     {
-        Task<ServiceResponseData<List<UsuarioGetDto>>> GetAll();
+        Task<ServiceResponseData<List<UsuarioGetDto>>> GetAll(int idPrograma);
         Task<ServiceResponseData<UsuarioGetDto>> GetById(int id);
         Task<ServiceResponseData<List<NivelUsuario>>> GetNiveles();
-        Task<ServiceResponseData<List<UsuarioGetDto>>> GetByIdRecinto(int id);
+        Task<ServiceResponseData<List<UsuarioGetDto>>> GetByIdRecinto(int id, int idPrograma);
         Task<ServicesResponseMessage<string>> Create(UsuarioAddDto usuario);
         Task<ServicesResponseMessage<string>> Update(UsuarioUpdateDto usuario);
         Task<ServicesResponseMessage<string>> UpdatePassword(UpdatePasswordDto password);

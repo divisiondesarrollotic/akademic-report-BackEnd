@@ -24,5 +24,8 @@ namespace AkademicReport.Dto.CargaDto
         public string nombre_profesor { get; set; } = null!;
         public string Cedula { get; set; } = null!;
         public int? idTipoCarga { get; set; }
+        public int? DiaMes { get; set; }
+        public int? IdMes { get; set; }
+        public int? IdPrograma { get; set; }
     }
 }

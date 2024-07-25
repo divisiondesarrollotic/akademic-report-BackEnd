@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace AkademicReport.Models
+namespace AkademicReport.Dto.CargaDto
 {
-    public partial class CargaDocente
+    public class CargaPosgradroDto
     {
         public int Id { get; set; }
         public int? Curricular { get; set; }
@@ -12,8 +11,6 @@ namespace AkademicReport.Models
         public string CodAsignatura { get; set; } = null!;
         public string NombreAsignatura { get; set; } = null!;
         public string CodUniversitas { get; set; } = null!;
-        public string Seccion { get; set; } = null!;
-        public string Aula { get; set; } = null!;
         public int? Modalidad { get; set; }
         public int Dias { get; set; }
         public string? HoraInicio { get; set; }
@@ -27,11 +24,5 @@ namespace AkademicReport.Models
         public int? DiaMes { get; set; }
         public int? IdMes { get; set; }
         public int? IdPrograma { get; set; }
-
-        public virtual TipoCarga? CurricularNavigation { get; set; }
-        public virtual Dia DiasNavigation { get; set; } = null!;
-        public virtual Mese? IdMesNavigation { get; set; }
-        public virtual ProgramasAcademico? IdProgramaNavigation { get; set; }
-        public virtual TipoModalidad? ModalidadNavigation { get; set; }
     }
 }

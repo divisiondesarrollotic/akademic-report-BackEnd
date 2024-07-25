@@ -3,6 +3,7 @@ using AkademicReport.Service;
 using AkademicReport.Service.UsuarioServices;
 using AkademicReport.Utilities;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace AkademicReport.Controllers
 {
@@ -102,10 +103,10 @@ namespace AkademicReport.Controllers
         ///  </summary>
         /// <returns></returns>
         [HttpGet]
-        [Route("recinto/{id}")]
-        public async Task<ActionResult> GetByIdRectino(int id)
+        [Route("recinto/{id}/{idprograma}")]
+        public async Task<ActionResult> GetByIdRectino(int id, [Required] int idprograma)
         {
-            return Ok(await _service.GetByIdRecinto(id));
+            return Ok(await _service.GetByIdRecinto(id, idprograma));
         }
         // <summary>
         /// --Este get trae los usuarios por id
@@ -122,9 +123,10 @@ namespace AkademicReport.Controllers
         ///  </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult> GetAll()
+        [Route("getusuarios/{idprograma}")]
+        public async Task<ActionResult> GetAll(int idprograma)
         {
-            return Ok(await _service.GetAll());
+            return Ok(await _service.GetAll(idprograma));
         }
     }
 }
