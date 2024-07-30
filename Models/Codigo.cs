@@ -17,8 +17,10 @@ namespace AkademicReport.Models
         public string? Nombre { get; set; }
         public string? Horas { get; set; }
         public string? Descripcion { get; set; }
+        public int? IdPrograma { get; set; }
 
         public virtual Concepto? IdConceptoNavigation { get; set; }
+        public virtual ProgramasAcademico? IdProgramaNavigation { get; set; }
         public virtual ICollection<TipoCargaCodigo> TipoCargaCodigos { get; set; }
         public virtual ICollection<TipoModalidadCodigo> TipoModalidadCodigos { get; set; }
     }

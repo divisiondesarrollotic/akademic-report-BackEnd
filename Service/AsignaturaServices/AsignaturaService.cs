@@ -52,11 +52,15 @@ namespace AkademicReport.Service.AsignaturaServices
             }
         }
 
-        public async Task<ServiceResponseData<List<AsignaturaGetDto>>> GetAll()
+        public async Task<ServiceResponseData<List<AsignaturaGetDto>>> GetAll(int IdPrograma)
         {
             try
             {
-                var codigos = await _dataContext.Codigos.Include(c => c.TipoCargaCodigos).ThenInclude(c => c.IdTipoCargaNavigation).Include(c => c.IdConceptoNavigation).Include(c=>c.TipoModalidadCodigos).ToListAsync();
+                var codigos = await _dataContext.Codigos.Where(c=>c.IdPrograma==IdPrograma).Include(c => c.TipoCargaCodigos).ThenInclude(c => c.IdTipoCargaNavigation)
+                    .Include(c => c.IdConceptoNavigation)
+                    .Include(c=>c.TipoModalidadCodigos)
+                    .Include(c=>c.IdProgramaNavigation)
+                    .ToListAsync();
 
                 var CodigoMap = _mapper.Map<List<AsignaturaGetDto>>(codigos);
                 foreach (var item in CodigoMap)
@@ -101,18 +105,18 @@ namespace AkademicReport.Service.AsignaturaServices
             }
         }
 
-        public async Task<ServiceResponseData<List<AsignaturaGetDto>>> GetAllByIdConcepto(int idConcepto)
+        public async Task<ServiceResponseData<List<AsignaturaGetDto>>> GetAllByIdConcepto(int idConcepto, int IdPrograma)
         {
-            var Data = await GetAll();
+            var Data = await GetAll(IdPrograma);
             Data.Data = Data.Data.Where(c => c.Id_concepto == idConcepto).ToList();
             return Data;
         }
 
-        public async Task<ServiceResponseData<List<AsignaturaGetDto>>> GetAllFilter(string filtro)
+        public async Task<ServiceResponseData<List<AsignaturaGetDto>>> GetAllFilter(string filtro, int IdPrograma)
         {
             try
             {
-                var codigos = await _dataContext.Codigos.Where(c => c.Codigo1.ToUpper().Contains(filtro.ToUpper().Trim()) || c.Nombre.ToUpper().Contains(filtro.ToUpper())).Include(c => c.TipoCargaCodigos).ThenInclude(c=>c.IdTipoCargaNavigation).Include(c => c.IdConceptoNavigation).Include(c=>c.TipoModalidadCodigos).ToListAsync();
+                var codigos = await _dataContext.Codigos.Where(c=>c.IdPrograma==IdPrograma && c.Codigo1.ToUpper().Contains(filtro.ToUpper().Trim()) || c.Nombre.ToUpper().Contains(filtro.ToUpper())).Include(c => c.TipoCargaCodigos).ThenInclude(c=>c.IdTipoCargaNavigation).Include(c => c.IdConceptoNavigation).Include(c=>c.TipoModalidadCodigos).Include(c=>c.IdProgramaNavigation).ToListAsync();
 
                 var CodigoMap = _mapper.Map<List<AsignaturaGetDto>>(codigos);
                 foreach (var item in CodigoMap)
@@ -165,8 +169,7 @@ namespace AkademicReport.Service.AsignaturaServices
         {
             try
             {
-                var codigos = await GetAll();
-              //  var CodigoMap = _mapper.Map<List<AsignaturaGetDto>>(codigos).OrderBy(c=>c.Id).Skip(filtro.paginaActual.Value-1 * filtro.elementosPorPagina.Value).Take(filtro.elementosPorPagina.Value).ToList();
+                var codigos = await GetAll(filtro.idPrograma.Value);
                 int CantReg = codigos.Data.Count;
                 int CantRegistrosSolicitado = filtro.elementosPorPagina.Value;
                 decimal TotalPage = Convert.ToDecimal(CantReg) / Convert.ToDecimal(CantRegistrosSolicitado);
@@ -185,11 +188,7 @@ namespace AkademicReport.Service.AsignaturaServices
                 decimal ParteEntera = Math.Truncate(TotalPage);
                 if (TotalPage > ParteEntera && (CantRegistrosSolicitado / CantReg) > 1)
                 { TotalPage = TotalPage + 1; }
-                //foreach (var item in result)
-                //{
-                //    item.Modalida = codigos.Data.Where(c => c.Id == item.Id).First().Modalida.ToString().Split(',').ToList();
-                //}
-            
+      
                 if (codigos.Data.Count < 1)
                     return new ServiceResponseDataPaginacion<List<AsignaturaGetDto>>() { Status = 204 };
                 return new ServiceResponseDataPaginacion<List<AsignaturaGetDto>>() { Status = 200, Data = result, TotalPaginas=codigos.Data.Count / filtro.elementosPorPagina, TotalRegistros = codigos.Data.Count };
@@ -221,17 +220,13 @@ namespace AkademicReport.Service.AsignaturaServices
         }
     
 
-        public async Task<ServiceResponseData<List<AsignaturaGetDto>>> GetById(int id)
+        public async Task<ServiceResponseData<List<AsignaturaGetDto>>> GetById(int id, int IdPrograma)
         {
             try
             {
-                var codigos = await GetAll();
+                var codigos = await GetAll(IdPrograma);
                  var data  = codigos.Data.Where(c => c.Id==id).ToList();
                 var CodigoMap = _mapper.Map<List<AsignaturaGetDto>>(data);
-                //foreach (var item in CodigoMap)
-                //{
-                //    item.Modalida = data.Where(c => c.Id == item.Id).First().Modalida.ToString().Split(',').ToList();
-                //}
 
                 if (CodigoMap.Count < 1)
                     return new ServiceResponseData<List<AsignaturaGetDto>>() { Status = 204 };

@@ -72,7 +72,8 @@ namespace AkademicReport.Data
                 .MapFrom(c => c.IdConcepto))
                 .ForMember(c => c.Codigo, opt => opt.MapFrom(c => c.Codigo1))
                 .ForMember(a => a.Modalidades, opt => opt.MapFrom(c=>c.TipoModalidadCodigos.FirstOrDefault(c=>c.Idcodigo==c.Idcodigo).IdTipoModalidadNavigation))
-                .ForMember(c => c.TiposCargas, opt => opt.MapFrom(c=>c.TipoCargaCodigos));
+                .ForMember(c => c.TiposCargas, opt => opt.MapFrom(c=>c.TipoCargaCodigos))
+                .ForMember(c=>c.Programa, o=>o.MapFrom(c=>c.IdProgramaNavigation));
 
 
 

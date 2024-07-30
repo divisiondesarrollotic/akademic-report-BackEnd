@@ -19,10 +19,10 @@ namespace AkademicReport.Controllers
         /// --Este get trae todos los codigos con todas sus caracteristicas
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
-        public async Task<ActionResult> GetAll()
+        [HttpGet("{idprograma}")]
+        public async Task<ActionResult> GetAll(int idprograma)
         {
-            return Ok(await _service.GetAll());
+            return Ok(await _service.GetAll(idprograma));
         }
         /// <summary>
         /// --Este get trae las modalidades existentes en el sistema
@@ -39,10 +39,10 @@ namespace AkademicReport.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Route("codigo-filter/{filtro}")]
-        public async Task<ActionResult> GetAllFilter( string filtro)
+        [Route("codigo-filter/{filtro}/{idprograma}")]
+        public async Task<ActionResult> GetAllFilter( string filtro, int idprograma)
         {
-            return Ok(await _service.GetAllFilter(filtro));
+            return Ok(await _service.GetAllFilter(filtro, idprograma));
         }
 
         /// <summary>
@@ -63,20 +63,20 @@ namespace AkademicReport.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Route("concepto/{id}")]
-        public async Task<ActionResult> GetAllByIdConcepto(int id)
+        [Route("concepto/{id}/{idprograma}")]
+        public async Task<ActionResult> GetAllByIdConcepto(int id, int idprograma)
         {
-            return Ok(await _service.GetAllByIdConcepto(id));
+            return Ok(await _service.GetAllByIdConcepto(id, idprograma));
         }
 
         /// <summary>
         /// --Este get  busca un codigo/asignatura por id
         /// </summary>
         /// <returns></returns>
-        [HttpGet("{id}")]
-        public async Task<ActionResult> GetById(int id)
+        [HttpGet("{id}/{idprograma}")]
+        public async Task<ActionResult> GetById(int id, int idprograma)
         {
-            return Ok(await _service.GetById(id));
+            return Ok(await _service.GetById(id, idprograma));
         }
 
         /// <summary>

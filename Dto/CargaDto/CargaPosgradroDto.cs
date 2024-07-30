@@ -4,8 +4,7 @@ namespace AkademicReport.Dto.CargaDto
 {
     public class CargaPosgradroDto
     {
-        public int Id { get; set; }
-        public int? Curricular { get; set; }
+        public int? Id { get; set; }
         public string Periodo { get; set; } = null!;
         public string Recinto { get; set; } = null!;
         public string CodAsignatura { get; set; } = null!;
@@ -17,7 +16,6 @@ namespace AkademicReport.Dto.CargaDto
         public string? MinutoInicio { get; set; }
         public string? HoraFin { get; set; }
         public string? MinutoFin { get; set; }
-        public double NumeroHora { get; set; }
         public int Credito { get; set; }
         public string NombreProfesor { get; set; } = null!;
         public string Cedula { get; set; } = null!;

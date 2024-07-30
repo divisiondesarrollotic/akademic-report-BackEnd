@@ -283,6 +283,8 @@ namespace AkademicReport.Data
 
                 entity.Property(e => e.IdConcepto).HasColumnName("id_concepto");
 
+                entity.Property(e => e.IdPrograma).HasColumnName("idPrograma");
+
                 entity.Property(e => e.Nombre)
                     .HasMaxLength(100)
                     .IsUnicode(false)
@@ -292,6 +294,11 @@ namespace AkademicReport.Data
                     .WithMany(p => p.Codigos)
                     .HasForeignKey(d => d.IdConcepto)
                     .HasConstraintName("codigo_concepto_FK");
+
+                entity.HasOne(d => d.IdProgramaNavigation)
+                    .WithMany(p => p.Codigos)
+                    .HasForeignKey(d => d.IdPrograma)
+                    .HasConstraintName("FK__codigo__idProgra__056ECC6A");
             });
 
             modelBuilder.Entity<Concepto>(entity =>
@@ -446,12 +453,19 @@ namespace AkademicReport.Data
 
                 entity.Property(e => e.Id).HasColumnName("id");
 
+                entity.Property(e => e.IdPrograma).HasColumnName("idPrograma");
+
                 entity.Property(e => e.Nivel)
                     .HasMaxLength(260)
                     .IsUnicode(false)
                     .HasColumnName("nivel");
 
                 entity.Property(e => e.PagoHora).HasColumnName("pago_hora");
+
+                entity.HasOne(d => d.IdProgramaNavigation)
+                    .WithMany(p => p.NivelAcademicos)
+                    .HasForeignKey(d => d.IdPrograma)
+                    .HasConstraintName("FK__nivel_aca__idPro__047AA831");
             });
 
             modelBuilder.Entity<NivelUsuario>(entity =>

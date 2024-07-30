@@ -274,6 +274,9 @@ namespace AkademicReport.Service.CargaServices
                 carga.Seccion = "N/A";
                 carga.Aula = "N/A";
                 carga.IdPrograma = 2;
+                carga.Curricular = null;
+                carga.NumeroHora = 0;
+
                 _dataContext.CargaDocentes.Add(carga);
                 await _dataContext.SaveChangesAsync();
                 return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjInsert };
@@ -294,6 +297,8 @@ namespace AkademicReport.Service.CargaServices
                     carga.Seccion = "N/A";
                     carga.Aula = "N/A";
                     carga.IdPrograma = 2;
+                    carga.Curricular = null;
+                    carga.NumeroHora = 0;
                     _dataContext.Entry(carga).State = EntityState.Modified;
                     await _dataContext.SaveChangesAsync();
                 }

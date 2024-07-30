@@ -1,4 +1,6 @@
-﻿namespace AkademicReport.Dto.AsignaturaDto
+﻿using AkademicReport.Dto.ProgramaDto;
+
+namespace AkademicReport.Dto.AsignaturaDto
 {
     public class AsignaturaGetDto
     {
@@ -11,5 +13,6 @@
         public string? Nombre { get; set; }
         public string? Horas { get; set; }
         public string? Descripcion { get; set; }
+        public ProgramaGetDto? Programa { get; set; }
     }
 }
