@@ -1,5 +1,7 @@
 ﻿using AkademicReport.Dto.ConceptoDto;
+using AkademicReport.Dto.ConceptoPosgradoDto;
 using AkademicReport.Dto.NivelDto;
+using AkademicReport.Models;
 
 namespace AkademicReport.Service.ConceptoServices
 {
@@ -10,6 +12,14 @@ namespace AkademicReport.Service.ConceptoServices
         Task<ServicesResponseMessage<string>> Insert(ConceptoAddDto item);
         Task<ServicesResponseMessage<string>> Update(ConceptoGetDto item);
         Task<ServicesResponseMessage<string>> Delete(int id);
+
+
+
+        Task<ServiceResponseData<List<ConceptoPosDto>>> GetAllPos();
+        Task<ServiceResponseData<List<ConceptoPosDto>>> GetByIdPos(int id);
+        Task<ServicesResponseMessage<string>> InsertPos(ConceptoPosDto item);
+        Task<ServicesResponseMessage<string>> UpdatePos(ConceptoPosDto item);
+        Task<ServicesResponseMessage<string>> DeletePos(int id);
     }
 }
 

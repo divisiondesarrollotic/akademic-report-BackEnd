@@ -6,6 +6,6 @@ namespace AkademicReport.Dto.ConceptoDto
     {
         public int? Id { get; set; }
         public string Nombre { get; set; } = null!;
-        public ProgramaGetDto? Programa { get; set; }
+        public int? IdPrograma { get; set; }
     }
 }

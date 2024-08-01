@@ -14,7 +14,7 @@ namespace AkademicReport.Service.CargaServices
         Task<ServicesResponseMessage<string>> UpdateCargaPosgrado(CargaPosgradroDto item);
         Task<ServicesResponseMessage<string>> Update(CargaUpdateDto item);
         Task<ServicesResponseMessage<string>> Delete(int id);
-        Task<ServiceResponseData<List<TipoDeCargaDto>>> GetTipoCarga();
+        Task<ServiceResponseData<List<TipoDeCargaDto>>> GetTipoCarga(int IdPrograma);
         Task<ServiceResponseData<List<MesGetDto>>> GetMeses();
         Task<ServiceResponseData<List<Dia>>> GetDias();
     }

@@ -199,10 +199,10 @@ namespace AkademicReport.Service.CargaServices
             }
         }
 
-        public async Task<ServiceResponseData<List<TipoDeCargaDto>>> GetTipoCarga()
+        public async Task<ServiceResponseData<List<TipoDeCargaDto>>> GetTipoCarga(int IdPrograma)
         {
 
-            var TipoCargas = await _dataContext.TipoCargas.ProjectTo<TipoDeCargaDto>(_mapper.ConfigurationProvider).ToListAsync();     
+            var TipoCargas = await _dataContext.TipoCargas.ProjectTo<TipoDeCargaDto>(_mapper.ConfigurationProvider).Where(c=>c.IdPrograma==IdPrograma).ToListAsync();     
             return new ServiceResponseData<List<TipoDeCargaDto>>() { Status = 200, Data = TipoCargas};
            
            

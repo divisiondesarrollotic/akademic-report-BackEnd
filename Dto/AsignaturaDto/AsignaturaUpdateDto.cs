@@ -6,7 +6,7 @@ namespace AkademicReport.Dto.AsignaturaDto
     public class AsignaturaUpdateDto
     {
         public int Id { get; set; }
-        [Required]
+       
         public int? id_concepto { get; set; }
         public string? Codigo { get; set; }
         public List<TipoModalidadDto>? Modalidades { get; set; }

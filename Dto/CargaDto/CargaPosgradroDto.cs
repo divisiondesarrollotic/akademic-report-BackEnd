@@ -22,5 +22,7 @@ namespace AkademicReport.Dto.CargaDto
         public int? DiaMes { get; set; }
         public int? IdMes { get; set; }
         public int? IdPrograma { get; set; }
+        public int? IdConcepto { get; set; }
+
     }
 }

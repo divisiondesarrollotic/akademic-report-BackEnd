@@ -95,8 +95,8 @@ namespace AkademicReport.Service.AsignaturaServices
                     }
                 }
 
-                if (codigos.Count < 1)
-                    return new ServiceResponseData<List<AsignaturaGetDto>>() { Status = 204 };
+                if (CodigoMap.Count < 1)
+                    return new ServiceResponseData<List<AsignaturaGetDto>>() { Data = CodigoMap, Status = 204, Message=Msj.MsjNoData };
                 return new ServiceResponseData<List<AsignaturaGetDto>>() { Status = 200, Data = CodigoMap };
             }
             catch (Exception ex)
@@ -244,14 +244,18 @@ namespace AkademicReport.Service.AsignaturaServices
             {
                 EntityEntry<Codigo> result =  _dataContext.Codigos.Add(_mapper.Map<Codigo>(item));
                 await _dataContext.SaveChangesAsync();
-                foreach (var i in item.TiposCargas)
+                if(item.TiposCargas!=null)
                 {
-                    TipoCargaPivot Privot = new TipoCargaPivot();
-                    Privot.IdTipoCarga = i.Id;
-                    Privot.IdCodigo = result.Entity.Id;
-                    _dataContext.TipoCargaCodigos.Add(_mapper.Map<TipoCargaCodigo>(Privot));
+                    foreach (var i in item.TiposCargas)
+                    {
+                        TipoCargaPivot Privot = new TipoCargaPivot();
+                        Privot.IdTipoCarga = i.Id;
+                        Privot.IdCodigo = result.Entity.Id;
+                        _dataContext.TipoCargaCodigos.Add(_mapper.Map<TipoCargaCodigo>(Privot));
 
+                    }
                 }
+               
                 foreach (var modalidad in item.Modalidades)
                 {
                     TipoModalidadCodigo Privot = new TipoModalidadCodigo();

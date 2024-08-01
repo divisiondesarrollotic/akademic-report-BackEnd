@@ -2,6 +2,7 @@
 using AkademicReport.Dto.AulaDto;
 using AkademicReport.Dto.CargaDto;
 using AkademicReport.Dto.ConceptoDto;
+using AkademicReport.Dto.ConceptoPosgradoDto;
 using AkademicReport.Dto.DocentesDto;
 using AkademicReport.Dto.NivelDto;
 using AkademicReport.Dto.PeriodoDto;
@@ -45,7 +46,7 @@ namespace AkademicReport.Data
             CreateMap<NivelAcademico, NivelGetDto>();
 
             CreateMap<ConceptoAddDto, Concepto>();
-            CreateMap<Concepto, ConceptoGetDto>().ForMember(c=>c.Programa, o=>o.MapFrom(c=>c.IdProgramaNavigation));
+            CreateMap<Concepto, ConceptoGetDto>();
             CreateMap<ConceptoGetDto, Concepto>();
 
             CreateMap<Aula, AulaGettDto>().ForMember(c=>c.Recinto, o=>o.MapFrom(c=>c.IdrecintoNavigation));
@@ -53,7 +54,7 @@ namespace AkademicReport.Data
           
             CreateMap<Paisesnacionalidade, NacionalidadDto>();
 
-            CreateMap<TipoCarga, TipoDeCargaDto>();
+            CreateMap<TipoCarga, TipoDeCargaDto>().ForMember(c=>c.Programa, o=>o.MapFrom(c=>c.IdProgramaNavigation));
             CreateMap<TipoCarga, TipoCargaDto>();
             CreateMap<TipoCargaPivot, TipoCargaCodigo>();
 
@@ -116,6 +117,8 @@ namespace AkademicReport.Data
             // .ForMember(c => c.TiposCarga, o => o.MapFrom(c => c.CurricularNavigation));
 
 
+            CreateMap<ConceptoPosgrado, ConceptoPosDto>();
+            CreateMap<ConceptoPosDto, ConceptoPosgrado>();
 
 
         }

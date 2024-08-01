@@ -1,5 +1,6 @@
 ﻿using AkademicReport.Data;
 using AkademicReport.Dto.ConceptoDto;
+using AkademicReport.Dto.ConceptoPosgradoDto;
 using AkademicReport.Dto.NivelDto;
 using AkademicReport.Models;
 using AkademicReport.Utilities;
@@ -39,6 +40,27 @@ namespace AkademicReport.Service.ConceptoServices
             }
         }
 
+        public async Task<ServicesResponseMessage<string>> DeletePos(int id)
+        {
+            try
+            {
+                var concepto = await _dataContext.ConceptoPosgrados.FirstOrDefaultAsync(c => c.IdConceptoPosgrado == id);
+                if (concepto == null)
+                    return new ServicesResponseMessage<string>() { Status = 204, Message = Msj.MsjNoRegistros };
+
+                var cargaDb = await _dataContext.CargaDocentes.Where(c => c.IdConceptoPosgrado == id).ToListAsync();
+                if (cargaDb.Count > 0)
+                    return new ServicesResponseMessage<string>() { Status = 204, Message = Msj.MsjNoEliminarCodigo };
+                _dataContext.ConceptoPosgrados.Remove(concepto);
+                await _dataContext.SaveChangesAsync();
+                return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjDelete };
+            }
+            catch (Exception ex)
+            {
+                return new ServicesResponseMessage<string>() { Status = 500, Message = Msj.MsjError + ex.ToString };
+            }
+        }
+
         public async Task<ServiceResponseData<List<ConceptoGetDto>>> GetAll(int idPrograma)
         {
             try
@@ -51,6 +73,21 @@ namespace AkademicReport.Service.ConceptoServices
             catch (Exception ex)
             {
                 return new ServiceResponseData<List<ConceptoGetDto>>() { Status = 500 };
+            }
+        }
+
+        public async Task<ServiceResponseData<List<ConceptoPosDto>>> GetAllPos()
+        {
+            try
+            {
+                var concepto = await _dataContext.ConceptoPosgrados.ToListAsync();
+                if (concepto.Count < 1)
+                    return new ServiceResponseData<List<ConceptoPosDto>>() { Data = _mapper.Map<List<ConceptoPosDto>>(concepto), Status = 200, Message = Msj.MsjNoData };
+                return new ServiceResponseData<List<ConceptoPosDto>>() { Status = 200, Data = _mapper.Map<List<ConceptoPosDto>>(concepto) };
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponseData<List<ConceptoPosDto>>() { Status = 500 };
             }
         }
 
@@ -69,11 +106,40 @@ namespace AkademicReport.Service.ConceptoServices
             }
         }
 
+        public async Task<ServiceResponseData<List<ConceptoPosDto>>> GetByIdPos(int id)
+        {
+            try
+            {
+                var concepto = await _dataContext.ConceptoPosgrados.ToListAsync();
+                if (concepto.Count < 1)
+                    return new ServiceResponseData<List<ConceptoPosDto>>() { Status = 204 };
+                return new ServiceResponseData<List<ConceptoPosDto>>() { Status = 200, Data = _mapper.Map<List<ConceptoPosDto>>(concepto.Where(c => c.IdConceptoPosgrado == id)) };
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponseData<List<ConceptoPosDto>>() { Status = 500 };
+            }
+        }
+
         public async Task<ServicesResponseMessage<string>> Insert(ConceptoAddDto item)
         {
             try
             {
                 _dataContext.Conceptos.Add(_mapper.Map<Concepto>(item));
+                await _dataContext.SaveChangesAsync();
+                return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjInsert };
+            }
+            catch (Exception ex)
+            {
+                return new ServicesResponseMessage<string>() { Status = 500, Message = Msj.MsjError + ex.ToString() };
+            }
+        }
+
+        public async Task<ServicesResponseMessage<string>> InsertPos(ConceptoPosDto item)
+        {
+            try
+            {
+                _dataContext.ConceptoPosgrados.Add(_mapper.Map<ConceptoPosgrado>(item));
                 await _dataContext.SaveChangesAsync();
                 return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjInsert };
             }
@@ -89,6 +155,7 @@ namespace AkademicReport.Service.ConceptoServices
             {
                 var concepto = await _dataContext.Conceptos.AsNoTracking().FirstOrDefaultAsync(c=>c.Id==item.Id);
                 concepto = _mapper.Map<Concepto>(item);
+                
                 _dataContext.Entry(concepto).State = EntityState.Modified;
                 _dataContext.SaveChangesAsync();
                 if (concepto==null)
@@ -98,6 +165,24 @@ namespace AkademicReport.Service.ConceptoServices
             catch (Exception ex)
             {
                 return new ServicesResponseMessage< string>() { Status = 500 , Message=Msj.MsjError + ex.ToString() };
+            }
+        }
+
+        public async Task<ServicesResponseMessage<string>> UpdatePos(ConceptoPosDto item)
+        {
+            try
+            {
+                var concepto = await _dataContext.ConceptoPosgrados.AsNoTracking().FirstOrDefaultAsync(c => c.IdConceptoPosgrado == item.IdConceptoPosgrado);
+                concepto = _mapper.Map<ConceptoPosgrado>(item);
+                _dataContext.Entry(concepto).State = EntityState.Modified;
+                _dataContext.SaveChangesAsync();
+                if (concepto == null)
+                    return new ServicesResponseMessage<string>() { Status = 204 };
+                return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjUpdate };
+            }
+            catch (Exception ex)
+            {
+                return new ServicesResponseMessage<string>() { Status = 500, Message = Msj.MsjError + ex.ToString() };
             }
         }
     }

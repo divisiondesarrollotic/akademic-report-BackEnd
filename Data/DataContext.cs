@@ -24,6 +24,7 @@ namespace AkademicReport.Data
         public virtual DbSet<CargaDocente> CargaDocentes { get; set; } = null!;
         public virtual DbSet<Codigo> Codigos { get; set; } = null!;
         public virtual DbSet<Concepto> Conceptos { get; set; } = null!;
+        public virtual DbSet<ConceptoPosgrado> ConceptoPosgrados { get; set; } = null!;
         public virtual DbSet<Configuracion> Configuracions { get; set; } = null!;
         public virtual DbSet<Contrato> Contratos { get; set; } = null!;
         public virtual DbSet<Dia> Dias { get; set; } = null!;
@@ -190,6 +191,8 @@ namespace AkademicReport.Data
                     .IsUnicode(false)
                     .HasColumnName("hora_inicio");
 
+                entity.Property(e => e.IdConceptoPosgrado).HasColumnName("idConceptoPosgrado");
+
                 entity.Property(e => e.IdMes).HasColumnName("idMes");
 
                 entity.Property(e => e.IdPrograma).HasColumnName("idPrograma");
@@ -243,6 +246,11 @@ namespace AkademicReport.Data
                     .HasForeignKey(d => d.Dias)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Dias_cargaDocente");
+
+                entity.HasOne(d => d.IdConceptoPosgradoNavigation)
+                    .WithMany(p => p.CargaDocentes)
+                    .HasForeignKey(d => d.IdConceptoPosgrado)
+                    .HasConstraintName("FK__carga_doc__idCon__0EF836A4");
 
                 entity.HasOne(d => d.IdMesNavigation)
                     .WithMany(p => p.CargaDocentes)
@@ -310,7 +318,7 @@ namespace AkademicReport.Data
                 entity.Property(e => e.IdPrograma).HasColumnName("idPrograma");
 
                 entity.Property(e => e.Nombre)
-                    .HasMaxLength(50)
+                    .HasMaxLength(200)
                     .IsUnicode(false)
                     .HasColumnName("nombre");
 
@@ -318,6 +326,21 @@ namespace AkademicReport.Data
                     .WithMany(p => p.Conceptos)
                     .HasForeignKey(d => d.IdPrograma)
                     .HasConstraintName("FK__concepto__idProg__7DCDAAA2");
+            });
+
+            modelBuilder.Entity<ConceptoPosgrado>(entity =>
+            {
+                entity.HasKey(e => e.IdConceptoPosgrado)
+                    .HasName("PK__Concepto__49BA2621CA18F044");
+
+                entity.ToTable("ConceptoPosgrado");
+
+                entity.Property(e => e.IdConceptoPosgrado).HasColumnName("idConceptoPosgrado");
+
+                entity.Property(e => e.Nombre)
+                    .HasMaxLength(200)
+                    .IsUnicode(false)
+                    .HasColumnName("nombre");
             });
 
             modelBuilder.Entity<Configuracion>(entity =>
@@ -591,10 +614,17 @@ namespace AkademicReport.Data
 
                 entity.Property(e => e.Id).HasColumnName("id");
 
+                entity.Property(e => e.IdPrograma).HasColumnName("idPrograma");
+
                 entity.Property(e => e.Nombre)
                     .HasMaxLength(500)
                     .IsUnicode(false)
                     .HasColumnName("nombre");
+
+                entity.HasOne(d => d.IdProgramaNavigation)
+                    .WithMany(p => p.TipoCargas)
+                    .HasForeignKey(d => d.IdPrograma)
+                    .HasConstraintName("FK__tipo_carg__idPro__0662F0A3");
             });
 
             modelBuilder.Entity<TipoCargaCodigo>(entity =>

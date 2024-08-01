@@ -115,10 +115,10 @@ namespace AkademicReport.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Route("get-tipo-carga")]
-        public async Task<ActionResult>GetTipoCarga()
+        [Route("get-tipo-carga/{idprograma}")]
+        public async Task<ActionResult>GetTipoCarga(int idprograma)
         {
-            return Ok(await _service.GetTipoCarga());
+            return Ok(await _service.GetTipoCarga(idprograma));
         }
     }
 }
