@@ -116,13 +116,14 @@ namespace AkademicReport.Service.AsignaturaServices
         {
             try
             {
-                var codigos = await _dataContext.Codigos.Where(c=>c.IdPrograma==IdPrograma && c.Codigo1.ToUpper().Contains(filtro.ToUpper().Trim()) || c.Nombre.ToUpper().Contains(filtro.ToUpper())).Include(c => c.TipoCargaCodigos).ThenInclude(c=>c.IdTipoCargaNavigation).Include(c => c.IdConceptoNavigation).Include(c=>c.TipoModalidadCodigos).Include(c=>c.IdProgramaNavigation).ToListAsync();
+                var codigosDb = await _dataContext.Codigos.Where(c=>c.IdPrograma==IdPrograma).Include(c => c.TipoCargaCodigos).ThenInclude(c=>c.IdTipoCargaNavigation).Include(c => c.IdConceptoNavigation).Include(c=>c.TipoModalidadCodigos).Include(c=>c.IdProgramaNavigation).ToListAsync();
+                var codigosFilter =  codigosDb.Where(c =>  c.Codigo1.ToUpper().Contains(filtro.ToUpper().Trim()) || c.Nombre.ToUpper().Contains(filtro.ToUpper()));
 
-                var CodigoMap = _mapper.Map<List<AsignaturaGetDto>>(codigos);
+                var CodigoMap = _mapper.Map<List<AsignaturaGetDto>>(codigosFilter);
                 foreach (var item in CodigoMap)
                 {
 
-                    var a = codigos.FirstOrDefault(c => c.Id == item.Id).TipoCargaCodigos.Where(c => c.IdCodigo == item.Id).ToList(); 
+                    var a = codigosDb.FirstOrDefault(c => c.Id == item.Id).TipoCargaCodigos.Where(c => c.IdCodigo == item.Id).ToList(); 
                     if (item.TiposCargas != null && item.TiposCargas.Any())
                     {
                         item.TiposCargas = new List<TipoCargaDto>();
@@ -155,7 +156,7 @@ namespace AkademicReport.Service.AsignaturaServices
 
                 }
 
-                if (codigos.Count < 1)
+                if (codigosDb.Count < 1)
                     return new ServiceResponseData<List<AsignaturaGetDto>>() { Data=new List<AsignaturaGetDto>(), Status = 204 };
                 return new ServiceResponseData<List<AsignaturaGetDto>>() { Status = 200, Data = CodigoMap };
             }

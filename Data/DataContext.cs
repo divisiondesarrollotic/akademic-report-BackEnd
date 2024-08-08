@@ -153,6 +153,11 @@ namespace AkademicReport.Data
 
                 entity.Property(e => e.Id).HasColumnName("id");
 
+                entity.Property(e => e.Anio)
+                    .HasMaxLength(200)
+                    .IsUnicode(false)
+                    .HasColumnName("anio");
+
                 entity.Property(e => e.Aula)
                     .HasMaxLength(200)
                     .IsUnicode(false)

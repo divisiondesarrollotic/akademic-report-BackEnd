@@ -84,6 +84,20 @@ namespace AkademicReport.Controllers
             var response = await _reposteService.ReporteConsolidado(filtro);
             return Ok(response);
         }
+
+        /// <summary>
+        /// --Este es un get re reposte de un docente de posgrado
+        /// /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("reporte_by_docente_posgrado/{cedula}/{periodo}")]
+        public async Task<ActionResult> ReporteByDocentePosgrado(string cedula, string periodo)
+        {
+            var response = await _reposteService.ReporteByDocentePosgrado(cedula, periodo);
+            return Ok(response);
+        }
+
+
     }
 
 }

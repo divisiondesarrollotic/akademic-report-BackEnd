@@ -27,7 +27,7 @@ namespace AkademicReport.Service.DocenteServices
         }
 
 
-        public async Task<ServiceResponseData<List<DocenteGetDto>>> CleanData(List<DocenteAmilcaDto> DocentesAmilca)
+        public async Task<ServiceResponseData<List<DocenteGetDto>>> CleanData(List<DocenteAmilcaDto> DocentesAmilca, int accion)
         {
             List<DocenteGetDto> Docentes = new List<DocenteGetDto>();
             foreach (var d in DocentesAmilca)
@@ -40,7 +40,7 @@ namespace AkademicReport.Service.DocenteServices
                 {
                     if (d.CedulaPasaporte[0].ToString().Trim() == "0" && d.CedulaPasaporte[1].ToString().Trim() == "0" && d.CedulaPasaporte[2].ToString().Trim() == "-" || d.CedulaPasaporte.Length == 13)
                     {
-                        docente.identificacion = docente.identificacion.Replace("00-", "");
+                        //docente.identificacion = docente.identificacion.Replace("00-", "");
                         docente.tipoIdentificacion = "Cedula";
                     }
                     else
@@ -107,7 +107,20 @@ namespace AkademicReport.Service.DocenteServices
                         }
                     }
                 }
-                Docentes.Add(docente);
+                if(accion==1)
+                {
+                    Docentes.Add(docente);
+                }
+                else
+                {
+                    if (docente.tiempoDedicacion == "TC" || docente.tiempoDedicacion == "MT" || docente.tiempoDedicacion == "M" || docente.tiempoDedicacion == "F" || docente.tiempoDedicacion == "A")
+                    {
+                        Docentes.Add(docente);
+                    }
+                }
+                
+               
+
             }
             return new ServiceResponseData<List<DocenteGetDto>>() { Data = Docentes, Status = 200 };
 
@@ -119,8 +132,8 @@ namespace AkademicReport.Service.DocenteServices
             try
             {
                 FiltroDocentesDto filtro = new FiltroDocentesDto();
-                string b = "Maestría";
-                b = b.Replace('í', 'i');
+                //string b = "Maestría";
+                //b = b.Replace('í', 'i');
                 string BaseUrl = "https://akademic.isfodosu.edu.do/apiDocente/Docente";
                 var content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(filtro), Encoding.UTF8, "application/json");
                 HttpResponseMessage response = await _httpClient.GetAsync(BaseUrl);
@@ -128,7 +141,7 @@ namespace AkademicReport.Service.DocenteServices
                 {
                     string jsonResponse = await response.Content.ReadAsStringAsync();
                     var docentesApi = JsonConvert.DeserializeObject<List<DocenteAmilcaDto>>(jsonResponse);
-                    var DocentesLimpio =   await CleanData(docentesApi);
+                    var DocentesLimpio =   await CleanData(docentesApi, 1);
                    return new ServiceResponseData<List<DocenteGetDto>>() { Data = DocentesLimpio.Data, Status = 200 };
                 }
                 return new ServiceResponseData<List<DocenteGetDto>>() { Status = 500 };
@@ -203,7 +216,7 @@ namespace AkademicReport.Service.DocenteServices
              {
                  string jsonResponse = await response.Content.ReadAsStringAsync();
                  var docentesApi = JsonConvert.DeserializeObject<List<DocenteAmilcaDto>>(jsonResponse);
-                 var DocentesLimpio = await CleanData(docentesApi);
+                 var DocentesLimpio = await CleanData(docentesApi, 2);
                  return new ServiceResponseData<List<DocenteGetDto>>() { Data = DocentesLimpio.Data, Status = 200 };
              }
              else
@@ -257,7 +270,7 @@ namespace AkademicReport.Service.DocenteServices
                 {
                     string jsonResponse = await response.Content.ReadAsStringAsync();
                     var docentesApi = JsonConvert.DeserializeObject<List<DocenteAmilcaDto>>(jsonResponse);
-                    var DocentesLimpio = await CleanData(docentesApi);
+                    var DocentesLimpio = await CleanData(docentesApi,2);
                     return new ServiceResponseData<List<DocenteGetDto>>() { Data = DocentesLimpio.Data, Status = 200 };
                 }
                 return new ServiceResponseData<List<DocenteGetDto>>() { Status = 500 };

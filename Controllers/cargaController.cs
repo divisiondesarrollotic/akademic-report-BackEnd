@@ -1,4 +1,5 @@
 ﻿using AkademicReport.Dto.CargaDto;
+using AkademicReport.Dto.ReporteDto;
 using AkademicReport.Dto.UsuarioDto;
 using AkademicReport.Service;
 using AkademicReport.Service.AsignaturaServices;
@@ -41,6 +42,24 @@ namespace AkademicReport.Controllers
             }
 
             return Ok(new ServiceResponseData<DocenteCargaDto>() { Status = 200, Data = result.Data.Value.Item1 });
+
+        }
+        [HttpPost]
+        [Route("docente_posgrado")]
+        public async Task<ActionResult> GetCargaPosgrado(DtoCarga filtro)
+        {
+
+            var result = await _service.GetCargaCallPosgrado(filtro.Cedula, filtro.Periodo, filtro.idPrograma);
+            if (result.Data.Value.Item1.Docente == null && result.Data.Value.Item1.Cargas == null)
+            {
+                return Ok(new ServicesResponseMessage<string>() { Status = 204, Message = "Docente no existe" });
+            }
+            if (result.Data.Value.Item1.Cargas == null)
+            {
+                return Ok(new ServiceResponseData<ReportCargaPosgradoDto>() { Status = 200, Data = result.Data.Value.Item1 });
+            }
+
+            return Ok(new ServiceResponseData<ReportCargaPosgradoDto>() { Status = 200, Data = result.Data.Value.Item1 });
 
         }
         /// <summary>

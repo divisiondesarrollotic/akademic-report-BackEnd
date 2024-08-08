@@ -1,5 +1,7 @@
 ﻿using AkademicReport.Dto.AsignaturaDto;
 using AkademicReport.Dto.ConceptoDto;
+using AkademicReport.Dto.ConceptoPosgradoDto;
+using AkademicReport.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace AkademicReport.Dto.CargaDto
@@ -17,6 +19,7 @@ namespace AkademicReport.Dto.CargaDto
         public string CodUniversitas { get; set; } = null!;
         public int Seccion { get; set; }
         public string Aula { get; set; } = null!;
+        public string? Edificio { get; set; }
         public TipoModalidadDto TipoModalidad { get; set; } = null!;
         public int dia_id { get; set; }
         public string dia_nombre { get; set; }=null!;
@@ -35,6 +38,8 @@ namespace AkademicReport.Dto.CargaDto
         public int? DiaMes { get; set; }
         public int? IdMes { get; set; }
         public int? IdPrograma { get; set; }
+        public int? IdConceptoPosgrado { get; set; }
+        public ConceptoPosDto? ConceptoPosgrado { get; set; }
 
 
 

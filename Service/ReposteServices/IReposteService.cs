@@ -11,6 +11,14 @@ namespace AkademicReport.Service.ReposteServices
         Task<ServiceResponseReporte<List<DocenteCargaReporteDto>>> PorRecinto(ReportePorRecintoDto filtro);
         Task<ServiceResponseReporte<List<DocenteCargaReporteDto>>> ReporteDiplomado(ReportePorRecintoDto filtro);
         Task<ServiceResponseReporte<List<ReporteConsolidadoResponseDto>>>ReporteConsolidado(FiltroReporteConsolidado filtro);
+
+        // Repostes de posgrado'
+        //Reporte por el id concepto de la carga
+        Task<ServiceResponseReporte<List<ReportCargaPosgradoDto>>> ReporteByIdProgramCargaPosgrado(int idConcepto, string periodo, int idRecinto);
+        Task<ServiceResponseReporte<List<ReportCargaPosgradoDto>>> ReporteByPeriodoPosgrado(string periodo, int idRecinto);
+        Task<ServiceResponseReporte<List<ReportCargaPosgradoDto>>> ReporteByIdRecintoPosgrado(int idRecinto, string periodo);
+        Task<ServiceResponseReporte<ReportCargaPosgradoDto>> ReporteByDocentePosgrado(string cedula, string periodo);
+
     }
 }
 

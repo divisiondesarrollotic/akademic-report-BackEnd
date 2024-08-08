@@ -21,8 +21,11 @@ namespace AkademicReport.Dto.CargaDto
         public string Cedula { get; set; } = null!;
         public int? DiaMes { get; set; }
         public int? IdMes { get; set; }
+        public string? Anio { get; set; }
         public int? IdPrograma { get; set; }
-        public int? IdConcepto { get; set; }
+        public int? IdConceptoPosgrado { get; set; }
+        [Required]
+        public int? idTipoCarga { get; set; }
 
     }
 }
