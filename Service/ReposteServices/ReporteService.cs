@@ -953,7 +953,7 @@ namespace AkademicReport.Service.ReposteServices
                             {
                                 foreach (var item in CargaFilter)
                                 {
-                                    Monto = item.precio_hora * item.credito;
+                                    Monto+= item.precio_hora * item.credito;
                                     CantCreditos += item.credito;
                                 }
                             }
