@@ -96,6 +96,15 @@ namespace AkademicReport.Controllers
             var response = await _reposteService.ReporteByDocentePosgrado(cedula, periodo);
             return Ok(response);
         }
+        [HttpGet]
+
+        [Route("reporte_by_programa_posgrado/{idconcepto}/{periodo}/{idrecinto}")]
+        public async Task<ActionResult> ReporteByIdProgramCargaPosgrado(int idconcepto, string periodo, int idrecinto)
+        {
+            var response = await _reposteService.ReporteByIdProgramCargaPosgrado(idconcepto, periodo, idrecinto);
+            return Ok(response);
+        }
+
 
 
     }
