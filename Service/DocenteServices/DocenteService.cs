@@ -29,9 +29,14 @@ namespace AkademicReport.Service.DocenteServices
 
         public async Task<ServiceResponseData<List<DocenteGetDto>>> CleanData(List<DocenteAmilcaDto> DocentesAmilca, int accion)
         {
+
             List<DocenteGetDto> Docentes = new List<DocenteGetDto>();
             foreach (var d in DocentesAmilca)
             {
+                if(d.CedulaPasaporte == "402-2529221-4")
+                {
+
+                }
                 var docente = new DocenteGetDto();
                 docente.id = d.Id;
                 docente.tiempoDedicacion = d.TiempoDedicacion;
@@ -52,7 +57,7 @@ namespace AkademicReport.Service.DocenteServices
                 docente.nombre = d.Nombre;
                 docente.nacionalidad = d.Nacionalidad;
                 docente.sexo = d.Sexo;
-                if (d.TiempoDedicacion != null)
+                if (d.TiempoDedicacion != null && d.TiempoDedicacion != "N/A"  &&  d.TiempoDedicacion != "N/D")
                 {
                     var vinculo = await _dataContext.Vinculos
                         .Where(n => n.Corto.Replace("á", "a")
@@ -60,7 +65,7 @@ namespace AkademicReport.Service.DocenteServices
                                             .Replace("í", "i")
                                             .Replace("ó", "o")
                                             .Replace("ú", "u")
-                                            .Contains(d.TiempoDedicacion.Replace("á", "a")
+                                             ==(d.TiempoDedicacion.Replace("á", "a")
                                                                 .Replace("é", "e")
                                                                 .Replace("í", "i")
                                                                 .Replace("ó", "o")
