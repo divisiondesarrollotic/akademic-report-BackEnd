@@ -1,4 +1,5 @@
 ﻿using AkademicReport.Dto.AsignaturaDto;
+using AkademicReport.Dto.ConceptoDto;
 using AkademicReport.Dto.ConceptoPosgradoDto;
 
 namespace AkademicReport.Dto.CargaDto
@@ -10,12 +11,16 @@ namespace AkademicReport.Dto.CargaDto
         public string Recinto { get; set; } = null!;
         public string RecintoNombreCorto { get; set; }
         public int? IdAsignatura { get; set; }
+        public ConceptoGetDto? ConceptoAsignatura { get; set; }
         public string CodAsignatura { get; set; } = null!;
         public string NombreAsignatura { get; set; } = null!;
         public string CodUniversitas { get; set; } = null!;
         public int? Modalidad { get; set; }
         public TipoModalidadDto? TipoModalidad { get; set; }
         public int Dias { get; set; }
+        public int precio_hora { get; set; }
+        public int pago_asignatura { get; set; }
+        public int pago_asignaturaMensual { get; set; }
         public string? Anio { get; set; }
         public string? DiaNombre { get; set; }
         public string? HoraInicio { get; set; }

@@ -169,7 +169,7 @@ namespace AkademicReport.Data
                     .HasColumnName("cedula");
 
                 entity.Property(e => e.CodAsignatura)
-                    .HasMaxLength(50)
+                    .HasMaxLength(200)
                     .IsUnicode(false)
                     .HasColumnName("cod_asignatura");
 
@@ -277,10 +277,13 @@ namespace AkademicReport.Data
             {
                 entity.ToTable("codigo");
 
+                entity.HasIndex(e => e.Codigo1, "UQ_codigo")
+                    .IsUnique();
+
                 entity.Property(e => e.Id).HasColumnName("id");
 
                 entity.Property(e => e.Codigo1)
-                    .HasMaxLength(100)
+                    .HasMaxLength(200)
                     .IsUnicode(false)
                     .HasColumnName("codigo");
 
@@ -297,6 +300,11 @@ namespace AkademicReport.Data
                 entity.Property(e => e.IdConcepto).HasColumnName("id_concepto");
 
                 entity.Property(e => e.IdPrograma).HasColumnName("idPrograma");
+
+                entity.Property(e => e.Modalida)
+                    .HasMaxLength(500)
+                    .IsUnicode(false)
+                    .HasColumnName("modalida");
 
                 entity.Property(e => e.Nombre)
                     .HasMaxLength(100)

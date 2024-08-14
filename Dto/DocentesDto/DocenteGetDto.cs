@@ -16,5 +16,6 @@
         public string? nombre_corto { get; set; }
         public string? id_nivel_academico { get; set; }
         public string? nivel { get; set; }
+        public string? TipoDocente { get; set; }
     }
 }

@@ -55,6 +55,7 @@ namespace AkademicReport.Service.DocenteServices
                 }
 
                 docente.nombre = d.Nombre;
+                docente.TipoDocente = d.TipoDocente;
                 docente.nacionalidad = d.Nacionalidad;
                 docente.sexo = d.Sexo;
                 if (d.TiempoDedicacion != null && d.TiempoDedicacion != "N/A"  &&  d.TiempoDedicacion != "N/D")

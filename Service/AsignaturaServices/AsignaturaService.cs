@@ -247,20 +247,21 @@ namespace AkademicReport.Service.AsignaturaServices
                 await _dataContext.SaveChangesAsync();
                 if(item.TiposCargas!=null)
                 {
+                    var ti = await _dataContext.TipoModalidads.ToListAsync();
                     foreach (var i in item.TiposCargas)
                     {
                         TipoCargaPivot Privot = new TipoCargaPivot();
-                        Privot.IdTipoCarga = i.Id;
+                        Privot.IdTipoCarga = i;
                         Privot.IdCodigo = result.Entity.Id;
                         _dataContext.TipoCargaCodigos.Add(_mapper.Map<TipoCargaCodigo>(Privot));
 
                     }
                 }
-               
+               var modalidades = await _dataContext.TipoModalidads.ToListAsync();
                 foreach (var modalidad in item.Modalidades)
                 {
                     TipoModalidadCodigo Privot = new TipoModalidadCodigo();
-                    Privot.IdTipoModalidad = modalidad.Id;
+                    Privot.IdTipoModalidad = modalidad;
                     Privot.Idcodigo = result.Entity.Id;
                     _dataContext.TipoModalidadCodigos.Add(Privot);
                 }
@@ -295,14 +296,14 @@ namespace AkademicReport.Service.AsignaturaServices
                 foreach (var i in item.TiposCargas)
                 {
                     TipoCargaCodigo Privot = new TipoCargaCodigo();
-                    Privot.IdTipoCarga = i.Id;
+                   // Privot.IdTipoCarga = i.Id;
                     Privot.IdCodigo = item.Id;
                     _dataContext.TipoCargaCodigos.Add(Privot);
                 }
                 foreach (var modalidad in item.Modalidades)
                 {
                     TipoModalidadCodigo Privot = new TipoModalidadCodigo();
-                    Privot.IdTipoModalidad = modalidad.Id;
+                   // Privot.IdTipoModalidad = modalidad.Id;
                     Privot.Idcodigo = item.Id; ;
                     _dataContext.TipoModalidadCodigos.Add(Privot);
                 }

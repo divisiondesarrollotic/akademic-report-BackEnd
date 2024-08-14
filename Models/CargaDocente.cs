@@ -9,7 +9,7 @@ namespace AkademicReport.Models
         public int? Curricular { get; set; }
         public string Periodo { get; set; } = null!;
         public string Recinto { get; set; } = null!;
-        public string CodAsignatura { get; set; } = null!;
+        public string? CodAsignatura { get; set; }
         public string NombreAsignatura { get; set; } = null!;
         public string CodUniversitas { get; set; } = null!;
         public string Seccion { get; set; } = null!;
