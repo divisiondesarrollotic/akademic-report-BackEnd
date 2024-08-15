@@ -72,10 +72,19 @@ namespace AkademicReport.Service.AsignaturaServices
                             item.TiposCargas = new List<TipoCargaDto>();
                             foreach (var element in a)
                             {
+                            if(element.IdTipoCargaNavigation!=null)
+                            {
                                 var tipoCarg = new TipoCargaDto();
                                 tipoCarg.Id = element.IdTipoCargaNavigation.Id;
                                 tipoCarg.Nombre = element.IdTipoCargaNavigation.Nombre;
                                 item.TiposCargas.Add(tipoCarg);
+                                if (item.TiposCargadIds==null)
+                                {
+                                    item.TiposCargadIds = new List<int>();
+                                }
+                                item.TiposCargadIds.Add(element.IdTipoCargaNavigation.Id);
+                            }
+                               
                             }
                             
                         }
@@ -85,13 +94,26 @@ namespace AkademicReport.Service.AsignaturaServices
                             var tipo = new TipoCargaDto() { Id = 0, Nombre = "NO ASIGNADO" };
                             tipos.Add(tipo);
                             item.TiposCargas = tipos;
+                            item.TiposCargadIds = new List<int>();
                         }
                     var tiposModalidad = await _dataContext.TipoModalidadCodigos.Where(c => c.Idcodigo == item.Id).Include(c => c.IdTipoModalidadNavigation).ToListAsync();
                     foreach (var i in tiposModalidad)
                     {
-                        var TipoModalida = new TipoModalidadDto();
-                        TipoModalida =_mapper.Map<TipoModalidadDto>(i.IdTipoModalidadNavigation);
-                        item.Modalidades.Add(TipoModalida);
+                        if(i.IdTipoModalidadNavigation!=null)
+                        {
+                            var TipoModalida = new TipoModalidadDto();
+                            TipoModalida = _mapper.Map<TipoModalidadDto>(i.IdTipoModalidadNavigation);
+                            item.Modalidades.Add(TipoModalida);
+                            if (item.ModalidadesIds == null)
+                            {
+                                item.ModalidadesIds = new List<int>();
+                            }
+                            item.ModalidadesIds.Add(i.IdTipoModalidad.Value);
+                        }
+                    }
+                    if(tiposModalidad.Count<1)
+                    {
+                        item.ModalidadesIds = new List<int>();
                     }
                 }
 
@@ -129,10 +151,15 @@ namespace AkademicReport.Service.AsignaturaServices
                         item.TiposCargas = new List<TipoCargaDto>();
                         foreach (var element in a)
                         {
-                            var tipoCarg = new TipoCargaDto();
-                            tipoCarg.Id = element.IdTipoCargaNavigation.Id;
-                            tipoCarg.Nombre = element.IdTipoCargaNavigation.Nombre;
-                            item.TiposCargas.Add(tipoCarg);
+                            if(element.IdTipoCargaNavigation!=null)
+                            {
+                                var tipoCarg = new TipoCargaDto();
+                                tipoCarg.Id = element.IdTipoCargaNavigation.Id;
+                                tipoCarg.Nombre = element.IdTipoCargaNavigation.Nombre;
+                                item.TiposCargas.Add(tipoCarg);
+                                item.TiposCargadIds.Add(element.IdTipoCargaNavigation.Id);
+                            }
+
                         }
 
                     }
@@ -142,16 +169,24 @@ namespace AkademicReport.Service.AsignaturaServices
                         var tipo = new TipoCargaDto() { Id = 0, Nombre = "NO ASIGNADO" };
                         tipos.Add(tipo);
                         item.TiposCargas = tipos;
+                        item.TiposCargadIds = new List<int>();
+
 
                     }
 
                     var tiposModalidad = await _dataContext.TipoModalidadCodigos.Where(c => c.Idcodigo == item.Id).Include(c => c.IdTipoModalidadNavigation).ToListAsync();
                     foreach (var i in tiposModalidad)
                     {
-                        var TipoModalida = new TipoModalidadDto();
-                        TipoModalida = _mapper.Map<TipoModalidadDto>(i.IdTipoModalidadNavigation);
-                        item.Modalidades.Add(TipoModalida);
+                        if(i.IdTipoModalidadNavigation==null)
+                        {
+                            var TipoModalida = new TipoModalidadDto();
+                            TipoModalida = _mapper.Map<TipoModalidadDto>(i.IdTipoModalidadNavigation);
+                            item.Modalidades.Add(TipoModalida);
+                            item.ModalidadesIds.Add(i.Id);
+                        }
                     }
+                    if (tiposModalidad.Count < 1)
+                        item.ModalidadesIds = new List<int>();
 
 
                 }
@@ -278,17 +313,21 @@ namespace AkademicReport.Service.AsignaturaServices
         {
             try
             {
-                var nivel = await _dataContext.Codigos.AsNoTracking().FirstOrDefaultAsync(c => c.Id == Convert.ToInt32(item.Id));
+                var codigo = await _dataContext.Codigos.AsNoTracking().FirstOrDefaultAsync(c => c.Id == Convert.ToInt32(item.Id));
                 var tipoCargas = await _dataContext.TipoCargaCodigos.Where(c => c.IdCodigo == item.Id).ToListAsync();
                 var modalidades = await _dataContext.TipoModalidadCodigos.Where(c=>c.Idcodigo==item.Id).ToListAsync();  
                if(tipoCargas.Count>0)
                 {
                     _dataContext.TipoCargaCodigos.RemoveRange(tipoCargas);
+                    await _dataContext.SaveChangesAsync();
+
 
                 }
                 if (modalidades.Count > 0)
                 {
                     _dataContext.TipoModalidadCodigos.RemoveRange(modalidades);
+                    await _dataContext.SaveChangesAsync();
+
 
                 }
 
@@ -296,19 +335,19 @@ namespace AkademicReport.Service.AsignaturaServices
                 foreach (var i in item.TiposCargas)
                 {
                     TipoCargaCodigo Privot = new TipoCargaCodigo();
-                   // Privot.IdTipoCarga = i.Id;
+                    Privot.IdTipoCarga = i;
                     Privot.IdCodigo = item.Id;
                     _dataContext.TipoCargaCodigos.Add(Privot);
                 }
                 foreach (var modalidad in item.Modalidades)
                 {
                     TipoModalidadCodigo Privot = new TipoModalidadCodigo();
-                   // Privot.IdTipoModalidad = modalidad.Id;
+                    Privot.IdTipoModalidad = modalidad;
                     Privot.Idcodigo = item.Id; ;
                     _dataContext.TipoModalidadCodigos.Add(Privot);
                 }
-                nivel = _mapper.Map<Codigo>(item);
-                _dataContext.Entry(nivel).State = EntityState.Modified;
+                codigo = _mapper.Map<Codigo>(item);
+                _dataContext.Entry(codigo).State = EntityState.Modified;
                 await _dataContext.SaveChangesAsync();
                 return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjUpdate };
             }
