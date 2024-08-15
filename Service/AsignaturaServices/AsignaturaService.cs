@@ -157,6 +157,10 @@ namespace AkademicReport.Service.AsignaturaServices
                                 tipoCarg.Id = element.IdTipoCargaNavigation.Id;
                                 tipoCarg.Nombre = element.IdTipoCargaNavigation.Nombre;
                                 item.TiposCargas.Add(tipoCarg);
+                                if (item.TiposCargadIds==null)
+                                {
+                                    item.TiposCargadIds = new List<int>();
+                                }
                                 item.TiposCargadIds.Add(element.IdTipoCargaNavigation.Id);
                             }
 
@@ -177,11 +181,15 @@ namespace AkademicReport.Service.AsignaturaServices
                     var tiposModalidad = await _dataContext.TipoModalidadCodigos.Where(c => c.Idcodigo == item.Id).Include(c => c.IdTipoModalidadNavigation).ToListAsync();
                     foreach (var i in tiposModalidad)
                     {
-                        if(i.IdTipoModalidadNavigation==null)
+                        if(i.IdTipoModalidadNavigation!=null)
                         {
                             var TipoModalida = new TipoModalidadDto();
                             TipoModalida = _mapper.Map<TipoModalidadDto>(i.IdTipoModalidadNavigation);
                             item.Modalidades.Add(TipoModalida);
+                            if(item.ModalidadesIds==null)
+                            {
+                                item.ModalidadesIds = new List<int>();  
+                            }
                             item.ModalidadesIds.Add(i.Id);
                         }
                     }
