@@ -56,50 +56,49 @@ namespace AkademicReport.Service.AsignaturaServices
         {
             try
             {
-                var codigos = await _dataContext.Codigos.Where(c=>c.IdPrograma==IdPrograma).Include(c => c.TipoCargaCodigos).ThenInclude(c => c.IdTipoCargaNavigation)
+                var codigos = await _dataContext.Codigos.Where(c => c.IdPrograma == IdPrograma).Include(c => c.TipoCargaCodigos).ThenInclude(c => c.IdTipoCargaNavigation)
                     .Include(c => c.IdConceptoNavigation)
-                    .Include(c=>c.TipoModalidadCodigos)
-                    .Include(c=>c.IdProgramaNavigation)
+                    .Include(c => c.TipoModalidadCodigos)
+                    .Include(c => c.IdProgramaNavigation)
                     .ToListAsync();
 
                 var CodigoMap = _mapper.Map<List<AsignaturaGetDto>>(codigos);
                 foreach (var item in CodigoMap)
                 {
-                        var a = codigos.FirstOrDefault(c => c.Id == item.Id).TipoCargaCodigos.Where(c => c.IdCodigo == item.Id).ToList();
-                        
-                        if (item.TiposCargas != null && item.TiposCargas.Any())
+                    var a = codigos.FirstOrDefault(c => c.Id == item.Id).TipoCargaCodigos.Where(c => c.IdCodigo == item.Id).ToList();
+
+                    if (item.TiposCargas != null && item.TiposCargas.Any())
+                    {
+                        item.TiposCargas = new List<TipoCargaDto>();
+                        foreach (var element in a)
                         {
-                            item.TiposCargas = new List<TipoCargaDto>();
-                            foreach (var element in a)
-                            {
-                            if(element.IdTipoCargaNavigation!=null)
+                            if (element.IdTipoCargaNavigation != null)
                             {
                                 var tipoCarg = new TipoCargaDto();
                                 tipoCarg.Id = element.IdTipoCargaNavigation.Id;
                                 tipoCarg.Nombre = element.IdTipoCargaNavigation.Nombre;
                                 item.TiposCargas.Add(tipoCarg);
-                                if (item.TiposCargadIds==null)
+                                if (item.TiposCargadIds == null)
                                 {
                                     item.TiposCargadIds = new List<int>();
                                 }
                                 item.TiposCargadIds.Add(element.IdTipoCargaNavigation.Id);
                             }
-                               
-                            }
-                            
+
                         }
-                        else
-                        {
-                            var tipos = new List<TipoCargaDto>();
-                            var tipo = new TipoCargaDto() { Id = 0, Nombre = "NO ASIGNADO" };
-                            tipos.Add(tipo);
-                            item.TiposCargas = tipos;
-                            item.TiposCargadIds = new List<int>();
-                        }
+                    }
+                    else
+                    {
+                        var tipos = new List<TipoCargaDto>();
+                        var tipo = new TipoCargaDto() { Id = 0, Nombre = "NO ASIGNADO" };
+                        tipos.Add(tipo);
+                        item.TiposCargas = tipos;
+                        item.TiposCargadIds = new List<int>();
+                    }
                     var tiposModalidad = await _dataContext.TipoModalidadCodigos.Where(c => c.Idcodigo == item.Id).Include(c => c.IdTipoModalidadNavigation).ToListAsync();
                     foreach (var i in tiposModalidad)
                     {
-                        if(i.IdTipoModalidadNavigation!=null)
+                        if (i.IdTipoModalidadNavigation != null)
                         {
                             var TipoModalida = new TipoModalidadDto();
                             TipoModalida = _mapper.Map<TipoModalidadDto>(i.IdTipoModalidadNavigation);
@@ -111,14 +110,14 @@ namespace AkademicReport.Service.AsignaturaServices
                             item.ModalidadesIds.Add(i.IdTipoModalidad.Value);
                         }
                     }
-                    if(tiposModalidad.Count<1)
+                    if (tiposModalidad.Count < 1)
                     {
                         item.ModalidadesIds = new List<int>();
                     }
                 }
 
                 if (CodigoMap.Count < 1)
-                    return new ServiceResponseData<List<AsignaturaGetDto>>() { Data = CodigoMap, Status = 204, Message=Msj.MsjNoData };
+                    return new ServiceResponseData<List<AsignaturaGetDto>>() { Data = CodigoMap, Status = 204, Message = Msj.MsjNoData };
                 return new ServiceResponseData<List<AsignaturaGetDto>>() { Status = 200, Data = CodigoMap };
             }
             catch (Exception ex)
@@ -138,26 +137,26 @@ namespace AkademicReport.Service.AsignaturaServices
         {
             try
             {
-                var codigosDb = await _dataContext.Codigos.Where(c=>c.IdPrograma==IdPrograma).Include(c => c.TipoCargaCodigos).ThenInclude(c=>c.IdTipoCargaNavigation).Include(c => c.IdConceptoNavigation).Include(c=>c.TipoModalidadCodigos).Include(c=>c.IdProgramaNavigation).ToListAsync();
-                var codigosFilter =  codigosDb.Where(c =>  c.Codigo1.ToUpper().Contains(filtro.ToUpper().Trim()) || c.Nombre.ToUpper().Contains(filtro.ToUpper()));
+                var codigosDb = await _dataContext.Codigos.Where(c => c.IdPrograma == IdPrograma).Include(c => c.TipoCargaCodigos).ThenInclude(c => c.IdTipoCargaNavigation).Include(c => c.IdConceptoNavigation).Include(c => c.TipoModalidadCodigos).Include(c => c.IdProgramaNavigation).ToListAsync();
+                var codigosFilter = codigosDb.Where(c => c.Codigo1.ToUpper().Contains(filtro.ToUpper().Trim()) || c.Nombre.ToUpper().Contains(filtro.ToUpper()));
 
                 var CodigoMap = _mapper.Map<List<AsignaturaGetDto>>(codigosFilter);
                 foreach (var item in CodigoMap)
                 {
 
-                    var a = codigosDb.FirstOrDefault(c => c.Id == item.Id).TipoCargaCodigos.Where(c => c.IdCodigo == item.Id).ToList(); 
+                    var a = codigosDb.FirstOrDefault(c => c.Id == item.Id).TipoCargaCodigos.Where(c => c.IdCodigo == item.Id).ToList();
                     if (item.TiposCargas != null && item.TiposCargas.Any())
                     {
                         item.TiposCargas = new List<TipoCargaDto>();
                         foreach (var element in a)
                         {
-                            if(element.IdTipoCargaNavigation!=null)
+                            if (element.IdTipoCargaNavigation != null)
                             {
                                 var tipoCarg = new TipoCargaDto();
                                 tipoCarg.Id = element.IdTipoCargaNavigation.Id;
                                 tipoCarg.Nombre = element.IdTipoCargaNavigation.Nombre;
                                 item.TiposCargas.Add(tipoCarg);
-                                if (item.TiposCargadIds==null)
+                                if (item.TiposCargadIds == null)
                                 {
                                     item.TiposCargadIds = new List<int>();
                                 }
@@ -181,14 +180,14 @@ namespace AkademicReport.Service.AsignaturaServices
                     var tiposModalidad = await _dataContext.TipoModalidadCodigos.Where(c => c.Idcodigo == item.Id).Include(c => c.IdTipoModalidadNavigation).ToListAsync();
                     foreach (var i in tiposModalidad)
                     {
-                        if(i.IdTipoModalidadNavigation!=null)
+                        if (i.IdTipoModalidadNavigation != null)
                         {
                             var TipoModalida = new TipoModalidadDto();
                             TipoModalida = _mapper.Map<TipoModalidadDto>(i.IdTipoModalidadNavigation);
                             item.Modalidades.Add(TipoModalida);
-                            if(item.ModalidadesIds==null)
+                            if (item.ModalidadesIds == null)
                             {
-                                item.ModalidadesIds = new List<int>();  
+                                item.ModalidadesIds = new List<int>();
                             }
                             item.ModalidadesIds.Add(i.Id);
                         }
@@ -200,7 +199,7 @@ namespace AkademicReport.Service.AsignaturaServices
                 }
 
                 if (codigosDb.Count < 1)
-                    return new ServiceResponseData<List<AsignaturaGetDto>>() { Data=new List<AsignaturaGetDto>(), Status = 204 };
+                    return new ServiceResponseData<List<AsignaturaGetDto>>() { Data = new List<AsignaturaGetDto>(), Status = 204 };
                 return new ServiceResponseData<List<AsignaturaGetDto>>() { Status = 200, Data = CodigoMap };
             }
             catch (Exception ex)
@@ -218,9 +217,9 @@ namespace AkademicReport.Service.AsignaturaServices
                 int CantRegistrosSolicitado = filtro.elementosPorPagina.Value;
                 decimal TotalPage = Convert.ToDecimal(CantReg) / Convert.ToDecimal(CantRegistrosSolicitado);
                 var result = new List<AsignaturaGetDto>();
-                if(filtro.Filtro!=string.Empty)
+                if (filtro.Filtro != string.Empty)
                 {
-                    result = _mapper.Map<List<AsignaturaGetDto>>(codigos.Data).Where(c=>c.Codigo!.ToUpper().Contains(filtro.Filtro!.ToUpper().Trim())
+                    result = _mapper.Map<List<AsignaturaGetDto>>(codigos.Data).Where(c => c.Codigo!.ToUpper().Contains(filtro.Filtro!.ToUpper().Trim())
                     || c.Nombre!.ToUpper().Contains(filtro.Filtro.ToUpper().ToUpper().Trim()) || c.NombreConcepto!.ToUpper().Contains(filtro.Filtro.Trim())).OrderBy(c => c.Nombre).Skip((filtro.paginaActual!.Value - 1) * CantRegistrosSolicitado).Take(CantRegistrosSolicitado).ToList();
 
                 }
@@ -232,10 +231,10 @@ namespace AkademicReport.Service.AsignaturaServices
                 decimal ParteEntera = Math.Truncate(TotalPage);
                 if (TotalPage > ParteEntera && (CantRegistrosSolicitado / CantReg) > 1)
                 { TotalPage = TotalPage + 1; }
-      
+
                 if (codigos.Data.Count < 1)
-                    return new ServiceResponseDataPaginacion<List<AsignaturaGetDto>>() { Status = 204 };
-                return new ServiceResponseDataPaginacion<List<AsignaturaGetDto>>() { Status = 200, Data = result, TotalPaginas=codigos.Data.Count / filtro.elementosPorPagina, TotalRegistros = codigos.Data.Count };
+                    return new ServiceResponseDataPaginacion<List<AsignaturaGetDto>>() { Status = 200, Data = new List<AsignaturaGetDto>(), TotalRegistros=0, TotalPaginas=0};
+                return new ServiceResponseDataPaginacion<List<AsignaturaGetDto>>() { Status = 200, Data = result, TotalPaginas = codigos.Data.Count / filtro.elementosPorPagina, TotalRegistros = codigos.Data.Count };
             }
             catch (Exception ex)
             {
@@ -249,12 +248,12 @@ namespace AkademicReport.Service.AsignaturaServices
             {
                 var Modalidad = await _dataContext.TipoModalidads.ToListAsync();
                 var ModalidadMap = _mapper.Map<List<TipoModalidadDto>>(Modalidad);
-                if(ModalidadMap.Count<1)
+                if (ModalidadMap.Count < 1)
                 {
                     return new ServiceResponseData<List<TipoModalidadDto>>() { Status = 204 };
 
                 }
-          
+
                 return new ServiceResponseData<List<TipoModalidadDto>>() { Status = 200, Data = ModalidadMap };
             }
             catch (Exception ex)
@@ -262,19 +261,19 @@ namespace AkademicReport.Service.AsignaturaServices
                 return new ServiceResponseData<List<TipoModalidadDto>>() { Status = 500 };
             }
         }
-    
+
 
         public async Task<ServiceResponseData<List<AsignaturaGetDto>>> GetById(int id, int IdPrograma)
         {
             try
             {
                 var codigos = await GetAll(IdPrograma);
-                 var data  = codigos.Data.Where(c => c.Id==id).ToList();
+                var data = codigos.Data.Where(c => c.Id == id).ToList();
                 var CodigoMap = _mapper.Map<List<AsignaturaGetDto>>(data);
 
                 if (CodigoMap.Count < 1)
                     return new ServiceResponseData<List<AsignaturaGetDto>>() { Status = 204 };
-                return new ServiceResponseData<List<AsignaturaGetDto>>() { Status = 200, Data = _mapper.Map<List<AsignaturaGetDto>>(CodigoMap.Where(c => c.Id ==  id)) };
+                return new ServiceResponseData<List<AsignaturaGetDto>>() { Status = 200, Data = _mapper.Map<List<AsignaturaGetDto>>(CodigoMap.Where(c => c.Id == id)) };
             }
             catch (Exception ex)
             {
@@ -286,9 +285,9 @@ namespace AkademicReport.Service.AsignaturaServices
         {
             try
             {
-                EntityEntry<Codigo> result =  _dataContext.Codigos.Add(_mapper.Map<Codigo>(item));
+                EntityEntry<Codigo> result = _dataContext.Codigos.Add(_mapper.Map<Codigo>(item));
                 await _dataContext.SaveChangesAsync();
-                if(item.TiposCargas!=null)
+                if (item.TiposCargas != null)
                 {
                     var ti = await _dataContext.TipoModalidads.ToListAsync();
                     foreach (var i in item.TiposCargas)
@@ -300,7 +299,7 @@ namespace AkademicReport.Service.AsignaturaServices
 
                     }
                 }
-               var modalidades = await _dataContext.TipoModalidads.ToListAsync();
+                var modalidades = await _dataContext.TipoModalidads.ToListAsync();
                 foreach (var modalidad in item.Modalidades)
                 {
                     TipoModalidadCodigo Privot = new TipoModalidadCodigo();
@@ -323,20 +322,16 @@ namespace AkademicReport.Service.AsignaturaServices
             {
                 var codigo = await _dataContext.Codigos.AsNoTracking().FirstOrDefaultAsync(c => c.Id == Convert.ToInt32(item.Id));
                 var tipoCargas = await _dataContext.TipoCargaCodigos.Where(c => c.IdCodigo == item.Id).ToListAsync();
-                var modalidades = await _dataContext.TipoModalidadCodigos.Where(c=>c.Idcodigo==item.Id).ToListAsync();  
-               if(tipoCargas.Count>0)
+                var modalidades = await _dataContext.TipoModalidadCodigos.Where(c => c.Idcodigo == item.Id).ToListAsync();
+                if (tipoCargas.Count > 0)
                 {
                     _dataContext.TipoCargaCodigos.RemoveRange(tipoCargas);
                     await _dataContext.SaveChangesAsync();
-
-
                 }
                 if (modalidades.Count > 0)
                 {
                     _dataContext.TipoModalidadCodigos.RemoveRange(modalidades);
                     await _dataContext.SaveChangesAsync();
-
-
                 }
 
 
@@ -346,7 +341,7 @@ namespace AkademicReport.Service.AsignaturaServices
                     Privot.IdTipoCarga = i;
                     Privot.IdCodigo = item.Id;
                     _dataContext.TipoCargaCodigos.Add(Privot);
-                }
+}
                 foreach (var modalidad in item.Modalidades)
                 {
                     TipoModalidadCodigo Privot = new TipoModalidadCodigo();

@@ -144,7 +144,8 @@ namespace AkademicReport.Data
                 .ForMember(c => c.Mes, o => o.MapFrom(c => c.IdMesNavigation))
             .ForMember(c => c.ConceptoPosgrado, o => o.MapFrom(c => c.IdConceptoPosgradoNavigation))
             .ForMember(c => c.TipoCarga, o => o.MapFrom(c => c.CurricularNavigation))
-            .ForMember(c=>c.DiaNombre, o=>o.MapFrom(c=>c.DiasNavigation.Nombre));
+            .ForMember(c=>c.DiaNombre, o=>o.MapFrom(c=>c.DiasNavigation.Nombre))
+            .ForMember(c=>c.Codigo, o=>o.MapFrom(c=>c.IdCodigoNavigation));
 
 
 

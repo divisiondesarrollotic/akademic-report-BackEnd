@@ -59,7 +59,8 @@ namespace AkademicReport.Service.CargaServices
    
                 var ResulData = new DocenteCargaDto();
                 var carga = await _dataContext.CargaDocentes.Where(c => c.Cedula.Contains(Cedula) && c.Periodo == Periodo && c.IdPrograma==idPrograma)
-                    .Include(c => c.DiasNavigation).Include(c => c.CurricularNavigation).Include(c=>c.ModalidadNavigation).Include(c=>c.IdConceptoPosgradoNavigation).Include(c=>c.IdMesNavigation).ToListAsync();
+                    .Include(c => c.DiasNavigation).Include(c => c.CurricularNavigation).Include(c=>c.ModalidadNavigation)
+                    .Include(c=>c.IdConceptoPosgradoNavigation).Include(c=>c.IdMesNavigation).Include(c=>c.IdCodigoNavigation).ToListAsync();
                 var docentes = Docentes;
                 int Creditos = 0;
                 var DocenteFilter = docentes.Where(c => c.identificacion.ToString().Contains(Cedula)).FirstOrDefault();
@@ -76,11 +77,14 @@ namespace AkademicReport.Service.CargaServices
                     return new ServiceResponseCarga<DocenteCargaDto, string>() { Status = 200, Data = (ResulData, "No hay carga") };
                 }
                
-                 
+            
                 var CargaMap = _mapper.Map<List<CargaGetDto>>(carga);
                 var CargaLista = new List<CargaGetDto>();
                 foreach (var i in CargaMap)
                 {
+                    if (i.IdCodigo != null)
+                        i.nombre_asignatura = carga.First(c => c.Id == i.Id).IdCodigoNavigation.Nombre;
+
                     var tiposModalidad = carga.Where(c => c.Id == i.Id).ToList();
                     foreach (var o in tiposModalidad)
                     {
@@ -123,8 +127,6 @@ namespace AkademicReport.Service.CargaServices
                         i.credito = Convert.ToInt32(Horas);
                         Creditos += i.credito;
                         CargaLista.Add(i);
-                    
-
                 }
       
                
@@ -145,7 +147,6 @@ namespace AkademicReport.Service.CargaServices
                     }
                   
                 }
-
                 ResulData.Carga = CargaLista.OrderBy(c => c.dia_id).ThenBy(c => int.Parse(c.hora_inicio)).ToList();
                 ResulData.Docente = DocenteFilter;
                 ResulData.CantCredito = Creditos;
@@ -169,7 +170,7 @@ namespace AkademicReport.Service.CargaServices
                 var ResulData = new ReportCargaPosgradoDto();
                 var carga = await _dataContext.CargaDocentes.Where(c => c.Cedula.Contains(Cedula) && c.Periodo == Periodo && c.IdPrograma == idPrograma)
                     .Include(c => c.DiasNavigation).Include(c => c.CurricularNavigation).Include(c => c.ModalidadNavigation).Include(c => c.IdConceptoPosgradoNavigation)
-                    .Include(c => c.IdMesNavigation).ToListAsync();
+                    .Include(c => c.IdMesNavigation).Include(c=>c.IdCodigoNavigation).ToListAsync();
                 var docentes = Docentes;
                 int Creditos = 0;
                 int pagoPorHora = 0;
@@ -195,10 +196,12 @@ namespace AkademicReport.Service.CargaServices
 
                 foreach (var item in CargaMap)
                 {
+                    if (item.IdCodigo != null)
+                        item.NombreAsignatura = carga.First(c => c.Id == item.Id).IdCodigoNavigation.Nombre;
+
                     item.RecintoNombreCorto = recinto.Find(c => c.Id == int.Parse(item.Recinto)).NombreCorto;
                     item.IdAsignatura = codigos.Find(c => c.Codigo1 == item.CodAsignatura).Id;
                     Creditos += item.Credito;
-
                 }
                 if(nivelAcademico.FirstOrDefault(c => c.Nivel == DocenteFilter.nivel)!=null)
                 {
@@ -247,7 +250,6 @@ namespace AkademicReport.Service.CargaServices
             {
                 var diasDb = await _dataContext.Dias.ToListAsync();
 
-
                 return new ServiceResponseData<List<Dia>>() { Data = diasDb, Status = 200, Message = Msj.MsjSucces };
             }
             catch (Exception ex)
@@ -261,8 +263,6 @@ namespace AkademicReport.Service.CargaServices
             try
             {
                 var meses = await _dataContext.Meses.ToListAsync();
-              
-
                 return new ServiceResponseData<List<MesGetDto>>() { Data = _mapper.Map<List<MesGetDto>>(meses), Status = 200, Message = Msj.MsjSucces };
             }
             catch (Exception ex)
@@ -273,7 +273,6 @@ namespace AkademicReport.Service.CargaServices
 
         public async Task<ServiceResponseData<List<TipoDeCargaDto>>> GetTipoCarga(int IdPrograma)
         {
-
             var TipoCargas = await _dataContext.TipoCargas.ProjectTo<TipoDeCargaDto>(_mapper.ConfigurationProvider).Where(c=>c.IdPrograma==IdPrograma).ToListAsync();     
             return new ServiceResponseData<List<TipoDeCargaDto>>() { Status = 200, Data = TipoCargas}; 
         }
@@ -292,7 +291,6 @@ namespace AkademicReport.Service.CargaServices
                 //  || cargaDocente.Data.Value.Item1.Docente.tiempoDedicacion == "M") ?  Msj.MsjPasoDeCredito : Msj.MsjPasoDeCreditoMedioTimepo};
 
                 //if (cargaDocente.Data.Value.Item1.Docente.tiempoDedicacion == "MT" && cargaDocente.Data.Value.Item1.CantCredito + item.credito > 32) return new ServicesResponseMessage<string>() { Status = 400, Message = Msj.MsjPasoDeCreditoMedioTimepo};
-      
                 CargaDocente carga = new CargaDocente();
                 carga.Curricular = item.idTipoCarga;
                 carga.Periodo = item.periodo;

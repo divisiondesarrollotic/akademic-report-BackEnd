@@ -196,6 +196,8 @@ namespace AkademicReport.Data
                     .IsUnicode(false)
                     .HasColumnName("hora_inicio");
 
+                entity.Property(e => e.IdCodigo).HasColumnName("idCodigo");
+
                 entity.Property(e => e.IdConceptoPosgrado).HasColumnName("idConceptoPosgrado");
 
                 entity.Property(e => e.IdMes).HasColumnName("idMes");
@@ -251,6 +253,11 @@ namespace AkademicReport.Data
                     .HasForeignKey(d => d.Dias)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Dias_cargaDocente");
+
+                entity.HasOne(d => d.IdCodigoNavigation)
+                    .WithMany(p => p.CargaDocentes)
+                    .HasForeignKey(d => d.IdCodigo)
+                    .HasConstraintName("FK__carga_doc__idCod__24E777C3");
 
                 entity.HasOne(d => d.IdConceptoPosgradoNavigation)
                     .WithMany(p => p.CargaDocentes)

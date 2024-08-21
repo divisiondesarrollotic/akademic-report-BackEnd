@@ -8,6 +8,8 @@ namespace AkademicReport.Dto.CargaDto
         public string Periodo { get; set; } = null!;
         public string Recinto { get; set; } = null!;
         public string CodAsignatura { get; set; } = null!;
+        [Required]
+        public int IdCodigo { get; set; }
         public string NombreAsignatura { get; set; } = null!;
         public string CodUniversitas { get; set; } = null!;
         public int? Modalidad { get; set; }

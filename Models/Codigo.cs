@@ -7,6 +7,7 @@ namespace AkademicReport.Models
     {
         public Codigo()
         {
+            CargaDocentes = new HashSet<CargaDocente>();
             TipoCargaCodigos = new HashSet<TipoCargaCodigo>();
             TipoModalidadCodigos = new HashSet<TipoModalidadCodigo>();
         }
@@ -22,6 +23,7 @@ namespace AkademicReport.Models
 
         public virtual Concepto? IdConceptoNavigation { get; set; }
         public virtual ProgramasAcademico? IdProgramaNavigation { get; set; }
+        public virtual ICollection<CargaDocente> CargaDocentes { get; set; }
         public virtual ICollection<TipoCargaCodigo> TipoCargaCodigos { get; set; }
         public virtual ICollection<TipoModalidadCodigo> TipoModalidadCodigos { get; set; }
     }
