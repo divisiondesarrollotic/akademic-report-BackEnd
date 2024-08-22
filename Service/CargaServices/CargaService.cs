@@ -343,7 +343,7 @@ namespace AkademicReport.Service.CargaServices
                 carga.Aula = "N/A";
                 carga.IdPrograma = 2;
                 carga.NumeroHora = 0;
-                carga.Curricular = 4;
+                carga.Curricular = 5;
                 carga.IdConceptoPosgrado = item.IdConceptoPosgrado;
 
                 _dataContext.CargaDocentes.Add(carga);
@@ -368,7 +368,7 @@ namespace AkademicReport.Service.CargaServices
                     carga.IdPrograma = 2;
                     carga.Curricular = null;
                     carga.NumeroHora = 0;
-                    carga.Curricular = 4;
+                    carga.Curricular = 5;
                     _dataContext.Entry(carga).State = EntityState.Modified;
                     await _dataContext.SaveChangesAsync();
                 }
