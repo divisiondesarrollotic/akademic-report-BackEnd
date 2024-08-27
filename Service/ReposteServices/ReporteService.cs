@@ -891,6 +891,8 @@ namespace AkademicReport.Service.ReposteServices
             int MontoPorAsignatura = 0;
             int Total = 0;
             int CantCreditos = 0;
+            int CantidadPagada = 0;
+            int CantCreditosF = 0;
             if (filtro.Curricular == "3")
             {
                 docentesRecinto = docentesRecinto.Where(c => c.tiempoDedicacion == "F" && c.TipoDocente== "Facilitador del DIID").ToList();
@@ -959,15 +961,29 @@ namespace AkademicReport.Service.ReposteServices
                                 }
                                 foreach (var item in CargaFilter)
                                 {
-                                    CantCreditos += item.credito;
-                                    if (CantCreditos > 20)
+                                    if (CantCreditosF + item.credito > 20)
                                     {
-                                        Monto+= item.precio_hora * item.credito;
+                                        // verificacion por si el monto resultante de la suma en mayor a 20 que solo tome despues de; va;pr 20
+                                       CantCreditosF += item.credito;
+                                        if (CantidadPagada == 0)
+                                        {
+                                            CantidadPagada = CantCreditosF - 20;
+                                            item.precio_hora = item.precio_hora;
+                                            item.pago_asignatura = item.precio_hora * CantidadPagada;
+                                            MontoPorAsignatura += item.pago_asignatura;
+                                        }
+                                        else
+                                        {
+                                            item.precio_hora = item.precio_hora;
+                                            item.pago_asignatura = item.precio_hora * item.credito;
+                                            MontoPorAsignatura += item.pago_asignatura;
+                                        }
                                     }
                                     else
                                     {
-                                        item.pago_asignatura = 0;
+                                        CantCreditosF += item.credito;
                                         item.precio_hora = 0;
+                                        item.pago_asignatura = 0;
                                     }
                                 }
                             }
@@ -1012,18 +1028,31 @@ namespace AkademicReport.Service.ReposteServices
                                 Monto = 0;
                                 foreach (var item in CargaFilter)
                                 {
-                                    CantCreditos += item.credito;
-                                    if (CantCreditos > 20)
+                                   
+                                    if (CantCreditosF + item.credito > 20)
                                     {
-                                        Monto += item.precio_hora * item.credito;
+                                        // verificacion por si el monto resultante de la suma en mayor a 20 que solo tome despues de; va;pr 20
+                                        CantCreditosF += item.credito;
+                                        if (CantidadPagada == 0)
+                                        {
+                                            CantidadPagada = CantCreditosF - 20;
+                                            item.precio_hora = item.precio_hora;
+                                            item.pago_asignatura = item.precio_hora * CantidadPagada;
+                                            MontoPorAsignatura += item.pago_asignatura;
+                                        }
+                                        else
+                                        {
+                                            item.precio_hora = item.precio_hora;
+                                            item.pago_asignatura = item.precio_hora * item.credito;
+                                            MontoPorAsignatura += item.pago_asignatura;
+                                        }
                                     }
                                     else
                                     {
-                                        item.pago_asignatura = 0;
+                                        CantCreditosF += item.credito;
                                         item.precio_hora = 0;
+                                        item.pago_asignatura = 0;
                                     }
-
-
                                 }
                             }
                             else if (DocenteConSuCarga.Data.Carga.Count() == CargaFilter.Count())
@@ -1058,9 +1087,9 @@ namespace AkademicReport.Service.ReposteServices
                         }
                         else if(docente.tiempoDedicacion == "MT")
                         {
-                            DocenteCargaListo.MontoSemanal = Monto;
-                            DocenteCargaListo.MontoMensual = DocenteConSuCarga.Data.MontoVinculacion + (Monto * 4);
-                            DocenteCargaListo.CantCreditos = CantCreditos;
+                            DocenteCargaListo.MontoSemanal = MontoPorAsignatura;
+                            DocenteCargaListo.MontoMensual = DocenteConSuCarga.Data.MontoVinculacion + (MontoPorAsignatura * 4);
+                            DocenteCargaListo.CantCreditos = CantCreditosF;
                         }
                         else if (docente.tiempoDedicacion == "A")
                         {
