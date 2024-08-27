@@ -50,6 +50,10 @@ namespace AkademicReport.Controllers
         {
 
             var result = await _service.GetCargaCallPosgrado(filtro.Cedula, filtro.Periodo, filtro.idPrograma);
+            if (result.Data.Value.Item1 == null)
+            {
+                return Ok(new ServicesResponseMessage<string>() { Status = 204, Message = result.Data.Value.Item2});
+            }
             if (result.Data.Value.Item1.Docente == null && result.Data.Value.Item1.Cargas == null)
             {
                 return Ok(new ServicesResponseMessage<string>() { Status = 204, Message = "Docente no existe" });

@@ -1,6 +1,7 @@
 ﻿using AkademicReport.Data;
 using AkademicReport.Dto.AsignaturaDto;
 using AkademicReport.Dto.CargaDto;
+using AkademicReport.Dto.ConceptoDto;
 using AkademicReport.Dto.ConceptoPosgradoDto;
 using AkademicReport.Dto.DocentesDto;
 using AkademicReport.Dto.ReporteDto;
@@ -170,7 +171,7 @@ namespace AkademicReport.Service.CargaServices
                 var ResulData = new ReportCargaPosgradoDto();
                 var carga = await _dataContext.CargaDocentes.Where(c => c.Cedula.Contains(Cedula) && c.Periodo == Periodo && c.IdPrograma == idPrograma)
                     .Include(c => c.DiasNavigation).Include(c => c.CurricularNavigation).Include(c => c.ModalidadNavigation).Include(c => c.IdConceptoPosgradoNavigation)
-                    .Include(c => c.IdMesNavigation).Include(c=>c.IdCodigoNavigation).ToListAsync();
+                    .Include(c => c.IdMesNavigation).Include(c=>c.IdCodigoNavigation).Include(c=>c.IdCodigoNavigation).ThenInclude(c=>c.IdConceptoNavigation).ToListAsync();
                 var docentes = Docentes;
                 int Creditos = 0;
                 int pagoPorHora = 0;
@@ -198,7 +199,7 @@ namespace AkademicReport.Service.CargaServices
                 {
                     if (item.IdCodigo != null)
                         item.NombreAsignatura = carga.First(c => c.Id == item.Id).IdCodigoNavigation.Nombre;
-
+                    item.ConceptoAsignatura??= _mapper.Map<ConceptoGetDto>(carga.First(c => c.Id == item.Id).IdCodigoNavigation.IdConceptoNavigation);
                     item.RecintoNombreCorto = recinto.Find(c => c.Id == int.Parse(item.Recinto)).NombreCorto;
                     item.IdAsignatura = codigos.Find(c => c.Codigo1 == item.CodAsignatura).Id;
                     Creditos += item.Credito;
@@ -239,6 +240,12 @@ namespace AkademicReport.Service.CargaServices
             FiltroDocentesDto filtro = new FiltroDocentesDto();
             filtro.Filtro = cedula;
             var Docentes = await _docenteService.GetAllFilter(filtro);
+
+            if(Docentes.Data.Count>0 && await ValidateNivelPosgrado(Docentes.Data[0].nivel)==false)
+            {
+                return new ServiceResponseCarga<ReportCargaPosgradoDto, string>() { Status = 204, Data =(null,$"Para un docente poder impartir carga en posgrado su nivel tiene que ser Maestría o Doctorado. Nivel del docente : {Docentes.Data[0].nivel}") };
+
+            }
             var Result = await GetCargaPosgrado(cedula, periodo, idPrograma, Docentes.Data);
             return Result;
 
@@ -401,6 +408,17 @@ namespace AkademicReport.Service.CargaServices
             {
                 return new ServicesResponseMessage<string>() { Status = 500, Message = Msj.MsjError + ex.ToString() };
             }
+        }
+
+        //Validacion para saber si el docenpte es apto para impartir docencia en posgrado, las condiciones son Su nivel tiene que er doctorado o maestria
+
+        public  async Task<bool> ValidateNivelPosgrado(string nivel)
+        {
+            var nivelAcademicoDb = await _dataContext.NivelAcademicos.Where(c => c.IdPrograma == 2).ToListAsync();
+            var nivelAcademico = nivelAcademicoDb.Find(c => c.Nivel.Contains(nivel));
+            bool resultado = false;
+            resultado = nivelAcademico == null?  false :  true;
+            return resultado;
         }
 
     }
