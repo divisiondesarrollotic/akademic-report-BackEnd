@@ -1110,6 +1110,10 @@ namespace AkademicReport.Service.ReposteServices
                             Total += DocenteCargaListo.MontoMensual;
                             Monto = 0;
                             CantCreditos = 0;
+                            CantCreditosF = 0;
+                            CantidadPagada = 0;
+                            MontoPorAsignatura = 0;
+
                         }
                     }
 
