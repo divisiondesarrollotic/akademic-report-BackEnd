@@ -40,6 +40,29 @@ namespace AkademicReport.Service.PeriodoServices
             }
         }
 
+        public async Task<ServicesResponseMessage<string>> ActualizarActualPosgrado(PeriodoActualUpdateDto periodo)
+        {
+            try
+            {
+                var periodosdb = await _dataContext.PeriodoAcademicos.AsNoTracking().ToListAsync();
+                foreach (var item in periodosdb)
+                {
+                    item.EstadoPosgrado = false;
+                    _dataContext.Entry(item).State = EntityState.Modified;
+                }
+                await _dataContext.SaveChangesAsync();
+                var periododb = await _dataContext.PeriodoAcademicos.FirstOrDefaultAsync(c => c.Id == periodo.Id);
+                periododb.EstadoPosgrado = true;
+                _dataContext.Entry(periododb).State = EntityState.Modified;
+                await _dataContext.SaveChangesAsync();
+                return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjUpdate };
+            }
+            catch (Exception ex)
+            {
+                return new ServicesResponseMessage<string>() { Status = 500 };
+            }
+        }
+
         public async Task<ServicesResponseMessage<string>> Delete(int id)
         {
             try
@@ -114,6 +137,20 @@ namespace AkademicReport.Service.PeriodoServices
                 return new ServiceResponseData<List<PeriodoGetDto>>() { Status = 500};
             }
       
+        }
+
+        public async Task<ServiceResponseData<List<PeriodoGetDto>>> PeriodoActualPosgrado()
+        {
+            try
+            {
+                var periodo = await _dataContext.PeriodoAcademicos.Where(c => c.EstadoPosgrado == true).ToListAsync();
+
+                return new ServiceResponseData<List<PeriodoGetDto>>() { Status = 200, Data = _mapper.Map<List<PeriodoGetDto>>(periodo) };
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponseData<List<PeriodoGetDto>>() { Status = 500 };
+            }
         }
 
         public async Task<ServicesResponseMessage<string>> Update(PeriodoUpdateDto item)

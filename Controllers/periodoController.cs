@@ -42,6 +42,16 @@ namespace AkademicReport.Controllers
         {
             return Ok(await _service.PeriodoActual());
         }
+        /// <summary>
+        /// --Este get trae el periodo actual establecido de posgrado
+        /// /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("actual_posgrado")]
+        public async Task<ActionResult> GetPeriodoActualPosgrado()
+        {
+            return Ok(await _service.PeriodoActualPosgrado());
+        }
 
         /// <summary>
         /// --Este post crea un nuevo periodo
@@ -55,7 +65,7 @@ namespace AkademicReport.Controllers
         }
 
         /// <summary>
-        /// --Este post actualiza el periodo actual
+        /// --Este post actualiza el periodo actual de posgrado
         /// /// </summary>
         /// <returns></returns>
         [HttpPost]
@@ -63,6 +73,17 @@ namespace AkademicReport.Controllers
         public async Task<ActionResult> UpdatePeriodoActual(PeriodoActualUpdateDto periodo)
         {
             return Ok(await _service.ActualizarActual(periodo));
+        }
+        /// <summary>
+        /// --Este post actualiza el periodo actual
+        /// /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("update/actual_posgrado")]
+
+        public async Task<ActionResult> UpdatePeriodoActualPosgrado(PeriodoActualUpdateDto periodo)
+        {
+            return Ok(await _service.ActualizarActualPosgrado(periodo));
         }
         /// <summary>
         /// --Este post actualiza un periodo

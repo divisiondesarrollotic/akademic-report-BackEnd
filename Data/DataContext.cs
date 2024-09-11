@@ -569,6 +569,8 @@ namespace AkademicReport.Data
                     .HasColumnName("estado")
                     .HasDefaultValueSql("((0))");
 
+                entity.Property(e => e.EstadoPosgrado).HasColumnName("estadoPosgrado");
+
                 entity.Property(e => e.Periodo)
                     .HasMaxLength(20)
                     .IsUnicode(false)
