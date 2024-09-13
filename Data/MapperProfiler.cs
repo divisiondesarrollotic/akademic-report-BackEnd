@@ -4,6 +4,8 @@ using AkademicReport.Dto.CargaDto;
 using AkademicReport.Dto.ConceptoDto;
 using AkademicReport.Dto.ConceptoPosgradoDto;
 using AkademicReport.Dto.DocentesDto;
+using AkademicReport.Dto.FirmaDto;
+using AkademicReport.Dto.FirmasDto;
 using AkademicReport.Dto.NivelDto;
 using AkademicReport.Dto.PeriodoDto;
 using AkademicReport.Dto.ProgramaDto;
@@ -147,6 +149,8 @@ namespace AkademicReport.Data
             .ForMember(c=>c.DiaNombre, o=>o.MapFrom(c=>c.DiasNavigation.Nombre))
             .ForMember(c=>c.Codigo, o=>o.MapFrom(c=>c.IdCodigoNavigation));
 
+            CreateMap<Firma, FirmaGetDto>().ForMember(c=>c.RecintoObj, o=>o.MapFrom(c=>c.IdRecintoNavigation));
+            CreateMap<FirmaDto, Firma>();
 
 
         }

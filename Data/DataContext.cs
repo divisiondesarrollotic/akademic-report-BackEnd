@@ -30,6 +30,7 @@ namespace AkademicReport.Data
         public virtual DbSet<Dia> Dias { get; set; } = null!;
         public virtual DbSet<Diplomado> Diplomados { get; set; } = null!;
         public virtual DbSet<Docentereal> Docentereals { get; set; } = null!;
+        public virtual DbSet<Firma> Firmas { get; set; } = null!;
         public virtual DbSet<Mese> Meses { get; set; } = null!;
         public virtual DbSet<NivelAcademico> NivelAcademicos { get; set; } = null!;
         public virtual DbSet<NivelUsuario> NivelUsuarios { get; set; } = null!;
@@ -476,6 +477,33 @@ namespace AkademicReport.Data
                     .WithMany(p => p.Docentereals)
                     .HasForeignKey(d => d.IdVinculo)
                     .HasConstraintName("FK_vinculo_docente");
+            });
+
+            modelBuilder.Entity<Firma>(entity =>
+            {
+                entity.HasKey(e => e.IdFirma)
+                    .HasName("PK__firmas__A9CB15C2647A0319");
+
+                entity.ToTable("firmas");
+
+                entity.Property(e => e.IdFirma).HasColumnName("idFirma");
+
+                entity.Property(e => e.Cargo)
+                    .HasMaxLength(200)
+                    .IsUnicode(false)
+                    .HasColumnName("cargo");
+
+                entity.Property(e => e.IdRecinto).HasColumnName("idRecinto");
+
+                entity.Property(e => e.Nombre)
+                    .HasMaxLength(200)
+                    .IsUnicode(false)
+                    .HasColumnName("nombre");
+
+                entity.HasOne(d => d.IdRecintoNavigation)
+                    .WithMany(p => p.Firmas)
+                    .HasForeignKey(d => d.IdRecinto)
+                    .HasConstraintName("FK__firmas__idRecint__27C3E46E");
             });
 
             modelBuilder.Entity<Mese>(entity =>

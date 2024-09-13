@@ -4,6 +4,7 @@ using AkademicReport.Service.AulaServices;
 using AkademicReport.Service.CargaServices;
 using AkademicReport.Service.ConceptoServices;
 using AkademicReport.Service.DocenteServices;
+using AkademicReport.Service.FirmaServices;
 using AkademicReport.Service.NivelServices;
 using AkademicReport.Service.PeriodoServices;
 using AkademicReport.Service.RecintoServices;
@@ -42,6 +43,7 @@ builder.Services.AddScoped<IAsignaturaService, AsignaturaService>();
 builder.Services.AddScoped<IDocenteService, DocenteService>();
 builder.Services.AddScoped<ICargaDocenteService, CargaService>();
 builder.Services.AddScoped<IReporteService, ReporteService>();
+builder.Services.AddScoped<IFirmaService, FirmaService>();
 builder.Services.AddAutoMapper(typeof(Program));
 
 var app = builder.Build();

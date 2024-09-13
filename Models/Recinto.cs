@@ -9,6 +9,7 @@ namespace AkademicReport.Models
         {
             Aulas = new HashSet<Aula>();
             Docentereals = new HashSet<Docentereal>();
+            Firmas = new HashSet<Firma>();
             Usuarios = new HashSet<Usuario>();
         }
 
@@ -18,6 +19,7 @@ namespace AkademicReport.Models
 
         public virtual ICollection<Aula> Aulas { get; set; }
         public virtual ICollection<Docentereal> Docentereals { get; set; }
+        public virtual ICollection<Firma> Firmas { get; set; }
         public virtual ICollection<Usuario> Usuarios { get; set; }
     }
 }

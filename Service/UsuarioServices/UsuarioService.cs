@@ -24,6 +24,8 @@ namespace AkademicReport.Service.UsuarioServices
         {
             try
             {
+         
+
                 var usuarios = await CargarUsuarios(usuario.IdPrograma.Value);
                 var usuariodb = usuarios.Where(c => c.Correo == usuario.Correo).FirstOrDefault();
                 if (usuariodb != null)
@@ -155,7 +157,7 @@ namespace AkademicReport.Service.UsuarioServices
         public async Task<List<Usuario>>CargarUsuarios(int idPrograma)
         {
            
-            return await _dataContext.Usuarios.Where(c=>c.SoftDelete==0 && c.IdPrograma==idPrograma).Include(c => c.IdRecintoNavigation).Include(c => c.NivelNavigation).Include(c=>c.IdProgramaNavigation) .ToListAsync();
+            return await _dataContext.Usuarios.Where(c=>c.SoftDelete==0).Include(c => c.IdRecintoNavigation).Include(c => c.NivelNavigation).Include(c=>c.IdProgramaNavigation) .ToListAsync();
         }
 
         public async Task<ServicesResponseMessage<string>> UpdatePassword(UpdatePasswordDto password)

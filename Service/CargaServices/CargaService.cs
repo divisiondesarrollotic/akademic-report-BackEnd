@@ -350,7 +350,7 @@ namespace AkademicReport.Service.CargaServices
                 carga.Aula = "N/A";
                 carga.IdPrograma = 2;
                 carga.NumeroHora = 0;
-                carga.Curricular = 5;
+                carga.Curricular = item.idTipoCarga;
                 carga.IdConceptoPosgrado = item.IdConceptoPosgrado;
 
                 _dataContext.CargaDocentes.Add(carga);
