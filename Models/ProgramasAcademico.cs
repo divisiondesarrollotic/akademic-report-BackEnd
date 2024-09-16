@@ -10,6 +10,7 @@ namespace AkademicReport.Models
             CargaDocentes = new HashSet<CargaDocente>();
             Codigos = new HashSet<Codigo>();
             Conceptos = new HashSet<Concepto>();
+            Firmas = new HashSet<Firma>();
             NivelAcademicos = new HashSet<NivelAcademico>();
             TipoCargas = new HashSet<TipoCarga>();
             Usuarios = new HashSet<Usuario>();
@@ -21,6 +22,7 @@ namespace AkademicReport.Models
         public virtual ICollection<CargaDocente> CargaDocentes { get; set; }
         public virtual ICollection<Codigo> Codigos { get; set; }
         public virtual ICollection<Concepto> Conceptos { get; set; }
+        public virtual ICollection<Firma> Firmas { get; set; }
         public virtual ICollection<NivelAcademico> NivelAcademicos { get; set; }
         public virtual ICollection<TipoCarga> TipoCargas { get; set; }
         public virtual ICollection<Usuario> Usuarios { get; set; }

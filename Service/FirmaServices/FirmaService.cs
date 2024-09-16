@@ -46,11 +46,11 @@ namespace AkademicReport.Service.FirmaServices
         }
 
       
-        public async Task<ServiceResponseData<List<FirmaGetDto>>> GetByIdRecinto(int idRecinto)
+        public async Task<ServiceResponseData<List<FirmaGetDto>>> GetByIdRecinto(int idRecinto, int idPrograma)
         {
             try
-            {
-                var firmasDb = await _datacontext.Firmas.Where(c => c.IdRecinto == idRecinto).Include(c=>c.IdRecintoNavigation).ToListAsync();
+            { 
+                var firmasDb = await _datacontext.Firmas.Where(c => c.IdRecinto == idRecinto && c.IdPrograma==idPrograma).Include(c=>c.IdRecintoNavigation).ToListAsync();
                 return new ServiceResponseData<List<FirmaGetDto>>() { Status = 200, Data = _mapper.Map<List<FirmaGetDto>>(firmasDb)};
             }
             catch (Exception ex)

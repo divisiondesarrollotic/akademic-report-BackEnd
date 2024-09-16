@@ -9,7 +9,9 @@ namespace AkademicReport.Models
         public int? IdRecinto { get; set; }
         public string? Nombre { get; set; }
         public string? Cargo { get; set; }
+        public int? IdPrograma { get; set; }
 
+        public virtual ProgramasAcademico? IdProgramaNavigation { get; set; }
         public virtual Recinto? IdRecintoNavigation { get; set; }
     }
 }

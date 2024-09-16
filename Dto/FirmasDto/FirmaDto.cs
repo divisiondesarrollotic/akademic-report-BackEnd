@@ -11,5 +11,8 @@ namespace AkademicReport.Dto.FirmasDto
         public string? Nombre { get; set; }
         [Required]
         public string? Cargo { get; set; }
+        [Required]
+        public int? IdPrograma { get; set; }
+
     }
 }

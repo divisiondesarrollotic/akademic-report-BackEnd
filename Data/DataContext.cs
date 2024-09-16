@@ -493,12 +493,19 @@ namespace AkademicReport.Data
                     .IsUnicode(false)
                     .HasColumnName("cargo");
 
+                entity.Property(e => e.IdPrograma).HasColumnName("idPrograma");
+
                 entity.Property(e => e.IdRecinto).HasColumnName("idRecinto");
 
                 entity.Property(e => e.Nombre)
                     .HasMaxLength(200)
                     .IsUnicode(false)
                     .HasColumnName("nombre");
+
+                entity.HasOne(d => d.IdProgramaNavigation)
+                    .WithMany(p => p.Firmas)
+                    .HasForeignKey(d => d.IdPrograma)
+                    .HasConstraintName("FK__firmas__idProgra__28B808A7");
 
                 entity.HasOne(d => d.IdRecintoNavigation)
                     .WithMany(p => p.Firmas)

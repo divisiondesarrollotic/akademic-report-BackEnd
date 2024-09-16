@@ -9,5 +9,7 @@ namespace AkademicReport.Dto.FirmaDto
         public virtual RecintoGetDto? RecintoObj { get; set; }
         public string? Nombre { get; set; }
         public string? Cargo { get; set; }
+        public int? IdPrograma { get; set; }
+
     }
 }

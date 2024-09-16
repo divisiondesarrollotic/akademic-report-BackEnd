@@ -19,10 +19,10 @@ namespace AkademicReport.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Route("get_by_idrecinto/{idrecinto}")]
-        public async Task<ActionResult> GetAllAylasByIdRecinto(int idrecinto)
+        [Route("get_by_idrecinto/{idrecinto}/{idprograma}")]
+        public async Task<ActionResult> GetAllAylasByIdRecinto(int idrecinto, int idprograma)
         {
-            return Ok(await _service.GetByIdRecinto(idrecinto));
+            return Ok(await _service.GetByIdRecinto(idrecinto, idprograma));
         }
         [HttpGet]
         public async Task<ActionResult> GetAll()
