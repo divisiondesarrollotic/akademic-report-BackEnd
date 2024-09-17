@@ -25,9 +25,10 @@ namespace AkademicReport.Controllers
             return Ok(await _service.GetByIdRecinto(idrecinto, idprograma));
         }
         [HttpGet]
-        public async Task<ActionResult> GetAll()
+        [Route("get_all_idprograma/{idprograma}")]
+        public async Task<ActionResult> GetAll(int idprograma)
         {
-            return Ok(await _service.GetAll());
+            return Ok(await _service.GetAll(idprograma));
         }
 
         [HttpDelete]

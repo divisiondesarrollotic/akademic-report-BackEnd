@@ -32,11 +32,11 @@ namespace AkademicReport.Service.FirmaServices
             }
         }
 
-        public async Task<ServiceResponseData<List<FirmaGetDto>>> GetAll()
+        public async Task<ServiceResponseData<List<FirmaGetDto>>> GetAll(int  idPrograma)
         {
             try
             {
-                var firmasDb = await _datacontext.Firmas.Include(c=>c.IdRecintoNavigation).ToListAsync();
+                var firmasDb = await _datacontext.Firmas.Where(c=>c.IdPrograma==idPrograma).Include(c=>c.IdRecintoNavigation).ToListAsync();
                 return new ServiceResponseData<List<FirmaGetDto>>() { Status = 200, Data = _mapper.Map<List<FirmaGetDto>>(firmasDb), Message=Msj.MsjSucces };
             }
             catch (Exception ex)
@@ -78,7 +78,7 @@ namespace AkademicReport.Service.FirmaServices
             try
             {
 
-                var firmadb = await _datacontext.Firmas.FirstAsync(c => c.IdFirma==item.IdFirma);
+                var firmadb = await _datacontext.Firmas.AsNoTracking().FirstAsync(c => c.IdFirma==item.IdFirma);
                 firmadb = _mapper.Map<Firma>(item);
                 _datacontext.Entry(firmadb).State = EntityState.Modified;
                 await _datacontext.SaveChangesAsync();

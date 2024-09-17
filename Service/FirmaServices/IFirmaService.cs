@@ -6,7 +6,7 @@ namespace AkademicReport.Service.FirmaServices
 {
     public interface IFirmaService
     {
-        Task<ServiceResponseData<List<FirmaGetDto>>> GetAll();
+        Task<ServiceResponseData<List<FirmaGetDto>>> GetAll(int idPrograma);
         Task<ServiceResponseData<List<FirmaGetDto>>> GetByIdRecinto(int idRecinto, int idPrograma);
         Task<ServicesResponseMessage<string>> Insert(FirmaDto item);
         Task<ServicesResponseMessage<string>> Update(FirmaDto item);
