@@ -1181,7 +1181,7 @@ namespace AkademicReport.Service.ReposteServices
             try
             {
                 var response = new List<ReportCargaPosgradoDto>();
-                var docentesAmilka = await _docentesService.GetAll();
+                var docentesAmilka = await _docentesService.GetAllRecinto(new FiltroDocentesDto(), idRecinto);
                 var nivelAcademico = await _dataContext.NivelAcademicos.Where(c => c.IdPrograma==2).ToListAsync();
                 var recinto = await _dataContext.Recintos.FirstAsync(c => c.Id == idRecinto);
                 int Monto = 0;

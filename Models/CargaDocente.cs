@@ -8,7 +8,7 @@ namespace AkademicReport.Models
         public int Id { get; set; }
         public int? Curricular { get; set; }
         public string Periodo { get; set; } = null!;
-        public string Recinto { get; set; } = null!;
+        public int Recinto { get; set; }
         public string? CodAsignatura { get; set; }
         public string NombreAsignatura { get; set; } = null!;
         public string CodUniversitas { get; set; } = null!;
@@ -38,5 +38,6 @@ namespace AkademicReport.Models
         public virtual Mese? IdMesNavigation { get; set; }
         public virtual ProgramasAcademico? IdProgramaNavigation { get; set; }
         public virtual TipoModalidad? ModalidadNavigation { get; set; }
+        public virtual Recinto RecintoNavigation { get; set; } = null!;
     }
 }

@@ -14,10 +14,7 @@ namespace AkademicReport.Controllers
         {
             _service = firmaService;
         }
-        /// <summary>
-        /// --Este get trae todas las aula de un recinto
-        /// </summary>
-        /// <returns></returns>
+   
         [HttpGet]
         [Route("get_by_idrecinto/{idrecinto}/{idprograma}")]
         public async Task<ActionResult> GetAllAylasByIdRecinto(int idrecinto, int idprograma)

@@ -230,14 +230,11 @@ namespace AkademicReport.Data
                 entity.Property(e => e.NumeroHora).HasColumnName("numero_hora");
 
                 entity.Property(e => e.Periodo)
-                    .HasMaxLength(10)
+                    .HasMaxLength(200)
                     .IsUnicode(false)
                     .HasColumnName("periodo");
 
-                entity.Property(e => e.Recinto)
-                    .HasMaxLength(100)
-                    .IsUnicode(false)
-                    .HasColumnName("recinto");
+                entity.Property(e => e.Recinto).HasColumnName("recinto");
 
                 entity.Property(e => e.Seccion)
                     .HasMaxLength(50)
@@ -279,6 +276,12 @@ namespace AkademicReport.Data
                     .WithMany(p => p.CargaDocentes)
                     .HasForeignKey(d => d.Modalidad)
                     .HasConstraintName("FK_modalidad_cargaDocente");
+
+                entity.HasOne(d => d.RecintoNavigation)
+                    .WithMany(p => p.CargaDocentes)
+                    .HasForeignKey(d => d.Recinto)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_carga_recinto");
             });
 
             modelBuilder.Entity<Codigo>(entity =>

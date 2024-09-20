@@ -301,7 +301,7 @@ namespace AkademicReport.Service.CargaServices
                 CargaDocente carga = new CargaDocente();
                 carga.Curricular = item.idTipoCarga;
                 carga.Periodo = item.periodo;
-                carga.Recinto = item.recinto.ToString();
+                carga.Recinto = item.recinto;
                 carga.CodAsignatura = item.cod_asignatura;
                 carga.NombreAsignatura = item.nombre_asignatura;
                 carga.CodUniversitas = item.cod_universitas;

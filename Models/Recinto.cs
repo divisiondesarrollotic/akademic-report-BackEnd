@@ -8,6 +8,7 @@ namespace AkademicReport.Models
         public Recinto()
         {
             Aulas = new HashSet<Aula>();
+            CargaDocentes = new HashSet<CargaDocente>();
             Docentereals = new HashSet<Docentereal>();
             Firmas = new HashSet<Firma>();
             Usuarios = new HashSet<Usuario>();
@@ -18,6 +19,7 @@ namespace AkademicReport.Models
         public string NombreCorto { get; set; } = null!;
 
         public virtual ICollection<Aula> Aulas { get; set; }
+        public virtual ICollection<CargaDocente> CargaDocentes { get; set; }
         public virtual ICollection<Docentereal> Docentereals { get; set; }
         public virtual ICollection<Firma> Firmas { get; set; }
         public virtual ICollection<Usuario> Usuarios { get; set; }
