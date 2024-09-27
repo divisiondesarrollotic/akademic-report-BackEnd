@@ -603,6 +603,11 @@ namespace AkademicReport.Data
 
                 entity.Property(e => e.Id).HasColumnName("id");
 
+                entity.Property(e => e.Descripcion)
+                    .HasMaxLength(350)
+                    .IsUnicode(false)
+                    .HasColumnName("descripcion");
+
                 entity.Property(e => e.Estado)
                     .HasColumnName("estado")
                     .HasDefaultValueSql("((0))");

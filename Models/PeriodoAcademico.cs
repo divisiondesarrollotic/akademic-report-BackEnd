@@ -9,5 +9,6 @@ namespace AkademicReport.Models
         public string Periodo { get; set; } = null!;
         public bool? Estado { get; set; }
         public bool? EstadoPosgrado { get; set; }
+        public string? Descripcion { get; set; }
     }
 }
