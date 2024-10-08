@@ -113,7 +113,7 @@ namespace AkademicReport.Service.PeriodoServices
         {
             try
             {
-         
+                
                 _dataContext.PeriodoAcademicos.Add(_mapper.Map<PeriodoAcademico>(item));
                 await _dataContext.SaveChangesAsync();
                 return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjInsert };

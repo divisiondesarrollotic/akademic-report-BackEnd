@@ -1,5 +1,6 @@
 ﻿using AkademicReport.Dto.AsignaturaDto;
 using AkademicReport.Dto.ConceptoDto;
+using AkademicReport.Dto.PeriodoDto;
 
 namespace AkademicReport.Dto.ReporteDto
 {
@@ -37,5 +38,7 @@ namespace AkademicReport.Dto.ReporteDto
             } }
 
         public string recinto { get; set; } = null!;
+        public int? IdPeriodo { get; set; }
+        public PeriodoGetDto? PeriodoObj { get; set; }
     }
 }

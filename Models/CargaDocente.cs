@@ -30,12 +30,14 @@ namespace AkademicReport.Models
         public int? IdConceptoPosgrado { get; set; }
         public string? Anio { get; set; }
         public int? IdCodigo { get; set; }
+        public int? IdPeriodo { get; set; }
 
         public virtual TipoCarga? CurricularNavigation { get; set; }
         public virtual Dia DiasNavigation { get; set; } = null!;
         public virtual Codigo? IdCodigoNavigation { get; set; }
         public virtual ConceptoPosgrado? IdConceptoPosgradoNavigation { get; set; }
         public virtual Mese? IdMesNavigation { get; set; }
+        public virtual PeriodoAcademico? IdPeriodoNavigation { get; set; }
         public virtual ProgramasAcademico? IdProgramaNavigation { get; set; }
         public virtual TipoModalidad? ModalidadNavigation { get; set; }
         public virtual Recinto RecintoNavigation { get; set; } = null!;

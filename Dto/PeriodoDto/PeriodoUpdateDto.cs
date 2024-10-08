@@ -7,5 +7,9 @@
         public string? Descripcion { get; set; }
 
         public bool estado { get; set; }
-    }   
+        public bool? EstadoPosgrado { get; set; }
+        public int? Anio { get; set; }
+
+
+    }
 }

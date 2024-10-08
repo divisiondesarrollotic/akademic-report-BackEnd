@@ -1,5 +1,6 @@
 ﻿using AkademicReport.Dto.DocentesDto;
 using AkademicReport.Dto.ReporteDto;
+using AkademicReport.Models;
 using AkademicReport.Service;
 using AkademicReport.Service.ReposteServices;
 using Microsoft.AspNetCore.Mvc;
@@ -24,7 +25,15 @@ namespace AkademicReport.Controllers
         public async Task<ActionResult>PorDocente(ReporteDto filtro)
         {
             var response =await _reposteService.PorDocenteCall(filtro);
-            if(response.Status==204)
+            if (response.Data.Carga.Count==0)
+            {
+                var ServiceR = new ServicesResponseMessage<string>();
+                ServiceR.Status = 2024;
+                ServiceR.Message = "Este docente no tiene carga en este periodo";
+
+                return Ok(ServiceR);
+            }
+            else if(response.Data.Docente==null)
             {
                 var ServiceR = new ServicesResponseMessage<string>();
                 ServiceR.Status = 2024;
@@ -32,6 +41,7 @@ namespace AkademicReport.Controllers
                 return Ok(ServiceR);
             }
             var ResponseDone = new ServiceResponseData<List<DocenteCargaReporteDtoPorDocente>>();
+            ResponseDone.Anio = response.Anio;
             ResponseDone.Status = 200;
             ResponseDone.Data = new List<DocenteCargaReporteDtoPorDocente>();
             var Uni = new DocenteCargaReporteDtoPorDocente();
@@ -41,7 +51,6 @@ namespace AkademicReport.Controllers
             Uni.MontoSemanal = response.Data.MontoSemanal;
             Uni.MontoMensual = response.Data.MontoMensual;
             Uni.MontoVinculacion = response.Data.MontoVinculacion;
-
             ResponseDone.Data.Add(Uni);
             return Ok(ResponseDone);
 

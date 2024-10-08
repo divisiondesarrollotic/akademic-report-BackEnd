@@ -1,6 +1,7 @@
 ﻿using AkademicReport.Dto.AsignaturaDto;
 using AkademicReport.Dto.ConceptoDto;
 using AkademicReport.Dto.ConceptoPosgradoDto;
+using AkademicReport.Dto.PeriodoDto;
 
 namespace AkademicReport.Dto.CargaDto
 {
@@ -39,5 +40,7 @@ namespace AkademicReport.Dto.CargaDto
         public int? IdConceptoPosgrado { get; set; }
         public ConceptoPosDto? ConceptoPosgrado { get; set; }
         public TipoCargaDto? TipoCarga { get; set; }
+        public int? IdPeriodo { get; set; }
+        public PeriodoGetDto? PeriodoObj { get; set; }
     }
 }

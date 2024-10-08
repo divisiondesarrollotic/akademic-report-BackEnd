@@ -10,6 +10,7 @@ namespace AkademicReport.Dto.ReporteDto
         public string? Periodo { get; set; }
         [Required]
         public int idPrograma { get; set; }
+        public int Anio { get; set; }
 
 
     }

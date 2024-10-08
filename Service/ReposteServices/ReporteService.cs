@@ -3,6 +3,7 @@ using AkademicReport.Dto.AsignaturaDto;
 using AkademicReport.Dto.CargaDto;
 using AkademicReport.Dto.ConceptoDto;
 using AkademicReport.Dto.DocentesDto;
+using AkademicReport.Dto.PeriodoDto;
 using AkademicReport.Dto.ReporteDto;
 using AkademicReport.Models;
 using AkademicReport.Service.CargaServices;
@@ -42,14 +43,25 @@ namespace AkademicReport.Service.ReposteServices
             var Response = new ServiceResponseData<DocenteCargaReporteDto>();
             try
             {
+                if(filtro.Periodo!=null)
+                {
+                    var periodo = await _dataContext.PeriodoAcademicos.Where(c => c.Periodo == filtro.Periodo).FirstAsync();
+                    Response.Anio = periodo.Anio!.Value;
+                }
                 DocenteCargaReporteDto DataResult = new DocenteCargaReporteDto();
                 DataResult.Carga = new List<CargaReporteDto>();
                 
                 var CargaMapeada = new List<CargaReporteDto>();
                 var CargaLista = new List<CargaGetDto>();
                 var Docente = new DocenteReporteDto();
-                var cargas = await _cargaService.GetCarga(filtro.Cedula, filtro.Periodo, filtro.idPrograma, DocentesAmilca);
-                if (cargas.Data.Value.Item1.Docente != null)
+                var cargas = await _cargaService.GetCarga(filtro.Cedula!, filtro.Periodo!, filtro.idPrograma, DocentesAmilca);
+                if(cargas.Data.Value.Item1.Carga.Count>0)
+                {
+                    Response.Anio = cargas.Data.Value.Item1.Carga[0].PeriodoObj.Anio.Value;
+
+                }
+
+                if (cargas.Data!.Value.Item1.Docente != null)
                 {
 
                     Docente.Id = cargas.Data.Value.Item1.Docente.id;
@@ -63,18 +75,17 @@ namespace AkademicReport.Service.ReposteServices
                     Docente.Monto = "0";
                     var recinto = await _dataContext.Recintos.FirstOrDefaultAsync(c => c.Id == int.Parse(cargas.Data.Value.Item1.Docente.id_recinto));
                     Docente.Id_recinto = cargas.Data.Value.Item1.Docente.id_recinto;
-                    Docente.Recinto = recinto.Recinto1;
+                    Docente.Recinto = recinto!.Recinto1;
                     Docente.Nombre_corto = cargas.Data.Value.Item1.Docente.nombre_corto;
                     Docente.Id_nivel_academico = cargas.Data.Value.Item1.Docente.id_nivel_academico;
                     Docente.Nivel = cargas.Data.Value.Item1.Docente.nivel;
                     DataResult.Docente = Docente;
-
-
                 }
-                if (cargas.Data.Value.Item1.Carga == null)
+                if (cargas.Data.Value.Item1.Carga == null || cargas.Data.Value.Item1.Carga.Count == 0)
                 {
                     DataResult.Docente = Docente;
                     Response.Data = DataResult;
+                    Response.Message = "El docente no tiene carga en este periodo";
                     Response.Status = 204;
                     return Response;
                 }
@@ -82,11 +93,11 @@ namespace AkademicReport.Service.ReposteServices
                 if (cargas.Data.Value.Item1.Carga != null)
                 {
                     int Monto = 0;
-                    if (DataResult.Docente.TiempoDedicacion == "TC")
+                    if (DataResult.Docente!.TiempoDedicacion == "TC")
                     {
                         var vinculacion = await _dataContext.Vinculos.FirstOrDefaultAsync(c => c.Corto == "TC");
 
-                        Monto = vinculacion.Monto;
+                        Monto = vinculacion!.Monto;
                         DataResult.MontoMensual = Monto;
                         DataResult.MontoVinculacion = Monto;
 
@@ -127,6 +138,9 @@ namespace AkademicReport.Service.ReposteServices
                             c.precio_hora = 0;
                             c.Concepto = item.Concepto;
                             c.pago_asignatura = 0;
+                            var periodo = await _dataContext.PeriodoAcademicos.Where(c => c.Periodo == item.Periodo).FirstAsync();
+                            c.IdPeriodo = periodo.Id;
+                            c.PeriodoObj = _mapper.Map<PeriodoGetDto>(periodo);
                             DataResult.Carga.Add(c);
 
                         }
@@ -136,10 +150,8 @@ namespace AkademicReport.Service.ReposteServices
                             CantCreditos += item.credito;
                         }
                         DataResult.CantCreditos = CantCreditos;
-
                         Response.Data = DataResult;
                         Response.Status = 200;
-
                         return Response;
                     }
                     else if (DataResult.Docente.TiempoDedicacion == "MT")
@@ -198,6 +210,9 @@ namespace AkademicReport.Service.ReposteServices
                             c.Horario_final = $"{item.hora_fin} : {item.minuto_fin}";
                             c.credito = item.credito;
                             c.Concepto = item.Concepto;
+                            var periodo = await _dataContext.PeriodoAcademicos.Where(c => c.Periodo == item.Periodo).FirstAsync();
+                            c.IdPeriodo = periodo.Id;
+                            c.PeriodoObj = _mapper.Map<PeriodoGetDto>(periodo);
                             var recinto = await _dataContext.Recintos.FirstOrDefaultAsync(c => c.Id == int.Parse(item.Recinto));
                             c.recinto = recinto.NombreCorto;
                           
@@ -218,19 +233,15 @@ namespace AkademicReport.Service.ReposteServices
                                     c.pago_asignatura = c.precio_hora * c.credito;
                                     MontoPorAsignatura += c.pago_asignatura;
                                 }
- 
                             }
                             else
                             {
                                 CantCreditosF += c.credito;
                                 c.precio_hora = 0;
                                 c.pago_asignatura = 0;
-
                             }
-
                             DataResult.Carga.Add(c);
                         }
-
                         DataResult.CantCreditos = CantCreditosF;
                         DataResult.MontoSemanal = MontoPorAsignatura;
                         DataResult.MontoMensual = Monto + (MontoPorAsignatura * 4);
@@ -240,7 +251,6 @@ namespace AkademicReport.Service.ReposteServices
                     }
                     else if (DataResult.Docente.TiempoDedicacion == "A")
                     {
-
                         var nivelAcademico = await _dataContext.NivelAcademicos
                              .Where(n => n.Nivel.Replace("á", "a")
                                                  .Replace("é", "e")
@@ -253,11 +263,9 @@ namespace AkademicReport.Service.ReposteServices
                                                                      .Replace("ó", "o")
                                                                      .Replace("ú", "u")))
                              .FirstOrDefaultAsync();
-
                         DataResult.Docente.Pago_hora = nivelAcademico.PagoHora.ToString();
                         foreach (var item in cargas.Data.Value.Item1.Carga)
                         {
-
                             decimal Horas = CalculoTiempoHoras.Calcular(int.Parse(item.hora_inicio), int.Parse(item.minuto_inicio), int.Parse(item.hora_fin), int.Parse(item.minuto_fin));
                             item.credito = Convert.ToInt32(Horas);
                             CargaLista.Add(item);
@@ -282,6 +290,9 @@ namespace AkademicReport.Service.ReposteServices
                             c.recinto = recinto.NombreCorto;
                             c.precio_hora = nivelAcademico.PagoHora;
                             c.pago_asignatura = c.precio_hora * c.credito;
+                            var periodo = await _dataContext.PeriodoAcademicos.Where(c => c.Periodo == item.Periodo).FirstAsync();
+                            c.IdPeriodo = periodo.Id;
+                            c.PeriodoObj = _mapper.Map<PeriodoGetDto>(periodo);
                             DataResult.Docente.Pago_hora = c.precio_hora.ToString();
                             DataResult.Carga.Add(c);
                         }
@@ -297,9 +308,6 @@ namespace AkademicReport.Service.ReposteServices
                         {
                             CantCreditos += item.credito;
                         }
-
-
-
                         DataResult.CantCreditos = CantCreditos;
                         DataResult.MontoSemanal = Monto;
                         DataResult.MontoMensual = Monto * 4;
@@ -337,6 +345,9 @@ namespace AkademicReport.Service.ReposteServices
                             var recinto = await _dataContext.Recintos.FirstOrDefaultAsync(c => c.Id == int.Parse(item.Recinto));
                             c.recinto = recinto.NombreCorto;
                             c.precio_hora = vinculacion.Monto;
+                            var periodo = await _dataContext.PeriodoAcademicos.Where(c => c.Periodo == item.Periodo).FirstAsync();
+                            c.IdPeriodo = periodo.Id;
+                            c.PeriodoObj = _mapper.Map<PeriodoGetDto>(periodo);
                             c.pago_asignatura = c.precio_hora * c.credito;
                             DataResult.Docente.Pago_hora = c.precio_hora.ToString();
                             DataResult.Carga.Add(c);
@@ -401,6 +412,9 @@ namespace AkademicReport.Service.ReposteServices
                             c.precio_hora = vinculacion.Monto;
                             DataResult.Docente.Pago_hora = c.precio_hora.ToString();
                             c.pago_asignatura = c.precio_hora * c.credito;
+                            var periodo = await _dataContext.PeriodoAcademicos.Where(c => c.Periodo == item.Periodo).FirstAsync();
+                            c.IdPeriodo = periodo.Id;
+                            c.PeriodoObj = _mapper.Map<PeriodoGetDto>(periodo);
                             DataResult.Carga.Add(c);
                         }
 
@@ -419,7 +433,6 @@ namespace AkademicReport.Service.ReposteServices
                         DataResult.CantCreditos = CantCreditos;
                         DataResult.MontoSemanal = Monto;
                         DataResult.MontoMensual = Monto * 4;
-                        Response.Data = DataResult;
                         Response.Status = 200;
                         return Response;
                     }
@@ -431,7 +444,8 @@ namespace AkademicReport.Service.ReposteServices
             {
 
                 Response.Status = 400;
-                //string error = ex.ToString();
+                Response.Message = ex.ToString();
+                string error = ex.ToString();
                 return Response;
 
             }
@@ -882,6 +896,7 @@ namespace AkademicReport.Service.ReposteServices
 
         public async Task<ServiceResponseReporte<List<DocenteCargaReporteDto>>> PorRecinto(ReportePorRecintoDto filtro)
         {
+
             var recintoActual = await _dataContext.Recintos.Where(c => c.Id == filtro.idRecinto).FirstOrDefaultAsync();
             var docentes = await _docentesService.GetAllRecinto(new FiltroDocentesDto(), recintoActual.Id);
             var docentesRecinto = docentes.Data.Where(c => c.id_recinto == filtro.idRecinto.ToString()).ToList();
@@ -1120,8 +1135,18 @@ namespace AkademicReport.Service.ReposteServices
 
                 }
             }
-         
-            return new ServiceResponseReporte<List<DocenteCargaReporteDto>>() { Status = 200, Data = CargadDocentes.OrderBy(c => c.Docente.Nombre).ToList(), totalRecinto = Total };
+            var response = new ServiceResponseReporte<List<DocenteCargaReporteDto>>()
+            {
+                Status = 200,
+                Data = CargadDocentes.OrderBy(c => c.Docente.Nombre).ToList(),
+                totalRecinto = Total
+            };
+            if (filtro.Periodo != null)
+            {
+                var periodo = await _dataContext.PeriodoAcademicos.Where(c => c.Periodo == filtro.Periodo).FirstAsync();
+                response.Anio = periodo.Anio!.Value;
+            }
+            return response;
         }
 
         public async Task<ServiceResponseReporte<List<ReportCargaPosgradoDto>>> ReporteByDocentePosgrado(string cedula, string periodo)
@@ -1165,9 +1190,12 @@ namespace AkademicReport.Service.ReposteServices
 
 
                 }
+
+              
                 ReportCargaPosgradoDto reponse = new ReportCargaPosgradoDto() {Docente =docente,  CantCreditos = cantCredito, Cargas= DocenteCarga.Data.Value.Item1.Cargas, MontoSemanal = Convert.ToInt32(Monto), MontoMensual=Convert.ToInt32(Monto)};
                 reponseDataList.Add(reponse);
-                return new ServiceResponseReporte<List<ReportCargaPosgradoDto>>() { Data = reponseDataList, Status=200 };
+                var p = await _dataContext.PeriodoAcademicos.Where(c => c.Periodo == DocenteCarga.Data.Value.Item1.Cargas[0].Periodo).FirstAsync();
+                return new ServiceResponseReporte<List<ReportCargaPosgradoDto>>() { Data = reponseDataList, Status=200, Anio = p.Anio!.Value };
             }
             catch (Exception ex)
             {
