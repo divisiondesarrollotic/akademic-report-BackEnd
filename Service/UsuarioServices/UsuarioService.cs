@@ -140,7 +140,7 @@ namespace AkademicReport.Service.UsuarioServices
                 int idRecinto = usuariodbForUpdate.IdRecinto;
                 usuariodbForUpdate = _mapper.Map<Usuario>(usuario);
                 usuariodbForUpdate.Contra = beforePasswor;
-                usuariodbForUpdate.IdRecinto = idRecinto;
+                //usuariodbForUpdate.IdRecinto = idRecinto;
 
                 // _dataContext.Usuarios.Add(_mapper.Map<Usuario>(usuariodbForUpdate));
                 _dataContext.Entry(usuariodbForUpdate).State = EntityState.Modified;
