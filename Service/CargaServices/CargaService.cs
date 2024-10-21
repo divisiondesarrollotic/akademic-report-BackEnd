@@ -178,6 +178,7 @@ namespace AkademicReport.Service.CargaServices
                     .Include(c => c.IdMesNavigation)
                     .Include(c=>c.IdCodigoNavigation)
                     .Include(c=>c.IdPeriodoNavigation)
+                    .Include(c=>c.RecintoNavigation)
                     .Include(c=>c.IdCodigoNavigation).ThenInclude(c=>c.IdConceptoNavigation).ToListAsync();
                 var docentes = Docentes;
                 int Creditos = 0;
@@ -195,11 +196,7 @@ namespace AkademicReport.Service.CargaServices
                     ResulData.Docente =_mapper.Map<DocenteReporteDto>(DocenteFilter);
                     return new ServiceResponseCarga<ReportCargaPosgradoDto, string>() { Status = 200, Data = (ResulData, "No hay carga") };
                 }
-
-
                 var CargaMap = _mapper.Map<List<CargaPosgradoGet>>(carga);
-                var recinto = await _dataContext.Recintos.ToListAsync();
-                var codigos = await _dataContext.Codigos.Where(c=>c.IdPrograma==idPrograma).ToListAsync();
                 var nivelAcademico = await _dataContext.NivelAcademicos.Where(c => c.IdPrograma == 2).ToListAsync();
 
                 foreach (var item in CargaMap)
@@ -207,8 +204,8 @@ namespace AkademicReport.Service.CargaServices
                     if (item.IdCodigo != null)
                         item.NombreAsignatura = carga.First(c => c.Id == item.Id).IdCodigoNavigation.Nombre;
                     item.ConceptoAsignatura??= _mapper.Map<ConceptoGetDto>(carga.First(c => c.Id == item.Id).IdCodigoNavigation.IdConceptoNavigation);
-                    item.RecintoNombreCorto = recinto.Find(c => c.Id == int.Parse(item.Recinto)).NombreCorto;
-                    item.IdAsignatura = codigos.Find(c => c.Codigo1 == item.CodAsignatura).Id;
+                    item.RecintoNombreCorto = item.RecintoObj.nombre_corto;
+                    item.IdAsignatura = item.Codigo.Id;
                     Creditos += item.Credito;
                 }
                 if(nivelAcademico.FirstOrDefault(c => c.Nivel == DocenteFilter.nivel)!=null)
@@ -219,7 +216,7 @@ namespace AkademicReport.Service.CargaServices
                 ResulData.Cargas = CargaMap.OrderBy(c => c.IdMes).ToList();
                 ResulData.Docente = _mapper.Map<DocenteReporteDto>(DocenteFilter);
                 ResulData.Docente.Monto = pagoPorHora.ToString();
-                ResulData.CantCreditos =Creditos;
+                ResulData.CantCreditos =Creditos;   
                 return new ServiceResponseCarga<ReportCargaPosgradoDto, string> { Data = (ResulData, ""), Status = 200 };
             }
             catch (Exception ex)
@@ -241,21 +238,15 @@ namespace AkademicReport.Service.CargaServices
             return Result;
 
         }
-        public async Task<ServiceResponseCarga<ReportCargaPosgradoDto, string>> GetCargaCallPosgrado(string cedula, string periodo, int idPrograma)
+        public async Task<ServiceResponseCarga<ReportCargaPosgradoDto, string>> GetCargaCallPosgrado(string cedula, string periodo, int idPrograma, List<DocenteGetDto> DocentesAmilca)
         {
-           
             FiltroDocentesDto filtro = new FiltroDocentesDto();
             filtro.Filtro = cedula;
-            var Docentes = await _docenteService.GetAllFilter(filtro);
-
-            if(Docentes.Data.Count>0 && await ValidateNivelPosgrado(Docentes.Data[0].nivel)==false)
-            {
-                return new ServiceResponseCarga<ReportCargaPosgradoDto, string>() { Status = 204, Data =(null,$"Para un docente poder impartir carga en posgrado su nivel tiene que ser Maestría o Doctorado. Nivel del docente : {Docentes.Data[0].nivel}") };
-
-            }
-            var Result = await GetCargaPosgrado(cedula, periodo, idPrograma, Docentes.Data);
+            var Docente = DocentesAmilca.Where(c=>c.identificacion==cedula).ToList();
+            if(Docente!.Count>0 && await ValidateNivelPosgrado(Docente[0].nivel)==false)
+                return new ServiceResponseCarga<ReportCargaPosgradoDto, string>() { Status = 204, Data =(null,$"Para un docente poder impartir carga en posgrado su nivel tiene que ser Maestría o Doctorado. Nivel del docente : {Docente[0].nivel}") };
+            var Result = await GetCargaPosgrado(cedula, periodo, idPrograma, Docente);
             return Result;
-
         }
 
         public async Task<ServiceResponseData<List<Dia>>> GetDias()

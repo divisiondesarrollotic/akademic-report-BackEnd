@@ -1,8 +1,10 @@
-﻿namespace AkademicReport.Utilities
+﻿using AkademicReport.Dto.ReporteDto;
+
+namespace AkademicReport.Utilities
 {
     public class CalculoTiempoHoras
     {
-        static public decimal Calcular(int HoraInicio, int MinutoInicio, int HoraFin, int MinutoFin)
+        public  static  decimal Calcular(int HoraInicio, int MinutoInicio, int HoraFin, int MinutoFin)
         {
 
             string TiempoInicio = $"{HoraInicio}: {MinutoInicio}";
@@ -14,5 +16,28 @@
             return Minutos / 50;
 
         }
+        
+        public static MontosPosgradosDto DistribucionMontosPosgrado(int mes, decimal monto)
+        {
+            var montos = new MontosPosgradosDto() { Mes1 = 0, Mes2 = 0, Mes3 = 0, Mes4 = 0 };
+
+            if (mes >= 1 && mes <= 12)
+            {
+                int indiceMes = (mes - 1) % 4;
+
+                switch (indiceMes)
+                {
+                    case 0: montos.Mes1 = monto; break;
+                    case 1: montos.Mes2 = monto; break;
+                    case 2: montos.Mes3 = monto; break;
+                    case 3: montos.Mes4 = monto; break;
+                }
+            }
+
+            return montos;
+
+
+        }
     }
 }
+

@@ -4,6 +4,7 @@ using AkademicReport.Models;
 using AkademicReport.Service;
 using AkademicReport.Service.ReposteServices;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace AkademicReport.Controllers
 {
@@ -99,10 +100,10 @@ namespace AkademicReport.Controllers
         /// /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Route("reporte_by_docente_posgrado/{cedula}/{periodo}")]
-        public async Task<ActionResult> ReporteByDocentePosgrado(string cedula, string periodo)
+        [Route("reporte_by_docente_posgrado/{cedula}/{periodo}/{idrecinto}")]
+        public async Task<ActionResult> ReporteByDocentePosgrado(string cedula, string periodo, [Required] int idrecinto)
         {
-            var response = await _reposteService.ReporteByDocentePosgrado(cedula, periodo);
+            var response = await _reposteService.ReporteByDocentePosgrado(cedula, periodo, idrecinto);
             return Ok(response);
         }
         [HttpGet]

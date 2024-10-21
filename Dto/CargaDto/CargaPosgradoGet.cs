@@ -2,6 +2,8 @@
 using AkademicReport.Dto.ConceptoDto;
 using AkademicReport.Dto.ConceptoPosgradoDto;
 using AkademicReport.Dto.PeriodoDto;
+using AkademicReport.Dto.RecintoDto;
+using AkademicReport.Dto.ReporteDto;
 
 namespace AkademicReport.Dto.CargaDto
 {
@@ -11,6 +13,7 @@ namespace AkademicReport.Dto.CargaDto
         public string Periodo { get; set; } = null!;
         public string Recinto { get; set; } = null!;
         public string RecintoNombreCorto { get; set; }
+        public RecintoGetDto? RecintoObj { get; set; }
         public int? IdAsignatura { get; set; }
         public ConceptoGetDto? ConceptoAsignatura { get; set; }
         public string CodAsignatura { get; set; } = null!;
@@ -42,5 +45,9 @@ namespace AkademicReport.Dto.CargaDto
         public TipoCargaDto? TipoCarga { get; set; }
         public int? IdPeriodo { get; set; }
         public PeriodoGetDto? PeriodoObj { get; set; }
+
+        // Campos dinamicos 
+        public MontosPosgradosDto? DistribucionMontos { get; set; }
+
     }
 }

@@ -17,7 +17,7 @@ namespace AkademicReport.Service.ReposteServices
         Task<ServiceResponseReporte<List<ReportCargaPosgradoDto>>> ReporteByIdProgramCargaPosgrado(int idConcepto, string periodo, int idRecinto);
         Task<ServiceResponseReporte<List<ReportCargaPosgradoDto>>> ReporteByPeriodoPosgrado(string periodo, int idRecinto);
         Task<ServiceResponseReporte<List<ReportCargaPosgradoDto>>> ReporteByIdRecintoPosgrado(int idRecinto, string periodo);
-        Task<ServiceResponseReporte<List<ReportCargaPosgradoDto>>> ReporteByDocentePosgrado(string cedula, string periodo);
+        Task<ServiceResponseReporte<List<ReportCargaPosgradoDto>>> ReporteByDocentePosgrado(string cedula, string periodo, int idRecinto);
 
     }
 }

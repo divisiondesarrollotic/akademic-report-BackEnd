@@ -272,7 +272,7 @@ namespace AkademicReport.Data
                 entity.HasOne(d => d.IdPeriodoNavigation)
                     .WithMany(p => p.CargaDocentes)
                     .HasForeignKey(d => d.IdPeriodo)
-                    .HasConstraintName("FK__carga_doc__idPer__3A4CA8FD");
+                    .HasConstraintName("FK__carga_doc__idPer__0D7A0286");
 
                 entity.HasOne(d => d.IdProgramaNavigation)
                     .WithMany(p => p.CargaDocentes)
@@ -337,7 +337,7 @@ namespace AkademicReport.Data
                 entity.HasOne(d => d.IdProgramaNavigation)
                     .WithMany(p => p.Codigos)
                     .HasForeignKey(d => d.IdPrograma)
-                    .HasConstraintName("FK__codigo__idProgra__114A936A");
+                    .HasConstraintName("FK__codigo__idProgra__123EB7A3");
             });
 
             modelBuilder.Entity<Concepto>(entity =>
@@ -356,13 +356,13 @@ namespace AkademicReport.Data
                 entity.HasOne(d => d.IdProgramaNavigation)
                     .WithMany(p => p.Conceptos)
                     .HasForeignKey(d => d.IdPrograma)
-                    .HasConstraintName("FK__concepto__idProg__1332DBDC");
+                    .HasConstraintName("FK__concepto__idProg__14270015");
             });
 
             modelBuilder.Entity<ConceptoPosgrado>(entity =>
             {
                 entity.HasKey(e => e.IdConceptoPosgrado)
-                    .HasName("PK__Concepto__49BA262171A8FD1A");
+                    .HasName("PK__Concepto__49BA26213DC5D5CF");
 
                 entity.ToTable("ConceptoPosgrado");
 
@@ -418,7 +418,7 @@ namespace AkademicReport.Data
             modelBuilder.Entity<Diplomado>(entity =>
             {
                 entity.HasKey(e => e.CodUnicersita)
-                    .HasName("PK__diplomad__09A0DB5470724377");
+                    .HasName("PK__diplomad__09A0DB545977DC26");
 
                 entity.ToTable("diplomado");
 
@@ -492,7 +492,7 @@ namespace AkademicReport.Data
             modelBuilder.Entity<Firma>(entity =>
             {
                 entity.HasKey(e => e.IdFirma)
-                    .HasName("PK__firmas__A9CB15C2E64BEC90");
+                    .HasName("PK__firmas__A9CB15C2A27CA5A5");
 
                 entity.ToTable("firmas");
 
@@ -515,18 +515,18 @@ namespace AkademicReport.Data
                 entity.HasOne(d => d.IdProgramaNavigation)
                     .WithMany(p => p.Firmas)
                     .HasForeignKey(d => d.IdPrograma)
-                    .HasConstraintName("FK__firmas__idProgra__17F790F9");
+                    .HasConstraintName("FK__firmas__idProgra__18EBB532");
 
                 entity.HasOne(d => d.IdRecintoNavigation)
                     .WithMany(p => p.Firmas)
                     .HasForeignKey(d => d.IdRecinto)
-                    .HasConstraintName("FK__firmas__idRecint__17036CC0");
+                    .HasConstraintName("FK__firmas__idRecint__17F790F9");
             });
 
             modelBuilder.Entity<Mese>(entity =>
             {
                 entity.HasKey(e => e.IdMes)
-                    .HasName("PK__Meses__0D1357C0F0D8081E");
+                    .HasName("PK__Meses__0D1357C011C0FD91");
 
                 entity.Property(e => e.IdMes).ValueGeneratedNever();
 
@@ -553,7 +553,7 @@ namespace AkademicReport.Data
                 entity.HasOne(d => d.IdProgramaNavigation)
                     .WithMany(p => p.NivelAcademicos)
                     .HasForeignKey(d => d.IdPrograma)
-                    .HasConstraintName("FK__nivel_aca__idPro__18EBB532");
+                    .HasConstraintName("FK__nivel_aca__idPro__19DFD96B");
             });
 
             modelBuilder.Entity<NivelUsuario>(entity =>
@@ -655,7 +655,7 @@ namespace AkademicReport.Data
             modelBuilder.Entity<ProgramasAcademico>(entity =>
             {
                 entity.HasKey(e => e.IdPrograma)
-                    .HasName("PK__Programa__467DDFD65775FF85");
+                    .HasName("PK__Programa__467DDFD673EBBECA");
 
                 entity.Property(e => e.IdPrograma).HasColumnName("idPrograma");
 
@@ -698,7 +698,7 @@ namespace AkademicReport.Data
                 entity.HasOne(d => d.IdProgramaNavigation)
                     .WithMany(p => p.TipoCargas)
                     .HasForeignKey(d => d.IdPrograma)
-                    .HasConstraintName("FK__tipo_carg__idPro__19DFD96B");
+                    .HasConstraintName("FK__tipo_carg__idPro__1AD3FDA4");
             });
 
             modelBuilder.Entity<TipoCargaCodigo>(entity =>
@@ -714,12 +714,12 @@ namespace AkademicReport.Data
                 entity.HasOne(d => d.IdCodigoNavigation)
                     .WithMany(p => p.TipoCargaCodigos)
                     .HasForeignKey(d => d.IdCodigo)
-                    .HasConstraintName("FK__tipo_carg__idCod__1BC821DD");
+                    .HasConstraintName("FK__tipo_carg__idCod__1CBC4616");
 
                 entity.HasOne(d => d.IdTipoCargaNavigation)
                     .WithMany(p => p.TipoCargaCodigos)
                     .HasForeignKey(d => d.IdTipoCarga)
-                    .HasConstraintName("FK__tipo_carg__idTip__1AD3FDA4");
+                    .HasConstraintName("FK__tipo_carg__idTip__1BC821DD");
             });
 
             modelBuilder.Entity<TipoModalidad>(entity =>
@@ -789,7 +789,7 @@ namespace AkademicReport.Data
                 entity.HasOne(d => d.IdProgramaNavigation)
                     .WithMany(p => p.Usuarios)
                     .HasForeignKey(d => d.IdPrograma)
-                    .HasConstraintName("FK__usuario__idProgr__1EA48E88");
+                    .HasConstraintName("FK__usuario__idProgr__1F98B2C1");
 
                 entity.HasOne(d => d.IdRecintoNavigation)
                     .WithMany(p => p.Usuarios)

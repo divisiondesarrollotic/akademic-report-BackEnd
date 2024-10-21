@@ -9,6 +9,7 @@ namespace AkademicReport.Dto.ReporteDto
         public int MontoVinculacion { get; set; }
         public int MontoSemanal { get; set; }
         public int MontoMensual { get; set; }
+        public MontosPosgradosDto? MontoPorMes { get; set; }
 
         public DocenteReporteDto? Docente { get; set; }
         public List<CargaPosgradoGet>? Cargas { get; set; }

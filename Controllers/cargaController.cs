@@ -1,9 +1,11 @@
 ﻿using AkademicReport.Dto.CargaDto;
+using AkademicReport.Dto.DocentesDto;
 using AkademicReport.Dto.ReporteDto;
 using AkademicReport.Dto.UsuarioDto;
 using AkademicReport.Service;
 using AkademicReport.Service.AsignaturaServices;
 using AkademicReport.Service.CargaServices;
+using AkademicReport.Service.DocenteServices;
 using AkademicReport.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -17,9 +19,11 @@ namespace AkademicReport.Controllers
     public class cargaController : ControllerBase
     {
         private readonly ICargaDocenteService _service;
-        public cargaController(ICargaDocenteService service)
+        private readonly IDocenteService _docenteService;
+        public cargaController(ICargaDocenteService service, IDocenteService docenteService)
         {
             _service = service;
+            _docenteService = docenteService;
         }
 
         /// <summary>
@@ -48,8 +52,8 @@ namespace AkademicReport.Controllers
         [Route("docente_posgrado")]
         public async Task<ActionResult> GetCargaPosgrado(DtoCarga filtro)
         {
-
-            var result = await _service.GetCargaCallPosgrado(filtro.Cedula, filtro.Periodo, filtro.idPrograma);
+            var docenteConsulta = await _docenteService.GetAllFilter(new FiltroDocentesDto() { Filtro = filtro.Cedula, idPrograma = 2, elementosPorPagina = 100, paginaActual = 1 });
+            var result = await _service.GetCargaCallPosgrado(filtro.Cedula, filtro.Periodo, filtro.idPrograma, docenteConsulta.Data);
             if (result.Data.Value.Item1 == null)
             {
                 return Ok(new ServicesResponseMessage<string>() { Status = 204, Message = result.Data.Value.Item2});
