@@ -1254,57 +1254,14 @@ namespace AkademicReport.Service.ReposteServices
                                         montoPorMes.Mes2 += cargaFiltrada.DistribucionMontos.Mes2;
                                         montoPorMes.Mes3 += cargaFiltrada.DistribucionMontos.Mes3;
                                         montoPorMes.Mes4 += cargaFiltrada.DistribucionMontos.Mes4;
-
-                                        tGMontosTotalesPorMes.Mes1 += cargaFiltrada.DistribucionMontos.Mes1;
-                                        tGMontosTotalesPorMes.Mes2 += cargaFiltrada.DistribucionMontos.Mes2;
-                                        tGMontosTotalesPorMes.Mes3 += cargaFiltrada.DistribucionMontos.Mes3;
-                                        tGMontosTotalesPorMes.Mes4 += cargaFiltrada.DistribucionMontos.Mes4;
-
                                         CantCreditos += cargaFiltrada.Credito;
                                         cargaFiltrada.precio_hora = int.Parse(DocenteCarga.Data.Value.Item1.Docente.Pago_hora);
                                         cargaFiltrada.pago_asignatura = cargaFiltrada.Credito * int.Parse(DocenteCarga.Data.Value.Item1.Docente.Pago_hora);
                                         cargaFiltrada.pago_asignaturaMensual = (cargaFiltrada.Credito * int.Parse(DocenteCarga.Data.Value.Item1.Docente.Pago_hora));
                                         cargaPosgradoList.Add(cargaFiltrada);
                                     }
-                                    if (cargaPosgradoList.Count > 0)
-                                    {
-                                        response.Add(new ReportCargaPosgradoDto()
-                                        {
-                                            Docente = _mapper.Map<DocenteReporteDto>(docente),
-                                            Cargas = cargaPosgradoList,
-                                            CantCreditos = DocenteCarga.Data.Value.Item1.CantCreditos,
-                                            MontoMensual = Monto,
-                                            MontoSemanal = Monto,
-                                           
-                                        }); ;
-                                        MontoTotal+= Monto;
-                                        Monto = 0;
-                                    }
-                                }
-                                else
-                                {
-                                    MontosPosgradosDto montoPorMes = new MontosPosgradosDto() { Mes1 = 0, Mes2 = 0, Mes3 = 0, Mes4 = 0 };
-                                    var cargaPosgradoList = new List<CargaPosgradoGet>();
-                                    foreach (var cargaFiltrada in DocenteCarga.Data.Value.Item1.Cargas.Where(c => c.IdPrograma == 2 && c.Recinto==idRecinto.ToString()))
-                                    {
-                                        Monto += (cargaFiltrada.Credito * int.Parse(DocenteCarga.Data.Value.Item1.Docente.Pago_hora));
-                                        cargaFiltrada.DistribucionMontos = CalculoTiempoHoras.DistribucionMontosPosgrado(cargaFiltrada.IdMes!.Value, (cargaFiltrada.Credito * int.Parse(DocenteCarga.Data.Value.Item1.Docente.Pago_hora)));
-                                        montoPorMes.Mes1 += cargaFiltrada.DistribucionMontos.Mes1;
-                                        montoPorMes.Mes2 += cargaFiltrada.DistribucionMontos.Mes2;
-                                        montoPorMes.Mes3 += cargaFiltrada.DistribucionMontos.Mes3;
-                                        montoPorMes.Mes4 += cargaFiltrada.DistribucionMontos.Mes4;
 
-                                        tGMontosTotalesPorMes.Mes1 += cargaFiltrada.DistribucionMontos.Mes1;
-                                        tGMontosTotalesPorMes.Mes2 += cargaFiltrada.DistribucionMontos.Mes2;
-                                        tGMontosTotalesPorMes.Mes3 += cargaFiltrada.DistribucionMontos.Mes3;
-                                        tGMontosTotalesPorMes.Mes4 += cargaFiltrada.DistribucionMontos.Mes4;
-
-                                        CantCreditos += cargaFiltrada.Credito;
-                                        cargaFiltrada.precio_hora = int.Parse(DocenteCarga.Data.Value.Item1.Docente.Pago_hora);
-                                        cargaFiltrada.pago_asignatura = cargaFiltrada.Credito * int.Parse(DocenteCarga.Data.Value.Item1.Docente.Pago_hora);
-                                        cargaFiltrada.pago_asignaturaMensual = (cargaFiltrada.Credito * int.Parse(DocenteCarga.Data.Value.Item1.Docente.Pago_hora));
-                                        cargaPosgradoList.Add(cargaFiltrada);
-                                    }
+                                   
                                     if (cargaPosgradoList.Count > 0)
                                     {
                                         response.Add(new ReportCargaPosgradoDto()
@@ -1315,10 +1272,56 @@ namespace AkademicReport.Service.ReposteServices
                                             MontoMensual = Monto,
                                             MontoSemanal = Monto,
                                             MontoPorMes = montoPorMes
-                                         
-                                        });
+
+                                        }); ;
+                                        tGMontosTotalesPorMes.Mes1 += montoPorMes.Mes1;
+                                        tGMontosTotalesPorMes.Mes2 += montoPorMes.Mes2;
+                                        tGMontosTotalesPorMes.Mes3 += montoPorMes.Mes3;
+                                        tGMontosTotalesPorMes.Mes4 += montoPorMes.Mes4;
                                         MontoTotal += Monto;
                                         Monto = 0;
+                                       
+                                    }
+                                }
+                                else
+                                {
+                                   
+                                    MontosPosgradosDto montoPorMes = new MontosPosgradosDto() { Mes1 = 0, Mes2 = 0, Mes3 = 0, Mes4 = 0 };
+                                    var cargaPosgradoList = new List<CargaPosgradoGet>();
+                                    foreach (var cargaFiltrada in DocenteCarga.Data.Value.Item1.Cargas.Where(c => c.IdPrograma == 2 && c.Recinto==idRecinto.ToString()))
+                                    {
+                                        Monto += (cargaFiltrada.Credito * int.Parse(DocenteCarga.Data.Value.Item1.Docente.Pago_hora));
+                                        cargaFiltrada.DistribucionMontos = CalculoTiempoHoras.DistribucionMontosPosgrado(cargaFiltrada.IdMes!.Value, (cargaFiltrada.Credito * int.Parse(DocenteCarga.Data.Value.Item1.Docente.Pago_hora)));
+                                        montoPorMes.Mes1 += cargaFiltrada.DistribucionMontos.Mes1;
+                                        montoPorMes.Mes2 += cargaFiltrada.DistribucionMontos.Mes2;
+                                        montoPorMes.Mes3 += cargaFiltrada.DistribucionMontos.Mes3;
+                                        montoPorMes.Mes4 += cargaFiltrada.DistribucionMontos.Mes4;
+                                        CantCreditos += cargaFiltrada.Credito;
+                                        cargaFiltrada.precio_hora = int.Parse(DocenteCarga.Data.Value.Item1.Docente.Pago_hora);
+                                        cargaFiltrada.pago_asignatura = cargaFiltrada.Credito * int.Parse(DocenteCarga.Data.Value.Item1.Docente.Pago_hora);
+                                        cargaFiltrada.pago_asignaturaMensual = (cargaFiltrada.Credito * int.Parse(DocenteCarga.Data.Value.Item1.Docente.Pago_hora));
+                                        cargaPosgradoList.Add(cargaFiltrada);
+                                    }
+                                   
+                                    if (cargaPosgradoList.Count > 0)
+                                    {
+                                        response.Add(new ReportCargaPosgradoDto()
+                                        {
+                                            Docente = _mapper.Map<DocenteReporteDto>(docente),
+                                            Cargas = cargaPosgradoList,
+                                            CantCreditos = CantCreditos,
+                                            MontoMensual = Monto,
+                                            MontoSemanal = Monto,
+                                            MontoPorMes = montoPorMes
+                                         
+                                        });
+                                        tGMontosTotalesPorMes.Mes1 += montoPorMes.Mes1;
+                                        tGMontosTotalesPorMes.Mes2 += montoPorMes.Mes2;
+                                        tGMontosTotalesPorMes.Mes3 += montoPorMes.Mes3;
+                                        tGMontosTotalesPorMes.Mes4 += montoPorMes.Mes4;
+                                        MontoTotal += Monto;
+                                        Monto = 0;
+                                      
                                     }
                                 }
                             }
