@@ -1272,7 +1272,6 @@ namespace AkademicReport.Service.ReposteServices
                                             MontoMensual = Monto,
                                             MontoSemanal = Monto,
                                             MontoPorMes = montoPorMes
-
                                         }); ;
                                         tGMontosTotalesPorMes.Mes1 += montoPorMes.Mes1;
                                         tGMontosTotalesPorMes.Mes2 += montoPorMes.Mes2;
@@ -1280,7 +1279,7 @@ namespace AkademicReport.Service.ReposteServices
                                         tGMontosTotalesPorMes.Mes4 += montoPorMes.Mes4;
                                         MontoTotal += Monto;
                                         Monto = 0;
-                                       
+
                                     }
                                 }
                                 else
@@ -1321,7 +1320,6 @@ namespace AkademicReport.Service.ReposteServices
                                         tGMontosTotalesPorMes.Mes4 += montoPorMes.Mes4;
                                         MontoTotal += Monto;
                                         Monto = 0;
-                                      
                                     }
                                 }
                             }
