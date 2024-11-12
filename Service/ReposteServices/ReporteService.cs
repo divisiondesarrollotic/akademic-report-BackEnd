@@ -1329,7 +1329,7 @@ namespace AkademicReport.Service.ReposteServices
 
                 }
                 
-                return new ServiceResponseReporte<List<ReportCargaPosgradoDto>>() { Data = response, Status = 200, totalRecinto = MontoTotal, MontoTotalesPorMes = tGMontosTotalesPorMes };
+                return new ServiceResponseReporte<List<ReportCargaPosgradoDto>>() { Data = response, Status = 200, Message = Msj.MsjSucces, totalRecinto = MontoTotal, Anio = int.Parse(response[0].Cargas[0].Anio),  MontoTotalesPorMes = tGMontosTotalesPorMes };
             }
             catch (Exception ex)
             {
