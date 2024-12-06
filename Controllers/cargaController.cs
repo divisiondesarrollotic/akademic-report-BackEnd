@@ -147,6 +147,12 @@ namespace AkademicReport.Controllers
         {
             return Ok(await _service.GetTipoCarga(idprograma));
         }
+        [HttpPut]
+        [Route("update_horas_contratadas")]
+        public async Task<ActionResult> UpdateHorasContratadas(int idCarga)
+        {
+            return Ok(await _service.UpdateHorasContratadas(idCarga));
+        }
     }
 }
 

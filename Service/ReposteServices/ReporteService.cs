@@ -29,7 +29,7 @@ namespace AkademicReport.Service.ReposteServices
         public List<string> CodigosIngles = new List<string> { "ING-201", "ING-302", "ING-403", "ING-504", "ING-605", "IOP-01", "IOP-02", "IOP-03", "ING-220", "ING-100", "ING-110", "ING-200", "ING-210", "FRP-201", "FRP-301", "FRP-601", "FRP-701", "FRP-801", "PVS-300", "PVS-305" };
 
 
-        public ReporteService(ICargaDocenteService cargaService, DataContext dataContext, IDocenteService docenteService, IMapper mapper )
+        public ReporteService(ICargaDocenteService cargaService, DataContext dataContext, IDocenteService docenteService, IMapper mapper)
         {
             _cargaService = cargaService;
             _dataContext = dataContext;
@@ -43,19 +43,19 @@ namespace AkademicReport.Service.ReposteServices
             var Response = new ServiceResponseData<DocenteCargaReporteDto>();
             try
             {
-                if(filtro.Periodo!=null)
+                if (filtro.Periodo != null)
                 {
                     var periodo = await _dataContext.PeriodoAcademicos.Where(c => c.Periodo == filtro.Periodo).FirstAsync();
                     Response.Anio = periodo.Anio!.Value;
                 }
                 DocenteCargaReporteDto DataResult = new DocenteCargaReporteDto();
                 DataResult.Carga = new List<CargaReporteDto>();
-                
+
                 var CargaMapeada = new List<CargaReporteDto>();
                 var CargaLista = new List<CargaGetDto>();
                 var Docente = new DocenteReporteDto();
                 var cargas = await _cargaService.GetCarga(filtro.Cedula!, filtro.Periodo!, filtro.idPrograma, DocentesAmilca);
-                if(cargas.Data.Value.Item1.Carga.Count>0)
+                if (cargas.Data.Value.Item1.Carga.Count > 0)
                 {
                     Response.Anio = cargas.Data.Value.Item1.Carga[0].PeriodoObj.Anio.Value;
 
@@ -215,14 +215,14 @@ namespace AkademicReport.Service.ReposteServices
                             c.PeriodoObj = _mapper.Map<PeriodoGetDto>(periodo);
                             var recinto = await _dataContext.Recintos.FirstOrDefaultAsync(c => c.Id == int.Parse(item.Recinto));
                             c.recinto = recinto.NombreCorto;
-                          
-                            if (CantCreditosF + c.credito > 20)
+
+                            if (CantCreditosF + c.credito > 12)
                             {
                                 // verificacion por si el monto resultante de la suma en mayor a 20 que solo tome despues de; va;pr 20
                                 CantCreditosF += c.credito;
-                                if(CantidadPagada==0)
+                                if (CantidadPagada == 0)
                                 {
-                                    CantidadPagada = CantCreditosF - 20;
+                                    CantidadPagada = CantCreditosF - 12;
                                     c.precio_hora = nivelAcademico.PagoHora;
                                     c.pago_asignatura = c.precio_hora * CantidadPagada;
                                     MontoPorAsignatura += c.pago_asignatura;
@@ -450,7 +450,7 @@ namespace AkademicReport.Service.ReposteServices
 
             }
 
-          
+
         }
 
         //public async Task<ServiceResponseData<DocenteCargaReporteDto>> PorDocente(ReporteDto filtro, List<DocenteGetDto> DocentesAmilca)
@@ -899,7 +899,7 @@ namespace AkademicReport.Service.ReposteServices
 
             var recintoActual = await _dataContext.Recintos.Where(c => c.Id == filtro.idRecinto).FirstOrDefaultAsync();
             var docentes = await _docentesService.GetAllRecinto(new FiltroDocentesDto(), recintoActual.Id);
-            var docentesRecinto = docentes.Data.Where(c => c.id_recinto == filtro.idRecinto.ToString()).ToList();
+            var docentesRecinto = filtro.TipoDocente != null && filtro.TipoDocente == "MT" || filtro.TipoDocente == "A" ? docentes.Data.Where(c => c.id_recinto == filtro.idRecinto.ToString()).ToList() : docentes.Data!.Where(c => c.id_recinto == filtro.idRecinto.ToString() && c.tiempoDedicacion==filtro.TipoDocente).ToList();
             List<DocenteCargaReporteDto> CargadDocentes = new List<DocenteCargaReporteDto>();
             var vinculacion = await _dataContext.Vinculos.ToListAsync();
             int Monto = 0;
@@ -910,7 +910,7 @@ namespace AkademicReport.Service.ReposteServices
             int CantCreditosF = 0;
             if (filtro.Curricular == "3")
             {
-                docentesRecinto = docentesRecinto.Where(c => c.tiempoDedicacion == "F" && c.TipoDocente== "Facilitador del DIID").ToList();
+                docentesRecinto = docentesRecinto.Where(c => c.tiempoDedicacion == "F" && c.TipoDocente == "Facilitador del DIID").ToList();
             }
             else
             {
@@ -919,6 +919,7 @@ namespace AkademicReport.Service.ReposteServices
 
             foreach (var docente in docentesRecinto)
             {
+
                 if (docente.identificacion != null)
                 {
 
@@ -927,11 +928,12 @@ namespace AkademicReport.Service.ReposteServices
                     filter.Periodo = filtro.Periodo;
                     filter.idRecinto = filtro.idRecinto.ToString();
                     filter.idPrograma = 1;
-                    if(docente.identificacion=="AT600815")
+                    if (filter.Cedula == "001-1749203-3")
                     {
 
                     }
                     ServiceResponseData<DocenteCargaReporteDto> DocenteConSuCarga = await PorDocente(filter, docentes.Data);
+
 
                     if (DocenteConSuCarga.Data != null && DocenteConSuCarga.Data.Carga != null)
                     {
@@ -939,7 +941,7 @@ namespace AkademicReport.Service.ReposteServices
                         List<CargaReporteDto> CargaFilter = new List<CargaReporteDto>();
                         if (filtro.Curricular != "0" && filtro.Curricular != null)
                         {
-                            if(DocenteConSuCarga.Data.Docente.TiempoDedicacion=="F")
+                            if (DocenteConSuCarga.Data.Docente.TiempoDedicacion == "F")
                             {
                                 CargaFilter = DocenteConSuCarga.Data.Carga.ToList();
                             }
@@ -970,44 +972,68 @@ namespace AkademicReport.Service.ReposteServices
                             //}
                             else if (DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT")
                             {
-                                if(DocenteConSuCarga.Data.Docente.Identificacion== "402-5637417-0")
+
+
+                                // Generamos la carga de docencia y acompañamiento
+
+                                var CargaFilterMT = new List<CargaReporteDto>();
+                                CargaFilterMT = CargaFilter.Where(c => c.nombre_asignatura.ToUpper().Contains("ACOMPAÑAMIENTO")).ToList();
+                                int CantCrA = CargaFilterMT.Sum(c => c.credito);
+                                if (CantCrA < 12)
                                 {
+                                    foreach (var item in CargaFilter)
+                                    {
+
+                                        if (item.Concepto.Id == 2 && CantCrA < 12 && CargaFilterMT.Count > 0)
+                                        {
+                                            CantCrA += item.credito;
+                                            CargaFilterMT.Add(item);
+                                        }
+
+                                        //if (CantCreditosF + item.credito > 12)
+                                        //{
+                                        //    // verificacion por si el monto resultante de la suma en mayor a 20 que solo tome despues de; va;pr 20
+                                        //    CantCreditosF += item.credito;
+                                        //    if (CantidadPagada == 0)
+                                        //    {
+                                        //        CantidadPagada = CantCreditosF - 12;
+                                        //        item.precio_hora = item.precio_hora;
+                                        //        item.pago_asignatura = item.precio_hora * CantidadPagada;
+                                        //        MontoPorAsignatura += item.pago_asignatura;
+                                        //    }
+                                        //    else
+                                        //    {
+                                        //        item.precio_hora = item.precio_hora;
+                                        //        item.pago_asignatura = item.precio_hora * item.credito;
+                                        //        MontoPorAsignatura += item.pago_asignatura;
+                                        //    }
+                                        //}
+                                        //else
+                                        //{
+                                        //    CantCreditosF += item.credito;
+                                        //    item.precio_hora = 0;
+                                        //    item.pago_asignatura = 0;
+                                        //}
+
+                                    }
 
                                 }
-                                foreach (var item in CargaFilter)
-                                {
-                                    if (CantCreditosF + item.credito > 20)
-                                    {
-                                        // verificacion por si el monto resultante de la suma en mayor a 20 que solo tome despues de; va;pr 20
-                                       CantCreditosF += item.credito;
-                                        if (CantidadPagada == 0)
-                                        {
-                                            CantidadPagada = CantCreditosF - 20;
-                                            item.precio_hora = item.precio_hora;
-                                            item.pago_asignatura = item.precio_hora * CantidadPagada;
-                                            MontoPorAsignatura += item.pago_asignatura;
-                                        }
-                                        else
-                                        {
-                                            item.precio_hora = item.precio_hora;
-                                            item.pago_asignatura = item.precio_hora * item.credito;
-                                            MontoPorAsignatura += item.pago_asignatura;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        CantCreditosF += item.credito;
-                                        item.precio_hora = 0;
-                                        item.pago_asignatura = 0;
-                                    }
-                                }
+                                CantCreditosF = CantCrA;
+                                CargaFilter = CargaFilterMT;
+
+
+
                             }
                             else if (DocenteConSuCarga.Data.Carga.Count() == CargaFilter.Count())
                             {
                                 Monto = DocenteConSuCarga.Data.MontoSemanal;
+
+                                var CargaFilterMT = new List<CargaReporteDto>();
+                                CargaFilterMT = CargaFilter.Where(c => !c.nombre_asignatura.ToUpper().Contains("ACOMPAÑAMIENTO") || c.Concepto!.Nombre.Contains("Docencia")).ToList();
+                                int CantCrA = CargaFilterMT.Sum(c => c.credito);
                                 foreach (var item in CargaFilter)
                                 {
-                                 
+
                                     CantCreditos += item.credito;
 
                                 }
@@ -1016,7 +1042,7 @@ namespace AkademicReport.Service.ReposteServices
                             {
                                 foreach (var item in CargaFilter)
                                 {
-                                    Monto+= item.precio_hora * item.credito;
+                                    Monto += item.precio_hora * item.credito;
                                     CantCreditos += item.credito;
                                 }
                             }
@@ -1036,21 +1062,20 @@ namespace AkademicReport.Service.ReposteServices
                                     CantCreditos += item.credito;
 
                                 }
-
                             }
                             else if (DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT")
                             {
-                                Monto = 0;
-                                foreach (var item in CargaFilter)
+
+                                foreach (var item in CargaFilter.Where(c=>c.HoraContratada==false))
                                 {
-                                   
-                                    if (CantCreditosF + item.credito > 20)
+
+                                    if (CantCreditosF + item.credito > 12)
                                     {
                                         // verificacion por si el monto resultante de la suma en mayor a 20 que solo tome despues de; va;pr 20
                                         CantCreditosF += item.credito;
                                         if (CantidadPagada == 0)
                                         {
-                                            CantidadPagada = CantCreditosF - 20;
+                                            CantidadPagada = CantCreditosF - 12;
                                             item.precio_hora = item.precio_hora;
                                             item.pago_asignatura = item.precio_hora * CantidadPagada;
                                             MontoPorAsignatura += item.pago_asignatura;
@@ -1069,7 +1094,10 @@ namespace AkademicReport.Service.ReposteServices
                                         item.pago_asignatura = 0;
                                     }
                                 }
+
                             }
+
+
                             else if (DocenteConSuCarga.Data.Carga.Count() == CargaFilter.Count())
                             {
                                 Monto = DocenteConSuCarga.Data.MontoSemanal;
@@ -1080,27 +1108,31 @@ namespace AkademicReport.Service.ReposteServices
 
                                 }
                             }
-                            else
+                            else if(DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT" || DocenteConSuCarga.Data.Docente.TiempoDedicacion == "A")
                             {
-                                foreach (var item in CargaFilter)
+                                if(DocenteConSuCarga.Data.Docente.Identificacion== "001-1749203-3")
+                                {
+
+                                }
+                                foreach (var item in CargaFilter.Where(c=>c.HoraContratada==true).ToList())
                                 {
                                     Monto = item.precio_hora * item.credito;
                                     CantCreditos += item.credito;
                                 }
                             }
+                            
                         }
-
                         var DocenteCargaListo = new DocenteCargaReporteDto();
                         DocenteCargaListo.Docente = DocenteConSuCarga.Data.Docente;
                         DocenteCargaListo.MontoVinculacion = DocenteConSuCarga.Data.MontoVinculacion;
                         DocenteCargaListo.Carga = CargaFilter;
-                        if(docente.tiempoDedicacion == "TC")
+                        if (docente.tiempoDedicacion == "TC")
                         {
                             DocenteCargaListo.MontoSemanal = 0;
                             DocenteCargaListo.MontoMensual = DocenteConSuCarga.Data.MontoVinculacion;
                             DocenteCargaListo.CantCreditos = CantCreditos;
                         }
-                        else if(docente.tiempoDedicacion == "MT")
+                        else if (docente.tiempoDedicacion == "MT")
                         {
                             DocenteCargaListo.MontoSemanal = MontoPorAsignatura;
                             DocenteCargaListo.MontoMensual = DocenteConSuCarga.Data.MontoVinculacion + (MontoPorAsignatura * 4);
@@ -1128,11 +1160,8 @@ namespace AkademicReport.Service.ReposteServices
                             CantCreditosF = 0;
                             CantidadPagada = 0;
                             MontoPorAsignatura = 0;
-
                         }
                     }
-
-
                 }
             }
             var response = new ServiceResponseReporte<List<DocenteCargaReporteDto>>()
@@ -1156,17 +1185,17 @@ namespace AkademicReport.Service.ReposteServices
                 MontosPosgradosDto tGMontosTotalesPorMes = new MontosPosgradosDto() { Mes1 = 0, Mes2 = 0, Mes3 = 0, Mes4 = 0 };
                 var reponseDataList = new List<ReportCargaPosgradoDto>();
                 var docenteConsulta = await _docentesService.GetAllFilter(new FiltroDocentesDto() { Filtro = cedula, idPrograma = 2, elementosPorPagina = 100, paginaActual = 1 });
-                var DocenteCarga= await  _cargaService.GetCargaCallPosgrado(cedula, periodo, 2, docenteConsulta.Data);
+                var DocenteCarga = await _cargaService.GetCargaCallPosgrado(cedula, periodo, 2, docenteConsulta.Data);
                 var cargaFilter = DocenteCarga.Data.Value.Item1.Cargas.Where(c => c.Recinto == idRecinto.ToString()).ToList();
-                if(!cargaFilter.Any())
+                if (!cargaFilter.Any())
                 {
                     return new ServiceResponseReporte<List<ReportCargaPosgradoDto>>() { Data = new List<ReportCargaPosgradoDto>(), Status = 204, Message = "Este docente no tiene carga en este recinto." };
 
                 }
                 var docente = _mapper.Map<DocenteReporteDto>(docenteConsulta.Data[0]);
-                var montoCarga = new MontosPosgradosDto() { Mes1=0, Mes2=0, Mes3=0, Mes4=0};
+                var montoCarga = new MontosPosgradosDto() { Mes1 = 0, Mes2 = 0, Mes3 = 0, Mes4 = 0 };
 
-                if (await _cargaService.ValidateNivelPosgrado(docente.Nivel)==false)
+                if (await _cargaService.ValidateNivelPosgrado(docente.Nivel) == false)
                 {
                     return new ServiceResponseReporte<List<ReportCargaPosgradoDto>>() { Data = new List<ReportCargaPosgradoDto>(), Status = 200, Message = "El nivel academico del docente es " + docente.Nivel + ". Este nivel no se encuentra registrado en Akademic Report" };
                 }
@@ -1174,22 +1203,22 @@ namespace AkademicReport.Service.ReposteServices
                 if (DocenteCarga.Data.Value.Item1.Cargas.Count < 1)
                 {
                     reponseDataList.Add(new ReportCargaPosgradoDto() { Docente = docente, Cargas = new List<CargaPosgradoGet>() });
-                    return new ServiceResponseReporte<List<ReportCargaPosgradoDto>>() { Data = reponseDataList, Status=400 };
+                    return new ServiceResponseReporte<List<ReportCargaPosgradoDto>>() { Data = reponseDataList, Status = 400 };
                 }
 
                 var nivelAcademicoDb = await _dataContext.NivelAcademicos.Where(c => c.IdPrograma == 2).ToListAsync();
                 var nivelAcademico = nivelAcademicoDb.Find(c => c.Nivel.Contains(docente.Nivel));
-                if(nivelAcademico is null)
+                if (nivelAcademico is null)
                 {
                     return new ServiceResponseReporte<List<ReportCargaPosgradoDto>>() { Data = new List<ReportCargaPosgradoDto>(), Status = 200, Message = "El nivel academico del docente es " + docente.Nivel + ". Este nivel no se encuentra registrado en Akademic Report" };
                 }
                 docente.Pago_hora = nivelAcademico.PagoHora.ToString();
                 decimal Monto = 0;
                 int cantCredito = 0;
-                
-                foreach (var carga in DocenteCarga.Data.Value.Item1.Cargas.Where(c=>c.Recinto==idRecinto.ToString()).ToList())
+
+                foreach (var carga in DocenteCarga.Data.Value.Item1.Cargas.Where(c => c.Recinto == idRecinto.ToString()).ToList())
                 {
-                    Monto+=(carga.Credito * nivelAcademico.PagoHora);
+                    Monto += (carga.Credito * nivelAcademico.PagoHora);
                     carga.DistribucionMontos = CalculoTiempoHoras.DistribucionMontosPosgrado(carga.IdMes!.Value, (carga.Credito * nivelAcademico.PagoHora));
                     montoCarga.Mes1 += carga.DistribucionMontos.Mes1;
                     montoCarga.Mes2 += carga.DistribucionMontos.Mes2;
@@ -1207,17 +1236,19 @@ namespace AkademicReport.Service.ReposteServices
                     carga.pago_asignaturaMensual = carga.Credito * nivelAcademico.PagoHora;
                     carga.precio_hora = nivelAcademico.PagoHora;
                 }
-                ReportCargaPosgradoDto reponse = new ReportCargaPosgradoDto() { Docente = docente, CantCreditos = cantCredito, Cargas = cargaFilter, MontoSemanal = Convert.ToInt32(Monto), MontoMensual=Convert.ToInt32(Monto), MontoPorMes = montoCarga};
+                ReportCargaPosgradoDto reponse = new ReportCargaPosgradoDto() { Docente = docente, CantCreditos = cantCredito, Cargas = cargaFilter, MontoSemanal = Convert.ToInt32(Monto), MontoMensual = Convert.ToInt32(Monto), MontoPorMes = montoCarga };
                 reponseDataList.Add(reponse);
                 var p = await _dataContext.PeriodoAcademicos.Where(c => c.Id == int.Parse(DocenteCarga.Data.Value.Item1.Cargas[0].Periodo)).FirstAsync();
-                return new ServiceResponseReporte<List<ReportCargaPosgradoDto>>() { Data = reponseDataList, Status=200, Anio = p.Anio!.Value, MontoTotalesPorMes= tGMontosTotalesPorMes };
+                return new ServiceResponseReporte<List<ReportCargaPosgradoDto>>() { Data = reponseDataList, Status = 200, Anio = p.Anio!.Value, MontoTotalesPorMes = tGMontosTotalesPorMes };
             }
             catch (Exception ex)
             {
                 string msj = ex.ToString();
-                return new ServiceResponseReporte<List<ReportCargaPosgradoDto>>() { Data=null, Status = 500 };
+                return new ServiceResponseReporte<List<ReportCargaPosgradoDto>>() { Data = null, Status = 500 };
             }
         }
+
+
 
         public async Task<ServiceResponseReporte<List<ReportCargaPosgradoDto>>> ReporteByIdProgramCargaPosgrado(int idConcepto, string periodo, int idRecinto)
         {
@@ -1226,13 +1257,13 @@ namespace AkademicReport.Service.ReposteServices
                 var response = new List<ReportCargaPosgradoDto>();
                 MontosPosgradosDto tGMontosTotalesPorMes = new MontosPosgradosDto() { Mes1 = 0, Mes2 = 0, Mes3 = 0, Mes4 = 0 };
                 var docentesAmilka = await _docentesService.GetAll();
-                var nivelAcademico = await _dataContext.NivelAcademicos.Where(c => c.IdPrograma==2).ToListAsync();
+                var nivelAcademico = await _dataContext.NivelAcademicos.Where(c => c.IdPrograma == 2).ToListAsync();
                 int Monto = 0;
                 int MontoTotal = 0;
                 int CantCreditos = 0;
                 foreach (var docente in docentesAmilka.Data.ToList())
                 {
-                    if (docente.nivel !=null && await _cargaService.ValidateNivelPosgrado(docente.nivel) == true)
+                    if (docente.nivel != null && await _cargaService.ValidateNivelPosgrado(docente.nivel) == true)
                     {
                         var DocenteCarga = await _cargaService.GetCargaCallPosgrado(docente.identificacion, periodo, 2, docentesAmilka.Data);
                         if (DocenteCarga.Status == 200 && DocenteCarga.Data.Value.Item1.Cargas != null && DocenteCarga.Data.Value.Item1.Cargas.Count > 0)
@@ -1240,12 +1271,13 @@ namespace AkademicReport.Service.ReposteServices
                             var NivelAcademicoDocente = nivelAcademico.FirstOrDefault(c => c.Nivel.Contains(docente.nivel));
                             if (NivelAcademicoDocente != null)
                             {
-                                DocenteCarga.Data.Value.Item1.Docente.Pago_hora = nivelAcademico.FirstOrDefault(c => c.Nivel.Contains(docente.nivel)).PagoHora.ToString();
+                                DocenteCarga.Data.Value.Item1.Docente!.Pago_hora = nivelAcademico.FirstOrDefault(c => c.Nivel.Contains(docente.nivel)).PagoHora.ToString();
                                 if (idConcepto != 0)
                                 {
+                                    CantCreditos = 0;
                                     MontosPosgradosDto montoPorMes = new MontosPosgradosDto() { Mes1 = 0, Mes2 = 0, Mes3 = 0, Mes4 = 0 };
                                     var cargaPosgradoList = new List<CargaPosgradoGet>();
-                                    foreach (var cargaFiltrada in DocenteCarga.Data.Value.Item1.Cargas.Where(c => c.IdPrograma == 2 && c.Codigo.Id_concepto == idConcepto && c.Recinto==idRecinto.ToString()).ToList())
+                                    foreach (var cargaFiltrada in DocenteCarga.Data.Value.Item1.Cargas.Where(c => c.IdPrograma == 2 && c.Codigo.Id_concepto == idConcepto && c.Recinto == idRecinto.ToString()).ToList())
                                     {
                                         cargaFiltrada.ConceptoAsignatura = _mapper.Map<ConceptoGetDto>(cargaFiltrada.ConceptoAsignatura);
                                         Monto += (cargaFiltrada.Credito * int.Parse(DocenteCarga.Data.Value.Item1.Docente.Pago_hora));
@@ -1261,7 +1293,7 @@ namespace AkademicReport.Service.ReposteServices
                                         cargaPosgradoList.Add(cargaFiltrada);
                                     }
 
-                                   
+
                                     if (cargaPosgradoList.Count > 0)
                                     {
                                         response.Add(new ReportCargaPosgradoDto()
@@ -1284,10 +1316,11 @@ namespace AkademicReport.Service.ReposteServices
                                 }
                                 else
                                 {
-                                   
+
                                     MontosPosgradosDto montoPorMes = new MontosPosgradosDto() { Mes1 = 0, Mes2 = 0, Mes3 = 0, Mes4 = 0 };
+                                    CantCreditos = 0;
                                     var cargaPosgradoList = new List<CargaPosgradoGet>();
-                                    foreach (var cargaFiltrada in DocenteCarga.Data.Value.Item1.Cargas.Where(c => c.IdPrograma == 2 && c.Recinto==idRecinto.ToString()))
+                                    foreach (var cargaFiltrada in DocenteCarga.Data.Value.Item1.Cargas.Where(c => c.IdPrograma == 2 && c.Recinto == idRecinto.ToString()))
                                     {
                                         Monto += (cargaFiltrada.Credito * int.Parse(DocenteCarga.Data.Value.Item1.Docente.Pago_hora));
                                         cargaFiltrada.DistribucionMontos = CalculoTiempoHoras.DistribucionMontosPosgrado(cargaFiltrada.IdMes!.Value, (cargaFiltrada.Credito * int.Parse(DocenteCarga.Data.Value.Item1.Docente.Pago_hora)));
@@ -1301,7 +1334,7 @@ namespace AkademicReport.Service.ReposteServices
                                         cargaFiltrada.pago_asignaturaMensual = (cargaFiltrada.Credito * int.Parse(DocenteCarga.Data.Value.Item1.Docente.Pago_hora));
                                         cargaPosgradoList.Add(cargaFiltrada);
                                     }
-                                   
+
                                     if (cargaPosgradoList.Count > 0)
                                     {
                                         response.Add(new ReportCargaPosgradoDto()
@@ -1312,7 +1345,7 @@ namespace AkademicReport.Service.ReposteServices
                                             MontoMensual = Monto,
                                             MontoSemanal = Monto,
                                             MontoPorMes = montoPorMes
-                                         
+
                                         });
                                         tGMontosTotalesPorMes.Mes1 += montoPorMes.Mes1;
                                         tGMontosTotalesPorMes.Mes2 += montoPorMes.Mes2;
@@ -1328,8 +1361,9 @@ namespace AkademicReport.Service.ReposteServices
                     }
 
                 }
-                
-                return new ServiceResponseReporte<List<ReportCargaPosgradoDto>>() { Data = response, Status = 200, Message = Msj.MsjSucces, totalRecinto = MontoTotal, Anio = int.Parse(response[0].Cargas[0].Anio),  MontoTotalesPorMes = tGMontosTotalesPorMes };
+                if (response.Count < 1)
+                    return new ServiceResponseReporte<List<ReportCargaPosgradoDto>>() { Data = response, Status = 204, Message = Msj.MsjNoData, totalRecinto = MontoTotal, MontoTotalesPorMes = tGMontosTotalesPorMes };
+                return new ServiceResponseReporte<List<ReportCargaPosgradoDto>>() { Data = response, Status = 200, Message = Msj.MsjSucces, totalRecinto = MontoTotal, Anio = int.Parse(response[0].Cargas[0].Anio), MontoTotalesPorMes = tGMontosTotalesPorMes };
             }
             catch (Exception ex)
             {
@@ -1337,6 +1371,8 @@ namespace AkademicReport.Service.ReposteServices
                 return new ServiceResponseReporte<List<ReportCargaPosgradoDto>>() { Data = null, Status = 500, Message = $"{Msj.MsjError} {ex.ToString()}" };
             }
         }
+
+
 
         public async Task<ServiceResponseReporte<List<ReportCargaPosgradoDto>>> ReporteByIdRecintoPosgrado(int idRecinto, string periodo)
         {
@@ -1423,7 +1459,7 @@ namespace AkademicReport.Service.ReposteServices
             //    }
 
 
-             
+
             //}
             //return DataPorRecinto;
             throw new NotImplementedException();

@@ -6,5 +6,6 @@
         public int idRecinto { get; set; }
         public string? Periodo { get; set; }
         public string? Curricular { get; set; }
+        public string? TipoDocente { get; set; } = null;
     }
 }

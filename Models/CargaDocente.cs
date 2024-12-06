@@ -31,6 +31,7 @@ namespace AkademicReport.Models
         public string? Anio { get; set; }
         public int? IdCodigo { get; set; }
         public int? IdPeriodo { get; set; }
+        public bool? HoraContratada { get; set; }
 
         public virtual TipoCarga? CurricularNavigation { get; set; }
         public virtual Dia DiasNavigation { get; set; } = null!;

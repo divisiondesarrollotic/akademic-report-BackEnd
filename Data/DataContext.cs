@@ -187,6 +187,10 @@ namespace AkademicReport.Data
 
                 entity.Property(e => e.Dias).HasColumnName("dias");
 
+                entity.Property(e => e.HoraContratada)
+                    .HasColumnName("horaContratada")
+                    .HasDefaultValueSql("((0))");
+
                 entity.Property(e => e.HoraFin)
                     .HasMaxLength(50)
                     .IsUnicode(false)
@@ -310,6 +314,10 @@ namespace AkademicReport.Data
                     .IsUnicode(false)
                     .HasColumnName("descripcion");
 
+                entity.Property(e => e.Deteled)
+                    .HasColumnName("deteled")
+                    .HasDefaultValueSql("((0))");
+
                 entity.Property(e => e.Horas)
                     .HasMaxLength(100)
                     .IsUnicode(false)
@@ -362,7 +370,7 @@ namespace AkademicReport.Data
             modelBuilder.Entity<ConceptoPosgrado>(entity =>
             {
                 entity.HasKey(e => e.IdConceptoPosgrado)
-                    .HasName("PK__Concepto__49BA26213DC5D5CF");
+                    .HasName("PK__Concepto__49BA26218BDCFC66");
 
                 entity.ToTable("ConceptoPosgrado");
 
@@ -418,7 +426,7 @@ namespace AkademicReport.Data
             modelBuilder.Entity<Diplomado>(entity =>
             {
                 entity.HasKey(e => e.CodUnicersita)
-                    .HasName("PK__diplomad__09A0DB545977DC26");
+                    .HasName("PK__diplomad__09A0DB542F95453F");
 
                 entity.ToTable("diplomado");
 
@@ -492,7 +500,7 @@ namespace AkademicReport.Data
             modelBuilder.Entity<Firma>(entity =>
             {
                 entity.HasKey(e => e.IdFirma)
-                    .HasName("PK__firmas__A9CB15C2A27CA5A5");
+                    .HasName("PK__firmas__A9CB15C26BDA4F53");
 
                 entity.ToTable("firmas");
 
@@ -526,7 +534,7 @@ namespace AkademicReport.Data
             modelBuilder.Entity<Mese>(entity =>
             {
                 entity.HasKey(e => e.IdMes)
-                    .HasName("PK__Meses__0D1357C011C0FD91");
+                    .HasName("PK__Meses__0D1357C0F3751515");
 
                 entity.Property(e => e.IdMes).ValueGeneratedNever();
 
@@ -655,7 +663,7 @@ namespace AkademicReport.Data
             modelBuilder.Entity<ProgramasAcademico>(entity =>
             {
                 entity.HasKey(e => e.IdPrograma)
-                    .HasName("PK__Programa__467DDFD673EBBECA");
+                    .HasName("PK__Programa__467DDFD6C5E7CE5A");
 
                 entity.Property(e => e.IdPrograma).HasColumnName("idPrograma");
 

@@ -28,21 +28,22 @@ namespace AkademicReport.Service.AsignaturaServices
 
             try
             {
-                var codigos = await _dataContext.Codigos.FirstOrDefaultAsync(c => c.Id == id);
-                var tipoCaragra = await _dataContext.TipoCargaCodigos.Where(c => c.IdCodigo == id).ToListAsync();
-                var modalidades = await _dataContext.TipoModalidadCodigos.Where(c => c.Idcodigo == id).ToListAsync();
-                if (tipoCaragra.Count > 0)
-                {
-                    _dataContext.TipoCargaCodigos.RemoveRange(tipoCaragra);
-                }
-                if (modalidades.Count > 0)
-                {
-                    _dataContext.TipoModalidadCodigos.RemoveRange(modalidades);
-                }
+                var codigo = await _dataContext.Codigos.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
+                //var tipoCaragra = await _dataContext.TipoCargaCodigos.Where(c => c.IdCodigo == id).ToListAsync();
+                //var modalidades = await _dataContext.TipoModalidadCodigos.Where(c => c.Idcodigo == id).ToListAsync();
+                //if (tipoCaragra.Count > 0)
+                //{
+                //    _dataContext.TipoCargaCodigos.RemoveRange(tipoCaragra);
+                //}
+                //if (modalidades.Count > 0)
+                //{
+                //    _dataContext.TipoModalidadCodigos.RemoveRange(modalidades);
+                //}
 
-                if (codigos == null)
+                if (codigo == null)
                     return new ServicesResponseMessage<string>() { Status = 204, Message = Msj.MsjNoRegistros };
-                _dataContext.Codigos.Remove(codigos);
+                codigo.Deteled = true;
+                _dataContext.Entry(codigo).State = EntityState.Modified;
                 await _dataContext.SaveChangesAsync();
                 return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjDelete };
             }
@@ -56,7 +57,7 @@ namespace AkademicReport.Service.AsignaturaServices
         {
             try
             {
-                var codigos = await _dataContext.Codigos.Where(c => c.IdPrograma == IdPrograma).Include(c => c.TipoCargaCodigos).ThenInclude(c => c.IdTipoCargaNavigation)
+                var codigos = await _dataContext.Codigos.Where(c => c.IdPrograma == IdPrograma && c.Deteled==false).Include(c => c.TipoCargaCodigos).ThenInclude(c => c.IdTipoCargaNavigation)
                     .Include(c => c.IdConceptoNavigation)
                     .Include(c => c.TipoModalidadCodigos)
                     .Include(c => c.IdProgramaNavigation)

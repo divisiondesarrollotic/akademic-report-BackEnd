@@ -426,5 +426,24 @@ namespace AkademicReport.Service.CargaServices
             return resultado;
         }
 
+        public async Task<ServicesResponseMessage<string>> UpdateHorasContratadas(int idCarga)
+        {
+            try
+            {
+                var carga = await _dataContext.CargaDocentes.AsNoTracking().FirstOrDefaultAsync(c => c.Id == idCarga);
+                if (carga != null)
+                {
+                    carga.HoraContratada = carga.HoraContratada==null || carga.HoraContratada==false? true : false;
+                    _dataContext.Entry(carga).State = EntityState.Modified;
+                    await _dataContext.SaveChangesAsync();
+                }
+
+                return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjUpdate };
+            }
+            catch (Exception ex)
+            {
+                return new ServicesResponseMessage<string>() { Status = 500, Message = Msj.MsjError + ex.ToString() };
+            }
+        }
     }
 }

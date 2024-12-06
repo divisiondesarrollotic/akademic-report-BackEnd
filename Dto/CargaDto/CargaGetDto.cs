@@ -45,6 +45,7 @@ namespace AkademicReport.Dto.CargaDto
         public ConceptoPosDto? ConceptoPosgrado { get; set; }
         public int? IdPeriodo { get; set; }
         public PeriodoGetDto? PeriodoObj { get; set; }
+        public bool? HoraContratada { get; set; }
 
 
 
