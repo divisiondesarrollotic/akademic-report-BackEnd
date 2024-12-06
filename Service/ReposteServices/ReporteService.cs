@@ -141,6 +141,7 @@ namespace AkademicReport.Service.ReposteServices
                             var periodo = await _dataContext.PeriodoAcademicos.Where(c => c.Periodo == item.Periodo).FirstAsync();
                             c.IdPeriodo = periodo.Id;
                             c.PeriodoObj = _mapper.Map<PeriodoGetDto>(periodo);
+                            c.HoraContratada = item.HoraContratada;
                             DataResult.Carga.Add(c);
 
                         }
@@ -177,6 +178,8 @@ namespace AkademicReport.Service.ReposteServices
                         int MontoPorAsignatura = 0;
                         int CantCreditosF = 0;
                         int CantidadPagada = 0;
+                        Docente.Pago_hora = nivelAcademico.PagoHora.ToString();
+                        DataResult.Docente.Pago_hora = nivelAcademico.PagoHora.ToString();
 
                         foreach (var item in cargas.Data.Value.Item1.Carga)
                         {
@@ -212,6 +215,7 @@ namespace AkademicReport.Service.ReposteServices
                             c.Concepto = item.Concepto;
                             var periodo = await _dataContext.PeriodoAcademicos.Where(c => c.Periodo == item.Periodo).FirstAsync();
                             c.IdPeriodo = periodo.Id;
+                            c.HoraContratada = item.HoraContratada;
                             c.PeriodoObj = _mapper.Map<PeriodoGetDto>(periodo);
                             var recinto = await _dataContext.Recintos.FirstOrDefaultAsync(c => c.Id == int.Parse(item.Recinto));
                             c.recinto = recinto.NombreCorto;
@@ -292,6 +296,7 @@ namespace AkademicReport.Service.ReposteServices
                             c.pago_asignatura = c.precio_hora * c.credito;
                             var periodo = await _dataContext.PeriodoAcademicos.Where(c => c.Periodo == item.Periodo).FirstAsync();
                             c.IdPeriodo = periodo.Id;
+                            c.HoraContratada = item.HoraContratada;
                             c.PeriodoObj = _mapper.Map<PeriodoGetDto>(periodo);
                             DataResult.Docente.Pago_hora = c.precio_hora.ToString();
                             DataResult.Carga.Add(c);
@@ -339,6 +344,7 @@ namespace AkademicReport.Service.ReposteServices
                             c.Concepto = item.Concepto;
                             c.seccion = item.Seccion;
                             c.Horario_dia = item.dia_nombre;
+                            c.HoraContratada = item.HoraContratada;
                             c.Horario_inicio = $"{item.hora_inicio} : {item.minuto_inicio}";
                             c.Horario_final = $"{item.hora_fin} : {item.minuto_fin}";
                             c.credito = item.credito;
@@ -403,6 +409,7 @@ namespace AkademicReport.Service.ReposteServices
                             c.CodUniversitas = item.CodUniversitas;
                             c.Concepto = item.Concepto;
                             c.seccion = item.Seccion;
+                            c.HoraContratada = item.HoraContratada;
                             c.Horario_dia = item.dia_nombre;
                             c.Horario_inicio = $"{item.hora_inicio} : {item.minuto_inicio}";
                             c.Horario_final = $"{item.hora_fin} : {item.minuto_fin}";
@@ -970,81 +977,66 @@ namespace AkademicReport.Service.ReposteServices
 
                             //    }
                             //}
-                            else if (DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT")
+                            else if (DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT" && filtro.TipoDocente!="A")
                             {
+                                CargaFilter = CargaFilter.Where(c => c.HoraContratada == false).ToList();
 
+                                //foreach (var item in CargaFilter.Where(c => c.HoraContratada == false).ToList())
+                                //{
 
-                                // Generamos la carga de docencia y acompañamiento
+                                   
 
-                                var CargaFilterMT = new List<CargaReporteDto>();
-                                CargaFilterMT = CargaFilter.Where(c => c.nombre_asignatura.ToUpper().Contains("ACOMPAÑAMIENTO")).ToList();
-                                int CantCrA = CargaFilterMT.Sum(c => c.credito);
-                                if (CantCrA < 12)
-                                {
-                                    foreach (var item in CargaFilter)
-                                    {
-
-                                        if (item.Concepto.Id == 2 && CantCrA < 12 && CargaFilterMT.Count > 0)
-                                        {
-                                            CantCrA += item.credito;
-                                            CargaFilterMT.Add(item);
-                                        }
-
-                                        //if (CantCreditosF + item.credito > 12)
-                                        //{
-                                        //    // verificacion por si el monto resultante de la suma en mayor a 20 que solo tome despues de; va;pr 20
-                                        //    CantCreditosF += item.credito;
-                                        //    if (CantidadPagada == 0)
-                                        //    {
-                                        //        CantidadPagada = CantCreditosF - 12;
-                                        //        item.precio_hora = item.precio_hora;
-                                        //        item.pago_asignatura = item.precio_hora * CantidadPagada;
-                                        //        MontoPorAsignatura += item.pago_asignatura;
-                                        //    }
-                                        //    else
-                                        //    {
-                                        //        item.precio_hora = item.precio_hora;
-                                        //        item.pago_asignatura = item.precio_hora * item.credito;
-                                        //        MontoPorAsignatura += item.pago_asignatura;
-                                        //    }
-                                        //}
-                                        //else
-                                        //{
-                                        //    CantCreditosF += item.credito;
-                                        //    item.precio_hora = 0;
-                                        //    item.pago_asignatura = 0;
-                                        //}
-
-                                    }
-
-                                }
-                                CantCreditosF = CantCrA;
-                                CargaFilter = CargaFilterMT;
-
-
+                                //    //if (CantCreditosF + item.credito > 12)
+                                //    //{
+                                //    //    // verificacion por si el monto resultante de la suma en mayor a 20 que solo tome despues de; va;pr 20
+                                //    //    CantCreditosF += item.credito;
+                                //    //    if (CantidadPagada == 0)
+                                //    //    {
+                                //    //        CantidadPagada = CantCreditosF - 12;
+                                //    //        item.precio_hora = item.precio_hora;
+                                //    //        item.pago_asignatura = item.precio_hora * CantidadPagada;
+                                //    //        MontoPorAsignatura += item.pago_asignatura;
+                                //    //    }
+                                //    //    else
+                                //    //    {
+                                //    //        item.precio_hora = item.precio_hora;
+                                //    //        item.pago_asignatura = item.precio_hora * item.credito;
+                                //    //        MontoPorAsignatura += item.pago_asignatura;
+                                //    //    }
+                                //    //}
+                                //    //else
+                                //    //{
+                                //    //    CantCreditosF += item.credito;
+                                //    //    item.precio_hora = 0;
+                                //    //    item.pago_asignatura = 0;
+                                //    //}
+                                //}
 
                             }
-                            else if (DocenteConSuCarga.Data.Carga.Count() == CargaFilter.Count())
-                            {
-                                Monto = DocenteConSuCarga.Data.MontoSemanal;
 
-                                var CargaFilterMT = new List<CargaReporteDto>();
-                                CargaFilterMT = CargaFilter.Where(c => !c.nombre_asignatura.ToUpper().Contains("ACOMPAÑAMIENTO") || c.Concepto!.Nombre.Contains("Docencia")).ToList();
-                                int CantCrA = CargaFilterMT.Sum(c => c.credito);
+
+
+
+
+                            //else if (DocenteConSuCarga.Data.Carga.Count() == CargaFilter.Count())
+                            //{
+                            //    Monto = DocenteConSuCarga.Data.MontoSemanal;
+                            //    foreach (var item in CargaFilter)
+                            //    {
+                            //        CantCreditos += item.credito;
+                            //    }
+                            //}
+                            if (DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT" && filtro.TipoDocente == "A")
+                            {
+                                CargaFilter = CargaFilter.Where(c => c.HoraContratada == true).ToList();
                                 foreach (var item in CargaFilter)
                                 {
-
-                                    CantCreditos += item.credito;
-
-                                }
-                            }
-                            else
-                            {
-                                foreach (var item in CargaFilter)
-                                {
+                                    item.precio_hora =int.Parse(DocenteConSuCarga.Data.Docente.Pago_hora);
                                     Monto += item.precio_hora * item.credito;
+                                    MontoPorAsignatura+= Monto;
                                     CantCreditos += item.credito;
                                 }
+
                             }
 
 
@@ -1052,7 +1044,6 @@ namespace AkademicReport.Service.ReposteServices
                         else
                         {
                             CargaFilter = DocenteConSuCarga.Data.Carga;
-
                             if (DocenteConSuCarga.Data.Docente.TiempoDedicacion == "TC")
                             {
                                 Monto = DocenteConSuCarga.Data.MontoVinculacion;
@@ -1063,65 +1054,66 @@ namespace AkademicReport.Service.ReposteServices
 
                                 }
                             }
-                            else if (DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT")
+                            else if (DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT" && filtro.TipoDocente != "A")
                             {
-
-                                foreach (var item in CargaFilter.Where(c=>c.HoraContratada==false))
-                                {
-
-                                    if (CantCreditosF + item.credito > 12)
-                                    {
-                                        // verificacion por si el monto resultante de la suma en mayor a 20 que solo tome despues de; va;pr 20
-                                        CantCreditosF += item.credito;
-                                        if (CantidadPagada == 0)
-                                        {
-                                            CantidadPagada = CantCreditosF - 12;
-                                            item.precio_hora = item.precio_hora;
-                                            item.pago_asignatura = item.precio_hora * CantidadPagada;
-                                            MontoPorAsignatura += item.pago_asignatura;
-                                        }
-                                        else
-                                        {
-                                            item.precio_hora = item.precio_hora;
-                                            item.pago_asignatura = item.precio_hora * item.credito;
-                                            MontoPorAsignatura += item.pago_asignatura;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        CantCreditosF += item.credito;
-                                        item.precio_hora = 0;
-                                        item.pago_asignatura = 0;
-                                    }
-                                }
+                                CargaFilter = CargaFilter.Where(c => c.HoraContratada == false).ToList();
+                                
+                                //foreach (var item in CargaFilter.Where(c => c.HoraContratada == false))
+                                //{
+                                //    if (CantCreditosF + item.credito > 12)
+                                //    {
+                                //        // verificacion por si el monto resultante de la suma en mayor a 20 que solo tome despues de; va;pr 20
+                                //        CantCreditosF += item.credito;
+                                //        if (CantidadPagada == 0)
+                                //        {
+                                //            CantidadPagada = CantCreditosF - 12;
+                                //            item.precio_hora = item.precio_hora;
+                                //            item.pago_asignatura = item.precio_hora * CantidadPagada;
+                                //            MontoPorAsignatura += item.pago_asignatura;
+                                //        }
+                                //        else
+                                //        {
+                                //            item.precio_hora = item.precio_hora;
+                                //            item.pago_asignatura = item.precio_hora * item.credito;
+                                //            MontoPorAsignatura += item.pago_asignatura;
+                                //        }
+                                //    }
+                                //    else
+                                //    {
+                                //        CantCreditosF += item.credito;
+                                //        item.precio_hora = 0;
+                                //        item.pago_asignatura = 0;
+                                //    }
+                                //}
 
                             }
 
 
-                            else if (DocenteConSuCarga.Data.Carga.Count() == CargaFilter.Count())
+                            //else if (DocenteConSuCarga.Data.Carga.Count() == CargaFilter.Count())
+                            //{
+                            //    Monto = DocenteConSuCarga.Data.MontoSemanal;
+                            //    foreach (var item in CargaFilter)
+                            //    {
+
+                            //        CantCreditos += item.credito;
+
+                            //    }
+                            //}
+                             if (DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT" && filtro.TipoDocente == "A")
                             {
-                                Monto = DocenteConSuCarga.Data.MontoSemanal;
+                                Monto = 0;
+                                CargaFilter = CargaFilter.Where(c => c.HoraContratada == true).ToList();
                                 foreach (var item in CargaFilter)
                                 {
-
-                                    CantCreditos += item.credito;
-
-                                }
-                            }
-                            else if(DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT" || DocenteConSuCarga.Data.Docente.TiempoDedicacion == "A")
-                            {
-                                if(DocenteConSuCarga.Data.Docente.Identificacion== "001-1749203-3")
-                                {
-
-                                }
-                                foreach (var item in CargaFilter.Where(c=>c.HoraContratada==true).ToList())
-                                {
+                                    item.precio_hora = int.Parse(DocenteConSuCarga.Data.Docente.Pago_hora);
                                     Monto = item.precio_hora * item.credito;
+                                    MontoPorAsignatura += Monto;
                                     CantCreditos += item.credito;
                                 }
                             }
-                            
+
                         }
+                    
                         var DocenteCargaListo = new DocenteCargaReporteDto();
                         DocenteCargaListo.Docente = DocenteConSuCarga.Data.Docente;
                         DocenteCargaListo.MontoVinculacion = DocenteConSuCarga.Data.MontoVinculacion;
@@ -1134,8 +1126,9 @@ namespace AkademicReport.Service.ReposteServices
                         }
                         else if (docente.tiempoDedicacion == "MT")
                         {
+                            DocenteCargaListo.MontoVinculacion = docente.tiempoDedicacion == "MT" && filtro.TipoDocente == "MT"? DocenteConSuCarga.Data.MontoVinculacion: 0;
                             DocenteCargaListo.MontoSemanal = MontoPorAsignatura;
-                            DocenteCargaListo.MontoMensual = DocenteConSuCarga.Data.MontoVinculacion + (MontoPorAsignatura * 4);
+                            DocenteCargaListo.MontoMensual = docente.tiempoDedicacion=="MT" && filtro.TipoDocente=="MT" ? DocenteConSuCarga.Data.MontoVinculacion :  (MontoPorAsignatura * 4);
                             DocenteCargaListo.CantCreditos = CantCreditosF;
                         }
                         else if (docente.tiempoDedicacion == "A")
