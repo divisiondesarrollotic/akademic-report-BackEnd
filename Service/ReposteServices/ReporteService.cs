@@ -906,7 +906,34 @@ namespace AkademicReport.Service.ReposteServices
 
             var recintoActual = await _dataContext.Recintos.Where(c => c.Id == filtro.idRecinto).FirstOrDefaultAsync();
             var docentes = await _docentesService.GetAllRecinto(new FiltroDocentesDto(), recintoActual.Id);
-            var docentesRecinto = filtro.TipoDocente != null && filtro.TipoDocente == "MT" || filtro.TipoDocente == "A" ? docentes.Data.Where(c => c.id_recinto == filtro.idRecinto.ToString()).ToList() : docentes.Data!.Where(c => c.id_recinto == filtro.idRecinto.ToString() && c.tiempoDedicacion==filtro.TipoDocente).ToList();
+            List<DocenteGetDto> docentesRecinto = new List<DocenteGetDto>();
+
+            switch (filtro.TipoDocente)
+            {
+                case "MT":
+                    docentesRecinto = docentes.Data!.Where(c =>
+                        c.id_recinto == filtro.idRecinto.ToString() &&
+                        c.tiempoDedicacion == "MT").ToList();
+                    break;
+
+                case "A":
+                    docentesRecinto = docentes.Data!.Where(c =>
+                        c.id_recinto == filtro.idRecinto.ToString() &&
+                        (c.tiempoDedicacion == "MT" || c.tiempoDedicacion == "A")).ToList();
+                    break;
+
+                case "TC":
+                    docentesRecinto = docentes.Data!.Where(c =>
+                        c.id_recinto == filtro.idRecinto.ToString() &&
+                        c.tiempoDedicacion == "TC").ToList();
+                    break;
+
+                default:
+                    docentesRecinto = docentes.Data!.Where(c =>
+                        c.id_recinto == filtro.idRecinto.ToString()).ToList();
+                    break;
+            }
+
             List<DocenteCargaReporteDto> CargadDocentes = new List<DocenteCargaReporteDto>();
             var vinculacion = await _dataContext.Vinculos.ToListAsync();
             int Monto = 0;
@@ -948,7 +975,7 @@ namespace AkademicReport.Service.ReposteServices
                         List<CargaReporteDto> CargaFilter = new List<CargaReporteDto>();
                         if (filtro.Curricular != "0" && filtro.Curricular != null)
                         {
-                            if (DocenteConSuCarga.Data.Docente.TiempoDedicacion == "F")
+                            if (DocenteConSuCarga.Data.Docente!.TiempoDedicacion == "F")
                             {
                                 CargaFilter = DocenteConSuCarga.Data.Carga.ToList();
                             }
@@ -964,68 +991,15 @@ namespace AkademicReport.Service.ReposteServices
                                 {
                                     item.precio_hora = 0;
                                     CantCreditos += item.credito;
-
                                 }
                             }
-                            //else if(DocenteConSuCarga.Data.Docente.TiempoDedicacion=="F")
-                            //{
-                            //    Monto = DocenteConSuCarga.Data.MontoVinculacion;
-                            //    foreach (var item in CargaFilter)
-                            //    {
-                            //        item.precio_hora = 0;
-                            //        CantCreditos += item.credito;
-
-                            //    }
-                            //}
+                           
                             else if (DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT" && filtro.TipoDocente!="A")
                             {
                                 CargaFilter = CargaFilter.Where(c => c.HoraContratada == false).ToList();
-
-                                //foreach (var item in CargaFilter.Where(c => c.HoraContratada == false).ToList())
-                                //{
-
-                                   
-
-                                //    //if (CantCreditosF + item.credito > 12)
-                                //    //{
-                                //    //    // verificacion por si el monto resultante de la suma en mayor a 20 que solo tome despues de; va;pr 20
-                                //    //    CantCreditosF += item.credito;
-                                //    //    if (CantidadPagada == 0)
-                                //    //    {
-                                //    //        CantidadPagada = CantCreditosF - 12;
-                                //    //        item.precio_hora = item.precio_hora;
-                                //    //        item.pago_asignatura = item.precio_hora * CantidadPagada;
-                                //    //        MontoPorAsignatura += item.pago_asignatura;
-                                //    //    }
-                                //    //    else
-                                //    //    {
-                                //    //        item.precio_hora = item.precio_hora;
-                                //    //        item.pago_asignatura = item.precio_hora * item.credito;
-                                //    //        MontoPorAsignatura += item.pago_asignatura;
-                                //    //    }
-                                //    //}
-                                //    //else
-                                //    //{
-                                //    //    CantCreditosF += item.credito;
-                                //    //    item.precio_hora = 0;
-                                //    //    item.pago_asignatura = 0;
-                                //    //}
-                                //}
+                                CantCreditosF = CargaFilter.Sum(c => c.credito);
 
                             }
-
-
-
-
-
-                            //else if (DocenteConSuCarga.Data.Carga.Count() == CargaFilter.Count())
-                            //{
-                            //    Monto = DocenteConSuCarga.Data.MontoSemanal;
-                            //    foreach (var item in CargaFilter)
-                            //    {
-                            //        CantCreditos += item.credito;
-                            //    }
-                            //}
                             if (DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT" && filtro.TipoDocente == "A")
                             {
                                 CargaFilter = CargaFilter.Where(c => c.HoraContratada == true).ToList();
@@ -1054,10 +1028,11 @@ namespace AkademicReport.Service.ReposteServices
 
                                 }
                             }
-                            else if (DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT" && filtro.TipoDocente != "A")
+                            else if (DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT" && filtro.TipoDocente != "A" && filtro.TipoDocente!=null)
                             {
                                 CargaFilter = CargaFilter.Where(c => c.HoraContratada == false).ToList();
-                                
+                                CantCreditosF = CargaFilter.Sum(c => c.credito);
+
                                 //foreach (var item in CargaFilter.Where(c => c.HoraContratada == false))
                                 //{
                                 //    if (CantCreditosF + item.credito > 12)
@@ -1099,17 +1074,18 @@ namespace AkademicReport.Service.ReposteServices
 
                             //    }
                             //}
-                             if (DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT" && filtro.TipoDocente == "A")
+                           if (filtro.TipoDocente != "MT" && DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT" || DocenteConSuCarga.Data.Docente.TiempoDedicacion == "A")
                             {
-                                Monto = 0;
+                                Monto = 0; 
                                 CargaFilter = CargaFilter.Where(c => c.HoraContratada == true).ToList();
                                 foreach (var item in CargaFilter)
                                 {
                                     item.precio_hora = int.Parse(DocenteConSuCarga.Data.Docente.Pago_hora);
-                                    Monto = item.precio_hora * item.credito;
+                                    Monto+= item.precio_hora * item.credito;
                                     MontoPorAsignatura += Monto;
                                     CantCreditos += item.credito;
                                 }
+                                CantCreditosF = CantCreditos;
                             }
 
                         }
@@ -1126,10 +1102,22 @@ namespace AkademicReport.Service.ReposteServices
                         }
                         else if (docente.tiempoDedicacion == "MT")
                         {
-                            DocenteCargaListo.MontoVinculacion = docente.tiempoDedicacion == "MT" && filtro.TipoDocente == "MT"? DocenteConSuCarga.Data.MontoVinculacion: 0;
-                            DocenteCargaListo.MontoSemanal = MontoPorAsignatura;
-                            DocenteCargaListo.MontoMensual = docente.tiempoDedicacion=="MT" && filtro.TipoDocente=="MT" ? DocenteConSuCarga.Data.MontoVinculacion :  (MontoPorAsignatura * 4);
-                            DocenteCargaListo.CantCreditos = CantCreditosF;
+                            if(filtro.TipoDocente==null)
+                            {
+                                DocenteCargaListo.MontoVinculacion = DocenteConSuCarga.Data.MontoVinculacion;
+                                DocenteCargaListo.MontoSemanal = MontoPorAsignatura;
+                                DocenteCargaListo.MontoMensual = DocenteConSuCarga.Data.MontoVinculacion + (MontoPorAsignatura * 4);
+                                DocenteCargaListo.CantCreditos = CantCreditosF;
+                            }
+                            else
+                            {
+                                DocenteCargaListo.MontoVinculacion = docente.tiempoDedicacion == "MT" && filtro.TipoDocente == "MT" ? DocenteConSuCarga.Data.MontoVinculacion : 0;
+                                DocenteCargaListo.MontoSemanal = MontoPorAsignatura;
+                                DocenteCargaListo.MontoMensual = docente.tiempoDedicacion == "MT" && filtro.TipoDocente == "MT" ? DocenteConSuCarga.Data.MontoVinculacion : (MontoPorAsignatura * 4);
+                                DocenteCargaListo.CantCreditos = CargaFilter.Sum(c => c.credito);
+                                    
+                            }
+                          
                         }
                         else if (docente.tiempoDedicacion == "A")
                         {
@@ -1148,7 +1136,7 @@ namespace AkademicReport.Service.ReposteServices
                         {
                             CargadDocentes.Add(DocenteCargaListo);
                             Total += DocenteCargaListo.MontoMensual;
-                            Monto = 0;
+                            Monto = 0; 
                             CantCreditos = 0;
                             CantCreditosF = 0;
                             CantidadPagada = 0;
