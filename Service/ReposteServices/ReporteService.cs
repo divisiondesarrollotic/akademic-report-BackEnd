@@ -993,8 +993,8 @@ namespace AkademicReport.Service.ReposteServices
                                     CantCreditos += item.credito;
                                 }
                             }
-                           
-                            else if (DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT" && filtro.TipoDocente!="A")
+
+                            else if (DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT" && filtro.TipoDocente != "A")
                             {
                                 CargaFilter = CargaFilter.Where(c => c.HoraContratada == false).ToList();
                                 CantCreditosF = CargaFilter.Sum(c => c.credito);
@@ -1005,9 +1005,9 @@ namespace AkademicReport.Service.ReposteServices
                                 CargaFilter = CargaFilter.Where(c => c.HoraContratada == true).ToList();
                                 foreach (var item in CargaFilter)
                                 {
-                                    item.precio_hora =int.Parse(DocenteConSuCarga.Data.Docente.Pago_hora);
+                                    item.precio_hora = int.Parse(DocenteConSuCarga.Data.Docente.Pago_hora);
                                     Monto += item.precio_hora * item.credito;
-                                    MontoPorAsignatura+= Monto;
+                                    MontoPorAsignatura += Monto;
                                     CantCreditos += item.credito;
                                 }
 
@@ -1028,10 +1028,12 @@ namespace AkademicReport.Service.ReposteServices
 
                                 }
                             }
-                            else if (DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT" && filtro.TipoDocente != "A" && filtro.TipoDocente!=null)
+                            else if (DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT" && filtro.TipoDocente != "A" && filtro.TipoDocente != null)
                             {
+
                                 CargaFilter = CargaFilter.Where(c => c.HoraContratada == false).ToList();
                                 CantCreditosF = CargaFilter.Sum(c => c.credito);
+
 
                                 //foreach (var item in CargaFilter.Where(c => c.HoraContratada == false))
                                 //{
@@ -1074,22 +1076,36 @@ namespace AkademicReport.Service.ReposteServices
 
                             //    }
                             //}
-                           if (filtro.TipoDocente != "MT" && DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT" || DocenteConSuCarga.Data.Docente.TiempoDedicacion == "A")
+                            if (filtro.TipoDocente != "MT" && DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT" || DocenteConSuCarga.Data.Docente.TiempoDedicacion == "A")
                             {
-                                Monto = 0; 
-                                CargaFilter = CargaFilter.Where(c => c.HoraContratada == true).ToList();
+                                Monto = 0;
+                                if(DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT" && CargaFilter.Where(c => c.HoraContratada == false).ToList().Sum(c=>c.credito)>12)
+                                {
+                                    CargaFilter = CargaFilter.Where(c => c.HoraContratada == false).ToList();
+                                }
+                                else if(filtro.TipoDocente!=null)
+                                {
+                                    CargaFilter = CargaFilter.Where(c => c.HoraContratada == true).ToList();
+                                }
+
                                 foreach (var item in CargaFilter)
                                 {
                                     item.precio_hora = int.Parse(DocenteConSuCarga.Data.Docente.Pago_hora);
-                                    Monto+= item.precio_hora * item.credito;
-                                    MontoPorAsignatura += Monto;
-                                    CantCreditos += item.credito;
+                                    item.pago_asignaturaMensual = item.HoraContratada == true ? (item.precio_hora * item.credito) * 4 : 0;
+                                    if(item.HoraContratada==true)
+                                    {
+                                        Monto += item.precio_hora * item.credito;
+                                        MontoPorAsignatura += Monto;
+                                        CantCreditos += item.credito;
+                                    }
+                                   
+                                   
                                 }
+
                                 CantCreditosF = CantCreditos;
                             }
-
                         }
-                    
+
                         var DocenteCargaListo = new DocenteCargaReporteDto();
                         DocenteCargaListo.Docente = DocenteConSuCarga.Data.Docente;
                         DocenteCargaListo.MontoVinculacion = DocenteConSuCarga.Data.MontoVinculacion;
@@ -1102,22 +1118,21 @@ namespace AkademicReport.Service.ReposteServices
                         }
                         else if (docente.tiempoDedicacion == "MT")
                         {
-                            if(filtro.TipoDocente==null)
+                            if (filtro.TipoDocente == null)
                             {
                                 DocenteCargaListo.MontoVinculacion = DocenteConSuCarga.Data.MontoVinculacion;
-                                DocenteCargaListo.MontoSemanal = MontoPorAsignatura;
-                                DocenteCargaListo.MontoMensual = DocenteConSuCarga.Data.MontoVinculacion + (MontoPorAsignatura * 4);
-                                DocenteCargaListo.CantCreditos = CantCreditosF;
+                                DocenteCargaListo.MontoSemanal = Monto;
+                                DocenteCargaListo.MontoMensual = DocenteConSuCarga.Data.MontoVinculacion + (Monto * 4);
+                                DocenteCargaListo.CantCreditos = CargaFilter.Sum(c=>c.credito);
                             }
                             else
                             {
                                 DocenteCargaListo.MontoVinculacion = docente.tiempoDedicacion == "MT" && filtro.TipoDocente == "MT" ? DocenteConSuCarga.Data.MontoVinculacion : 0;
-                                DocenteCargaListo.MontoSemanal = MontoPorAsignatura;
-                                DocenteCargaListo.MontoMensual = docente.tiempoDedicacion == "MT" && filtro.TipoDocente == "MT" ? DocenteConSuCarga.Data.MontoVinculacion : (MontoPorAsignatura * 4);
+                                DocenteCargaListo.MontoSemanal = Monto;
+                                DocenteCargaListo.MontoMensual = docente.tiempoDedicacion == "MT" && filtro.TipoDocente == "MT" ? DocenteConSuCarga.Data.MontoVinculacion : (Monto * 4);
                                 DocenteCargaListo.CantCreditos = CargaFilter.Sum(c => c.credito);
-                                    
                             }
-                          
+
                         }
                         else if (docente.tiempoDedicacion == "A")
                         {
@@ -1136,7 +1151,7 @@ namespace AkademicReport.Service.ReposteServices
                         {
                             CargadDocentes.Add(DocenteCargaListo);
                             Total += DocenteCargaListo.MontoMensual;
-                            Monto = 0; 
+                            Monto = 0;
                             CantCreditos = 0;
                             CantCreditosF = 0;
                             CantidadPagada = 0;

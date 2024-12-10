@@ -24,18 +24,7 @@ namespace AkademicReport.Dto.ReporteDto
         public int precio_hora { get; set; }
         public int pago_asignatura { get; set; }
         public string Aula { get; set; }
-        public int pago_asignaturaMensual { get 
-            { 
-               if(Vinculacion=="TC")
-                {
-                    return 0;
-                }
-               else
-                {
-                    return this.pago_asignatura * 4;
-                }
-                
-            } }
+        public int pago_asignaturaMensual { get; set; }
 
         public string recinto { get; set; } = null!;
         public int? IdPeriodo { get; set; }
