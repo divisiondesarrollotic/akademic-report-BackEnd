@@ -26,8 +26,8 @@ namespace AkademicReport.Dto.CargaDto
         public string Cedula { get; set; } = null!;
      
         public int? idTipoCarga { get; set; }
-        [Required]
-        public bool? HoraContratada { get; set; }
+
+        public bool? HoraContratada { get; set; } = true;
 
     }
 }

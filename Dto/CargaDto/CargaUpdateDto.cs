@@ -29,6 +29,6 @@ namespace AkademicReport.Dto.CargaDto
         public int? DiaMes { get; set; }
         public int? IdMes { get; set; }
         public int? IdPrograma { get; set; }
-        public bool? HoraContratada { get; set; }
+        public bool? HoraContratada { get; set; } = true;
     }
 }

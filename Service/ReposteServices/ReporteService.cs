@@ -1076,17 +1076,31 @@ namespace AkademicReport.Service.ReposteServices
 
                             //    }
                             //}
-                            if (filtro.TipoDocente != "MT" && DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT" || DocenteConSuCarga.Data.Docente.TiempoDedicacion == "A")
+                            if (filtro.TipoDocente != "MT" && DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT" || DocenteConSuCarga.Data.Docente.TiempoDedicacion == "A" || DocenteConSuCarga.Data.Docente.TiempoDedicacion == "M" || DocenteConSuCarga.Data.Docente.TiempoDedicacion == "F")
                             {
                                 Monto = 0;
-                                if(DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT" && CargaFilter.Where(c => c.HoraContratada == false).ToList().Sum(c=>c.credito)>12)
+                                if(DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT" && filtro.TipoDocente == "MT" && CargaFilter.Where(c => c.HoraContratada == false).ToList().Sum(c=>c.credito)>=0)
                                 {
                                     CargaFilter = CargaFilter.Where(c => c.HoraContratada == false).ToList();
                                 }
-                                else if(filtro.TipoDocente!=null)
+                                else if(filtro.TipoDocente!=null && filtro.TipoDocente!="MT" )
                                 {
-                                    CargaFilter = CargaFilter.Where(c => c.HoraContratada == true).ToList();
+                                    if(DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT"&& CargaFilter.Where(c => c.HoraContratada == false).ToList().Sum(c => c.credito) < 1)
+                                    {
+                                        CargaFilter = new List<CargaReporteDto>();
+                                    }
+                                    else
+                                    {
+                                        CargaFilter = CargaFilter.Where(c => c.HoraContratada == true).ToList();
+                                    }
+
                                 }
+                                //Esta condicion lo saca de la lista de todos si la carga no tiene por lo menos una fija
+                                else if(DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT" && filtro.TipoDocente==null && CargaFilter.Where(c => c.HoraContratada == false).ToList().Sum(c => c.credito) <1)
+                                {
+                                    CargaFilter = new List<CargaReporteDto>();
+                                }
+
 
                                 foreach (var item in CargaFilter)
                                 {
