@@ -5,6 +5,11 @@ namespace AkademicReport.Models
 {
     public partial class Usuario
     {
+        public Usuario()
+        {
+            LogTransacionals = new HashSet<LogTransacional>();
+        }
+
         public int Id { get; set; }
         public string Nombre { get; set; } = null!;
         public string Correo { get; set; } = null!;
@@ -17,5 +22,6 @@ namespace AkademicReport.Models
         public virtual ProgramasAcademico? IdProgramaNavigation { get; set; }
         public virtual Recinto IdRecintoNavigation { get; set; } = null!;
         public virtual NivelUsuario NivelNavigation { get; set; } = null!;
+        public virtual ICollection<LogTransacional> LogTransacionals { get; set; }
     }
 }

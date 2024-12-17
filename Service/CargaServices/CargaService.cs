@@ -1,4 +1,5 @@
 ﻿using AkademicReport.Data;
+using AkademicReport.Dto;
 using AkademicReport.Dto.AsignaturaDto;
 using AkademicReport.Dto.CargaDto;
 using AkademicReport.Dto.ConceptoDto;
@@ -34,17 +35,17 @@ namespace AkademicReport.Service.CargaServices
             _docenteService = docenteService;
            
         }
-        public async Task<ServicesResponseMessage<string>> Delete(int id)
+        public async Task<ServicesResponseMessage<string>> Delete(int id, int idUsuario)
         {
             try
             {
                 var carga = await _dataContext.CargaDocentes.FirstOrDefaultAsync(c => c.Id == id);
                 if (carga == null)
                     return new ServicesResponseMessage<string>() { Status = 204, Message = Msj.MsjNoRegistros };
-
-
-                _dataContext.CargaDocentes.Remove(carga);
+                carga.Deleted = true;
+                _dataContext.Entry(carga).State =EntityState.Modified;
                 await _dataContext.SaveChangesAsync();
+                await SaveLogTransaction(new LogTransDto() { Accion = "DELETE", Fecha = DateTime.Now, IdCarga = id, IdUsuario = idUsuario, Cedula = carga.Cedula });
                 return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjDelete };
             }
             catch (Exception ex)
@@ -59,7 +60,7 @@ namespace AkademicReport.Service.CargaServices
             {
    
                 var ResulData = new DocenteCargaDto();
-                var carga = await _dataContext.CargaDocentes.Where(c => c.Cedula.Contains(Cedula) && c.Periodo == Periodo && c.IdPrograma==idPrograma)
+                var carga = await _dataContext.CargaDocentes.Where(c => c.Cedula==Cedula && c.Periodo == Periodo && c.IdPrograma==idPrograma && c.Deleted==false)
                     .Include(c => c.DiasNavigation)
                     .Include(c => c.CurricularNavigation)
                     .Include(c=>c.ModalidadNavigation)
@@ -164,12 +165,12 @@ namespace AkademicReport.Service.CargaServices
         }
 
 
-        public async Task<ServiceResponseCarga<ReportCargaPosgradoDto, string>> GetCargaPosgrado(string Cedula, string Periodo, int idPrograma, List<DocenteGetDto> Docentes)
+        public async Task<ServiceResponseCarga<ReportCargaPosgradoDto, string>> GetCargaPosgrado(string Cedula, string Periodo, int idPrograma, List<DocenteGetDto> Docentes, int idRecinto)
         {
             try
             {
                 var ResulData = new ReportCargaPosgradoDto();
-                var carga = await _dataContext.CargaDocentes.Where(c => c.Cedula.Contains(Cedula) && c.Periodo == Periodo && c.IdPrograma == idPrograma)
+                var carga = await _dataContext.CargaDocentes.Where(c => c.Cedula.Contains(Cedula) && c.Periodo == Periodo && c.IdPrograma == idPrograma && c.Recinto==idRecinto && c.Deleted==false)
                     .Include(c => c.DiasNavigation)
                     .Include(c => c.CurricularNavigation)
                     .Include(c => c.ModalidadNavigation)
@@ -237,14 +238,14 @@ namespace AkademicReport.Service.CargaServices
             return Result;
 
         }
-        public async Task<ServiceResponseCarga<ReportCargaPosgradoDto, string>> GetCargaCallPosgrado(string cedula, string periodo, int idPrograma, List<DocenteGetDto> DocentesAmilca)
+        public async Task<ServiceResponseCarga<ReportCargaPosgradoDto, string>> GetCargaCallPosgrado(string cedula, string periodo, int idPrograma, List<DocenteGetDto> DocentesAmilca, int idRecinto)
         {
             FiltroDocentesDto filtro = new FiltroDocentesDto();
             filtro.Filtro = cedula;
             var Docente = DocentesAmilca.Where(c=>c.identificacion==cedula).ToList();
             if(Docente!.Count>0 && await ValidateNivelPosgrado(Docente[0].nivel)==false)
                 return new ServiceResponseCarga<ReportCargaPosgradoDto, string>() { Status = 204, Data =(null,$"Para un docente poder impartir carga en posgrado su nivel tiene que ser Maestría o Doctorado. Nivel del docente : {Docente[0].nivel}") };
-            var Result = await GetCargaPosgrado(cedula, periodo, idPrograma, Docente);
+            var Result = await GetCargaPosgrado(cedula, periodo, idPrograma, Docente, idRecinto);
             return Result;
         }
 
@@ -275,6 +276,7 @@ namespace AkademicReport.Service.CargaServices
             }
         }
 
+
         public async Task<ServiceResponseData<List<TipoDeCargaDto>>> GetTipoCarga(int IdPrograma)
         {
             var TipoCargas = await _dataContext.TipoCargas.ProjectTo<TipoDeCargaDto>(_mapper.ConfigurationProvider).Where(c=>c.IdPrograma==IdPrograma).ToListAsync();     
@@ -296,6 +298,7 @@ namespace AkademicReport.Service.CargaServices
 
                 //if (cargaDocente.Data.Value.Item1.Docente.tiempoDedicacion == "MT" && cargaDocente.Data.Value.Item1.CantCredito + item.credito > 32) return new ServicesResponseMessage<string>() { Status = 400, Message = Msj.MsjPasoDeCreditoMedioTimepo};
                 CargaDocente carga = new CargaDocente();
+                carga.HoraContratada = true;
                 carga.Curricular = item.idTipoCarga;
                 carga.Periodo = item.periodo;
                 carga.Recinto = item.recinto;
@@ -317,10 +320,12 @@ namespace AkademicReport.Service.CargaServices
                 carga.DiaMes = null;
                 carga.DiaMes = null;
                 carga.IdPrograma = 1;
+                carga.Deleted = false;
                 var periodo = await _dataContext.PeriodoAcademicos.Where(c => c.Periodo == item.periodo).FirstAsync();
                 carga.IdPeriodo = periodo.Id;
-                _dataContext.CargaDocentes.Add(carga);
+                EntityEntry<CargaDocente> cargaSave = _dataContext.CargaDocentes.Add(carga);
                 await _dataContext.SaveChangesAsync();
+                await SaveLogTransaction(new LogTransDto() { Accion = "CREATE", Fecha = DateTime.Now, IdCarga = cargaSave.Entity.Id, IdUsuario = item.idUsuario, Cedula = carga.Cedula });
                 return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjInsert };
             }
             catch (Exception ex)
@@ -353,8 +358,10 @@ namespace AkademicReport.Service.CargaServices
                 carga.IdConceptoPosgrado = item.IdConceptoPosgrado;
                 var periodo = await _dataContext.PeriodoAcademicos.Where(c => c.Periodo == item.Periodo).FirstAsync();
                 carga.IdPeriodo = periodo.Id;
-                _dataContext.CargaDocentes.Add(carga);
+                EntityEntry<CargaDocente> cargaSave  = _dataContext.CargaDocentes.Add(carga);
                 await _dataContext.SaveChangesAsync();
+                await SaveLogTransaction(new LogTransDto() { Accion = "CREATE", Fecha = DateTime.Now, IdCarga = cargaSave.Entity.Id, IdUsuario = item.idUsuario });
+
                 return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjInsert };
             }
             catch (Exception ex)
@@ -376,10 +383,13 @@ namespace AkademicReport.Service.CargaServices
                     carga.Curricular = null;
                     carga.NumeroHora = 0;
                     carga.Curricular = 5;
+                    carga.Deleted = false;
                     var periodo = await _dataContext.PeriodoAcademicos.Where(c => c.Periodo == item.Periodo).FirstAsync();
                     carga.IdPeriodo = periodo.Id;
                     _dataContext.Entry(carga).State = EntityState.Modified;
                     await _dataContext.SaveChangesAsync();
+                    await SaveLogTransaction(new LogTransDto() { Accion = "UPDATE", Fecha = DateTime.Now, IdCarga = item.Id, IdUsuario = item.idUsuario });
+
                 }
                 return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjUpdate };
             }
@@ -398,14 +408,15 @@ namespace AkademicReport.Service.CargaServices
                 {
                     carga = _mapper.Map<CargaDocente>(item);
                     carga.Curricular = item.idTipoCarga;
+                    carga.HoraContratada = true;
                     carga.IdPrograma = 1;
+                    carga.Deleted = false;
                     var periodo = await _dataContext.PeriodoAcademicos.Where(c => c.Periodo == item.Periodo).FirstAsync();
                     carga.IdPeriodo = periodo.Id;
                     _dataContext.Entry(carga).State = EntityState.Modified;
-
                     await _dataContext.SaveChangesAsync();
+                    await SaveLogTransaction(new LogTransDto() { Accion = "UPDATE", Fecha = DateTime.Now, IdCarga = item.Id, IdUsuario = item.idUsuario });
                 }
-               
                 return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjUpdate };
             }
             catch (Exception ex)
@@ -414,7 +425,6 @@ namespace AkademicReport.Service.CargaServices
             }
         }
 
-        //Validacion para saber si el docenpte es apto para impartir docencia en posgrado, las condiciones son Su nivel tiene que er doctorado o maestria
 
         public  async Task<bool> ValidateNivelPosgrado(string nivel)
         {
@@ -443,6 +453,23 @@ namespace AkademicReport.Service.CargaServices
             {
                 return new ServicesResponseMessage<string>() { Status = 500, Message = Msj.MsjError + ex.ToString() };
             }
+
+
+        }
+        public async Task<bool> SaveLogTransaction(LogTransDto log)
+        {
+            try
+            {
+                    _dataContext.LogTransacionals.Add(_mapper.Map<LogTransacional>(log));
+                    await _dataContext.SaveChangesAsync();
+                    return true;
+            }
+            catch (Exception ex)
+            {
+
+                return false;
+            }
+
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using AkademicReport.Dto.AsignaturaDto;
+﻿using AkademicReport.Dto;
+using AkademicReport.Dto.AsignaturaDto;
 using AkademicReport.Dto.AulaDto;
 using AkademicReport.Dto.CargaDto;
 using AkademicReport.Dto.ConceptoDto;
@@ -12,6 +13,7 @@ using AkademicReport.Dto.ProgramaDto;
 using AkademicReport.Dto.RecintoDto;
 using AkademicReport.Dto.UsuarioDto;
 using AkademicReport.Models;
+using AkademicReport.Utilities;
 using AutoMapper;
 
 namespace AkademicReport.Data
@@ -116,6 +118,8 @@ namespace AkademicReport.Data
                .ForMember(c => c.NumeroHora, o => o.MapFrom(c => c.numero_hora))
                     .ForMember(c => c.Modalidad, o => o.MapFrom(c => c.idModalidad))
                .ForMember(c => c.NombreProfesor, o => o.MapFrom(c => c.nombre_profesor));
+
+            CreateMap<LogTransDto, LogTransacional>();
 
             CreateMap<CargaDocente, CargaGetDto>().ForMember(c => c.cod_asignatura, o => o.MapFrom(c => c.CodAsignatura))
              .ForMember(c => c.nombre_asignatura, o => o.MapFrom(c => c.NombreAsignatura))

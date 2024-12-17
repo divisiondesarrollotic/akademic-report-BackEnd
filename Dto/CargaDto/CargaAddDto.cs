@@ -28,6 +28,7 @@ namespace AkademicReport.Dto.CargaDto
         public int? idTipoCarga { get; set; }
 
         public bool? HoraContratada { get; set; } = true;
+        public int? idUsuario { get; set; }
 
     }
 }

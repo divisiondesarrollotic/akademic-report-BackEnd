@@ -53,7 +53,7 @@ namespace AkademicReport.Controllers
         public async Task<ActionResult> GetCargaPosgrado(DtoCarga filtro)
         {
             var docenteConsulta = await _docenteService.GetAllFilter(new FiltroDocentesDto() { Filtro = filtro.Cedula, idPrograma = 2, elementosPorPagina = 100, paginaActual = 1 });
-            var result = await _service.GetCargaCallPosgrado(filtro.Cedula, filtro.Periodo, filtro.idPrograma, docenteConsulta.Data);
+            var result = await _service.GetCargaCallPosgrado(filtro.Cedula, filtro.Periodo, filtro.idPrograma, docenteConsulta.Data, int.Parse(docenteConsulta.Data[0].id_recinto));
             if (result.Data.Value.Item1 == null)
             {
                 return Ok(new ServicesResponseMessage<string>() { Status = 204, Message = result.Data.Value.Item2});
@@ -131,10 +131,10 @@ namespace AkademicReport.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Route("delete/{id}")]
-        public async Task<ActionResult> Delete(int id)
+        [Route("delete/{id}/{idUsuario}")]
+        public async Task<ActionResult> Delete(int id, int idUsuario)
         {
-            return Ok(await _service.Delete(id));
+            return Ok(await _service.Delete(id, idUsuario));
         }
 
         /// <summary>

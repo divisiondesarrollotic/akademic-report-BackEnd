@@ -10,12 +10,12 @@ namespace AkademicReport.Service.CargaServices
     {
         Task<ServiceResponseCarga<DocenteCargaDto, string>> GetCarga(string cedula, string periodo, int idPrograma, List<DocenteGetDto> DocentesAmilca);
         Task<ServiceResponseCarga<DocenteCargaDto, string>> GetCargaCall(string cedula, string periodo, int idPrograma);
-        Task<ServiceResponseCarga<ReportCargaPosgradoDto, string>> GetCargaCallPosgrado(string cedula, string periodo, int idPrograma, List<DocenteGetDto>? DocentesAmilca);
+        Task<ServiceResponseCarga<ReportCargaPosgradoDto, string>> GetCargaCallPosgrado(string cedula, string periodo, int idPrograma, List<DocenteGetDto>? DocentesAmilca, int idRecinto);
         Task<ServicesResponseMessage<string>> Insert(CargaAddDto item);
         Task<ServicesResponseMessage<string>> InsertCargaPosgrado(CargaPosgradroDto item);
         Task<ServicesResponseMessage<string>> UpdateCargaPosgrado(CargaPosgradroDto item);
         Task<ServicesResponseMessage<string>> Update(CargaUpdateDto item);
-        Task<ServicesResponseMessage<string>> Delete(int id);
+        Task<ServicesResponseMessage<string>> Delete(int id, int idUsuario);
         Task<ServiceResponseData<List<TipoDeCargaDto>>> GetTipoCarga(int IdPrograma);
         Task<ServiceResponseData<List<MesGetDto>>> GetMeses();
         Task<ServiceResponseData<List<Dia>>> GetDias();

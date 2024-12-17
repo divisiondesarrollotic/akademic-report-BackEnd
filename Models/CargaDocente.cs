@@ -5,6 +5,11 @@ namespace AkademicReport.Models
 {
     public partial class CargaDocente
     {
+        public CargaDocente()
+        {
+            LogTransacionals = new HashSet<LogTransacional>();
+        }
+
         public int Id { get; set; }
         public int? Curricular { get; set; }
         public string Periodo { get; set; } = null!;
@@ -32,6 +37,7 @@ namespace AkademicReport.Models
         public int? IdCodigo { get; set; }
         public int? IdPeriodo { get; set; }
         public bool? HoraContratada { get; set; }
+        public bool? Deleted { get; set; }
 
         public virtual TipoCarga? CurricularNavigation { get; set; }
         public virtual Dia DiasNavigation { get; set; } = null!;
@@ -42,5 +48,6 @@ namespace AkademicReport.Models
         public virtual ProgramasAcademico? IdProgramaNavigation { get; set; }
         public virtual TipoModalidad? ModalidadNavigation { get; set; }
         public virtual Recinto RecintoNavigation { get; set; } = null!;
+        public virtual ICollection<LogTransacional> LogTransacionals { get; set; }
     }
 }

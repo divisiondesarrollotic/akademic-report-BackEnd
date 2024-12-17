@@ -28,6 +28,7 @@ namespace AkademicReport.Dto.CargaDto
         public int? IdConceptoPosgrado { get; set; }
         [Required]
         public int? idTipoCarga { get; set; }
+        public int? idUsuario { get; set; }
 
     }
 }
