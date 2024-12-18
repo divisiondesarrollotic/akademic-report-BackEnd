@@ -135,6 +135,8 @@ namespace AkademicReport.Service.DocenteServices
 
         public async Task<ServiceResponseData<List<DocenteGetDto>>> GetAll()
         {
+
+
             try
             {
                 FiltroDocentesDto filtro = new FiltroDocentesDto();
@@ -147,14 +149,14 @@ namespace AkademicReport.Service.DocenteServices
                 {
                     string jsonResponse = await response.Content.ReadAsStringAsync();
                     var docentesApi = JsonConvert.DeserializeObject<List<DocenteAmilcaDto>>(jsonResponse);
-                    var DocentesLimpio =   await CleanData(docentesApi, 1);
-                   return new ServiceResponseData<List<DocenteGetDto>>() { Data = DocentesLimpio.Data, Status = 200 };
+                    var DocentesLimpio = await CleanData(docentesApi, 1);
+                    return new ServiceResponseData<List<DocenteGetDto>>() { Data = DocentesLimpio.Data, Status = 200 };
                 }
                 return new ServiceResponseData<List<DocenteGetDto>>() { Status = 500 };
             }
             catch (Exception ex)
             {
-                return new ServiceResponseData<List<DocenteGetDto>>() { Status = 500, Message = ex.ToString()};
+                return new ServiceResponseData<List<DocenteGetDto>>() { Status = 500, Message = ex.ToString() };
             }
         }
 
