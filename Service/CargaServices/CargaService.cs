@@ -388,7 +388,7 @@ namespace AkademicReport.Service.CargaServices
                     carga.IdPeriodo = periodo.Id;
                     _dataContext.Entry(carga).State = EntityState.Modified;
                     await _dataContext.SaveChangesAsync();
-                    await SaveLogTransaction(new LogTransDto() { Accion = "UPDATE", Fecha = DateTime.Now, IdCarga = item.Id, IdUsuario = item.idUsuario });
+                    await SaveLogTransaction(new LogTransDto() { Accion = "UPDATE", Fecha = DateTime.Now, IdCarga = item.Id, IdUsuario = item.idUsuario, Cedula= item.Cedula });
 
                 }
                 return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjUpdate };
@@ -415,7 +415,7 @@ namespace AkademicReport.Service.CargaServices
                     carga.IdPeriodo = periodo.Id;
                     _dataContext.Entry(carga).State = EntityState.Modified;
                     await _dataContext.SaveChangesAsync();
-                    await SaveLogTransaction(new LogTransDto() { Accion = "UPDATE", Fecha = DateTime.Now, IdCarga = item.Id, IdUsuario = item.idUsuario });
+                    await SaveLogTransaction(new LogTransDto() { Accion = "UPDATE", Fecha = DateTime.Now, IdCarga = item.Id, IdUsuario = item.idUsuario, Cedula = item.Cedula });
                 }
                 return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjUpdate };
             }
