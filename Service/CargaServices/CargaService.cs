@@ -354,7 +354,9 @@ namespace AkademicReport.Service.CargaServices
                 carga.Aula = "N/A";
                 carga.IdPrograma = 2;
                 carga.NumeroHora = 0;
+                carga.Deleted = false;
                 carga.Curricular = item.idTipoCarga;
+                carga.HoraContratada = true;
                 carga.IdConceptoPosgrado = item.IdConceptoPosgrado;
                 var periodo = await _dataContext.PeriodoAcademicos.Where(c => c.Periodo == item.Periodo).FirstAsync();
                 carga.IdPeriodo = periodo.Id;
@@ -383,6 +385,7 @@ namespace AkademicReport.Service.CargaServices
                     carga.Curricular = null;
                     carga.NumeroHora = 0;
                     carga.Curricular = 5;
+                    carga.HoraContratada = true;
                     carga.Deleted = false;
                     var periodo = await _dataContext.PeriodoAcademicos.Where(c => c.Periodo == item.Periodo).FirstAsync();
                     carga.IdPeriodo = periodo.Id;
