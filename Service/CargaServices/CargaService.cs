@@ -170,13 +170,13 @@ namespace AkademicReport.Service.CargaServices
             try
             {
                 var ResulData = new ReportCargaPosgradoDto();
-                var carga = await _dataContext.CargaDocentes.Where(c => c.Cedula.Contains(Cedula) && c.Periodo == Periodo && c.IdPrograma == idPrograma && c.Recinto==idRecinto && c.Deleted==false)
+                var carga = await _dataContext.CargaDocentes.Where(c => c.Cedula.Replace("-","")==Cedula.Replace("-","").ToString() && c.Periodo == Periodo && c.IdPrograma == idPrograma  && c.Deleted==false)
                     .Include(c => c.DiasNavigation)
                     .Include(c => c.CurricularNavigation)
                     .Include(c => c.ModalidadNavigation)
                     .Include(c => c.IdConceptoPosgradoNavigation)
                     .Include(c => c.IdMesNavigation)
-                    .Include(c=>c.IdCodigoNavigation)
+                    .Include(c=>c.IdCodigoNavigation) 
                     .Include(c=>c.IdPeriodoNavigation)
                     .Include(c=>c.RecintoNavigation)
                     .Include(c=>c.IdCodigoNavigation).ThenInclude(c=>c.IdConceptoNavigation).ToListAsync();

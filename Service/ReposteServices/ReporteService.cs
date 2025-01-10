@@ -28,7 +28,7 @@ namespace AkademicReport.Service.ReposteServices
         private readonly IMapper _mapper;
         public List<string> CodigosIngles = new List<string> { "ING-201", "ING-302", "ING-403", "ING-504", "ING-605", "IOP-01", "IOP-02", "IOP-03", "ING-220", "ING-100", "ING-110", "ING-200", "ING-210", "FRP-201", "FRP-301", "FRP-601", "FRP-701", "FRP-801", "PVS-300", "PVS-305" };
         //Docentes que tienen traslado en este periodo
-       public List<string> CedulasDocentePosGradoTraslado = new List<string>() { "001-0904425-5", "001-1231754-0", "001-0637035-4", "402-5368334-2", "001-1511496-9" };
+       public List<string> CedulasDocentePosGradoTraslado = new List<string>() {""};
 
         public ReporteService(ICargaDocenteService cargaService, DataContext dataContext, IDocenteService docenteService, IMapper mapper)
         {
@@ -1352,7 +1352,7 @@ namespace AkademicReport.Service.ReposteServices
                                             {
                                                 Docente = _mapper.Map<DocenteReporteDto>(docente),
                                                 Cargas = cargaPosgradoList,
-                                                CantCreditos = DocenteCarga.Data.Value.Item1.CantCreditos,
+                                                CantCreditos = CantCreditos,
                                                 MontoMensual = Monto,
                                                 MontoSemanal = Monto,
                                                 MontoPorMes = montoPorMes
