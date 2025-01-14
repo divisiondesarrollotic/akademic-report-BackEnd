@@ -949,11 +949,11 @@ namespace AkademicReport.Service.ReposteServices
             int CantCreditosF = 0;
             if (filtro.Curricular == "3")
             {
-                docentesRecinto = docentesRecinto.Where(c => c.tiempoDedicacion == "F" && c.TipoDocente == "Facilitador del DIID").ToList();
+                docentesRecinto = docentesRecinto.Where(c => c.tiempoDedicacion == "F" && c.TipoDocente!.Trim() == "Facilitador del DIID" || c.TipoDocente!.Trim() == "Facilitadores del DIID").ToList();
             }
             else
             {
-                docentesRecinto = docentesRecinto.Where(c => c.TipoDocente != "Facilitador del DIID").ToList();
+                docentesRecinto = docentesRecinto.Where(c => c.TipoDocente!.Trim() != "Facilitador del DIID" && c.TipoDocente.Trim()!="Facilitadores del DIID").ToList();
             }
 
             foreach (var docente in docentesRecinto)
