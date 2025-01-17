@@ -136,7 +136,6 @@ namespace AkademicReport.Service.DocenteServices
         public async Task<ServiceResponseData<List<DocenteGetDto>>> GetAll()
         {
 
-
             try
             {
                 FiltroDocentesDto filtro = new FiltroDocentesDto();

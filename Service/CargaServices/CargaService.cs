@@ -14,7 +14,11 @@ using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.VisualBasic;
+using Microsoft.Identity.Client;
+using Newtonsoft.Json;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
 
 namespace AkademicReport.Service.CargaServices
 {
@@ -254,6 +258,7 @@ namespace AkademicReport.Service.CargaServices
             try
             {
                 var diasDb = await _dataContext.Dias.ToListAsync();
+                var A = await GetCargaUniversitas("2025-01");
 
                 return new ServiceResponseData<List<Dia>>() { Data = diasDb, Status = 200, Message = Msj.MsjSucces };
             }
@@ -474,5 +479,78 @@ namespace AkademicReport.Service.CargaServices
             }
 
         }
+
+        public async Task<ServiceResponseData<List<CargaGetDto>>> GetCargaUniversitas(string periodo)
+        {
+ 
+            try
+            {
+
+                // Datos de autenticación
+                string clientId = "1lHZgaHDvpD8rmctuJnn9w..";
+                string clientSecret = "6YlofIMT6TqmQ6TOL_z_BQ..";
+
+                // Codificar client_id y client_secret en Base64
+                var credentials = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{clientId}:{clientSecret}"));
+
+                // URL del endpoint de la API
+                string tokenUrl = "https://uxxi.isfodosu.edu.do/ac_api_sql/uxxiac_api_sql/oauth/token";
+
+                // Crear HttpClient
+                using (HttpClient client = new HttpClient())
+                {
+                    // Establecer los encabezados de la solicitud
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Add("Authorization", $"Basic {credentials}");
+
+                    // Crear el contenido del cuerpo de la solicitud (application/x-www-form-urlencoded)
+                    var contenta = new FormUrlEncodedContent(new[]
+                    {
+                // Aquí puedes agregar más parámetros si la API los requiere, como `grant_type` o `scope`
+                new KeyValuePair<string, string>("grant_type", "client_credentials")
+            });
+
+                    // Hacer la solicitud POST
+                    HttpResponseMessage responsea = await client.PostAsync(tokenUrl, contenta);
+
+                    // Comprobar si la solicitud fue exitosa
+                    if (responsea.IsSuccessStatusCode)
+                    {
+                        // Leer y mostrar la respuesta
+                        string responseBody = await responsea.Content.ReadAsStringAsync();
+                        Console.WriteLine("Respuesta exitosa: " + responseBody);
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Error: {responsea.StatusCode}");
+                        string errorResponse = await responsea.Content.ReadAsStringAsync();
+                        Console.WriteLine($"Detalles del error: {errorResponse}");
+                    }
+                }
+
+
+                HttpClient clienta = new HttpClient();
+                FiltroDocentesDto filtro = new FiltroDocentesDto();
+                //string b = "Maestría";
+                //b = b.Replace('í', 'i');
+                var content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(filtro), Encoding.UTF8, "application/json");
+                //_httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+                HttpResponseMessage response = await clienta.GetAsync(tokenUrl);
+                if (response.IsSuccessStatusCode)
+                {
+                    string jsonResponse = await response.Content.ReadAsStringAsync();
+                    var docentesApi = JsonConvert.DeserializeObject<List<DocenteAmilcaDto>>(jsonResponse);
+                    //var DocentesLimpio = await CleanData(docentesApi, 1);
+                    //return new ServiceResponseData<List<DocenteGetDto>>() { Data = DocentesLimpio.Data, Status = 200 };
+                }
+                return new ServiceResponseData<List<CargaGetDto>>() { Status = 500 };
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponseData<List<CargaGetDto>>() { Status = 500, Message = ex.ToString() };
+            }
+        }
+
+        
     }
 }
