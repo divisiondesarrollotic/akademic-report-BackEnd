@@ -19,7 +19,7 @@ namespace AkademicReport.Service.CargaServices
         Task<ServiceResponseData<List<TipoDeCargaDto>>> GetTipoCarga(int IdPrograma);
         Task<ServiceResponseData<List<MesGetDto>>> GetMeses();
         Task<ServiceResponseData<List<Dia>>> GetDias();
-        Task<ServicesResponseMessage<string>> UpdateHorasContratadas(int idCarga);
+        Task<ServicesResponseMessage<string>> UpdateHorasContratadas(int idCarga, string cedula);
         Task<bool> ValidateNivelPosgrado(string nivel);
 
         //Task<ServiceResponseData<List<CargaGetDto>>> GetCargaUniversitas(string periodo);

@@ -157,6 +157,35 @@ namespace AkademicReport.Data
             CreateMap<Firma, FirmaGetDto>().ForMember(c=>c.RecintoObj, o=>o.MapFrom(c=>c.IdRecintoNavigation));
             CreateMap<FirmaDto, Firma>();
 
+            CreateMap<ResponseApiUniversitas.Items, CargaGetDto>()
+                .ForMember(c => c.Periodo, o => o.MapFrom(c => c.any_anyaca))
+                .ForMember(c => c.RecintoNombre, o => o.MapFrom(c => c.recinto))
+                .ForMember(c => c.cod_asignatura, o => o.MapFrom(c => c.nomid1.Substring(0, 6).ToString()))
+                .ForMember(c => c.nombre_asignatura, o => o.MapFrom(c => c.nomid1.Substring(7)))
+                .ForMember(c => c.cod_universitas, o => o.MapFrom(c => c.vac_codnum))
+                .ForMember(c => c.CodUniversitas, o => o.MapFrom(c => c.vac_codnum))
+                .ForMember(c => c.Seccion, o => o.MapFrom(c => c.id_grp_activ[1]))
+                .ForMember(c => c.Recinto, o => o.MapFrom(c => c.id_grp_activ[0]))
+                .ForMember(c => c.Aula, o => o.MapFrom(c => c.aul_desc))
+                .ForMember(c => c.hora_inicio, o => o.MapFrom(c => c.horini))
+                .ForMember(c => c.minuto_inicio, o => o.MapFrom(c => c.minini))
+                .ForMember(c => c.hora_fin, o => o.MapFrom(c => c.horfin))
+                .ForMember(c => c.minuto_fin, o => o.MapFrom(c => c.minfin))
+                .ForMember(c => c.Cedula, o => o.MapFrom(c => c.identificador))
+                .ForMember(c => c.nombre_profesor, o => o.MapFrom(c => c.descripcion))
+                .ForMember(c => c.IdPrograma, o => o.MapFrom(c => 1))
+                .ForMember(c => c.HoraContratada, o => o.MapFrom(c => false))
+                .ForMember(c=>c.credito, o=> o.MapFrom(c=>c.numcre));
+
+
+
+
+
+
+
+
+
+
 
         }
     }
