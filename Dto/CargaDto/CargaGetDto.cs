@@ -16,13 +16,13 @@ namespace AkademicReport.Dto.CargaDto
         public int? id_asignatura { get; set; } = null!;
         public string cod_asignatura { get; set; } = null!;
         public int? IdCodigo { get; set; }
-        public AsignaturaGetDto? Codigo { get; set; }
         public string nombre_asignatura { get; set; } = null!;
         public string cod_universitas { get; set; } = null!;
         public string CodUniversitas { get; set; } = null!;
         public int Seccion { get; set; }
         public string Aula { get; set; } = null!;
         public string? Edificio { get; set; }
+        public int? Modalidad { get; set; }
         public TipoModalidadDto TipoModalidad { get; set; } = null!;
         public int dia_id { get; set; }
         public string dia_nombre { get; set; }=null!;
@@ -37,7 +37,8 @@ namespace AkademicReport.Dto.CargaDto
         public int?  id_concepto { get; set; }
         public ConceptoGetDto? Concepto { get; set; }
         [Required]
-        public TipoCargaDto TiposCarga { get; set; }
+        public int? Curricular { get; set; }
+        public TipoCargaDto TiposCarga { get; set; } = new TipoCargaDto();
         public int? DiaMes { get; set; }
         public int? IdMes { get; set; }
         public int? IdPrograma { get; set; }

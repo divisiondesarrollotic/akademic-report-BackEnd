@@ -55,14 +55,11 @@ namespace AkademicReport.Service.ReposteServices
                 var CargaMapeada = new List<CargaReporteDto>();
                 var CargaLista = new List<CargaGetDto>();
                 var Docente = new DocenteReporteDto();
-                if(filtro.Cedula== "001-1731056-5")
-                {
-
-                }
+ 
                 var cargas = await _cargaService.GetCarga(filtro.Cedula!, filtro.Periodo!, filtro.idPrograma, DocentesAmilca);
                 if (cargas.Data.Value.Item1.Carga.Count > 0)
                 {
-                    Response.Anio = cargas.Data.Value.Item1.Carga[0].PeriodoObj.Anio.Value;
+                    Response.Anio = cargas.Data.Value.Item1.Anio!.Value;
 
                 }
 
@@ -299,6 +296,7 @@ namespace AkademicReport.Service.ReposteServices
                             c.recinto = recinto.NombreCorto;
                             c.precio_hora = nivelAcademico.PagoHora;
                             c.pago_asignatura = c.precio_hora * c.credito;
+                            c.pago_asignaturaMensual = c.pago_asignatura * 4;
                             var periodo = await _dataContext.PeriodoAcademicos.Where(c => c.Periodo == item.Periodo).FirstAsync();
                             c.IdPeriodo = periodo.Id;
                             c.HoraContratada = item.HoraContratada;

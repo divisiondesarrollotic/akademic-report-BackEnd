@@ -118,7 +118,19 @@ namespace AkademicReport.Controllers
             return Ok(await _service.GetDias());
         }
 
-
+        /// <summary>
+        /// --Este  metodo sincroniza la carga de univeritas con la de akademic si existe la actualiza y si no la agrega
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("sincronizar_carga/{periodo}")]
+        public async Task<ActionResult<List<MesGetDto>>> SincroniZarCarga([Required] string periodo)
+        {
+            var result = await _service.SincronizarCarga(periodo);
+            if(result.Status==200)
+                return Ok(result);
+            return BadRequest(result);
+        }
 
         [HttpPost]
         [Route("update")]

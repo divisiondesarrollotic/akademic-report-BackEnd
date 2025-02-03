@@ -17,12 +17,14 @@ namespace AkademicReport.Service.CargaServices
         Task<ServicesResponseMessage<string>> Update(CargaUpdateDto item);
         Task<ServicesResponseMessage<string>> Delete(int id, int idUsuario);
         Task<ServiceResponseData<List<TipoDeCargaDto>>> GetTipoCarga(int IdPrograma);
-        Task<ServiceResponseData<List<MesGetDto>>> GetMeses();
+        Task<ServiceResponseData<List<MesGetDto>>> GetMeses();  
         Task<ServiceResponseData<List<Dia>>> GetDias();
-        Task<ServicesResponseMessage<string>> UpdateHorasContratadas(int idCarga, string cedula);
+        Task<ServicesResponseMessage<string>> UpdateHorasContratadas(int idCarga);
         Task<bool> ValidateNivelPosgrado(string nivel);
 
-        //Task<ServiceResponseData<List<CargaGetDto>>> GetCargaUniversitas(string periodo);
+        Task<ServiceResponseData<List<CargaGetDto>>> GetCargaUniversitas(string periodo);
+        Task<ServiceResponseData<List<CargaGetDto>>> SincronizarCarga(string periodo);
+
 
 
 

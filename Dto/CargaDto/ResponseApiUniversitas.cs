@@ -59,21 +59,21 @@
             public int count { get; set; }
 
         }
-        //public class Items
-        //{
-        //    public int statementId { get; set; }
-        //    public string statementType { get; set; }
-        //    public StatementPos statementPos { get; set; }
-        //    public string statementText { get; set; }
-        //    public ResultSet resultSet { get; set; }
-        //    public IList<undefined> response { get; set; }
-        //    public int result { get; set; }
+        public class ItemsOupSise
+        {
+            public int statementId { get; set; }
+            public string statementType { get; set; }
+            public StatementPos statementPos { get; set; }
+            public string statementText { get; set; }
+            public ResultSet resultSet { get; set; }
+            public IList<Items> response { get; set; }
+            public int result { get; set; }
 
-        //}
+        }
         public class Application
         {
             public Env env { get; set; }
-            public IList<Items> items { get; set; }
+            public IList<ItemsOupSise> items { get; set; }
 
         }
     }

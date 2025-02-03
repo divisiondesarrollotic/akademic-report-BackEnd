@@ -62,7 +62,6 @@ namespace AkademicReport.Service.CargaServices
         {
             try
             {
-
                 var ResulData = new DocenteCargaDto();
                 var carga = await _dataContext.CargaDocentes.Where(c => c.Cedula == Cedula && c.Periodo == Periodo && c.IdPrograma == idPrograma && c.Deleted == false)
                     .Include(c => c.DiasNavigation)
@@ -88,21 +87,23 @@ namespace AkademicReport.Service.CargaServices
                     return new ServiceResponseCarga<DocenteCargaDto, string>() { Status = 200, Data = (ResulData, "No hay carga") };
                 }
 
+                var CargaMap = new List<CargaGetDto>();
+                CargaMap = _mapper.Map<List<CargaGetDto>>(carga);
+                //Ahora a esa carga le agregamos la carga de univeritas
+                //var CargaUniversita = await GetCargaUniversitas(Periodo, Cedula);
+                //CargaMap.AddRange(CargaUniversita.Data);
 
-                var CargaMap = _mapper.Map<List<CargaGetDto>>(carga);
                 var CargaLista = new List<CargaGetDto>();
                 foreach (var i in CargaMap)
                 {
                     if (i.IdCodigo != null)
                         i.nombre_asignatura = carga.First(c => c.Id == i.Id).IdCodigoNavigation.Nombre;
 
-                    var tiposModalidad = carga.Where(c => c.Id == i.Id).ToList();
-                    foreach (var o in tiposModalidad)
-                    {
-                        var TipoModalida = new TipoModalidadDto();
-                        TipoModalida = _mapper.Map<TipoModalidadDto>(o.ModalidadNavigation);
-                        i.TipoModalidad = TipoModalida;
-                    }
+                    var tiposModalidad = await _dataContext.TipoModalidads.FirstAsync(c => c.Id == i.TipoModalidad.Id);
+                    var TipoModalida = new TipoModalidadDto();
+                    TipoModalida = _mapper.Map<TipoModalidadDto>(tiposModalidad);
+                    i.TipoModalidad = TipoModalida;
+                    
                     var recinto = await _dataContext.Recintos.FirstOrDefaultAsync(c => c.Id == int.Parse(i.Recinto));
                     if (recinto != null)
                     {
@@ -124,10 +125,9 @@ namespace AkademicReport.Service.CargaServices
                     }
 
                     i.TiposCarga = new TipoCargaDto();
-                    i.TiposCarga.Id = carga.FirstOrDefault(c => c.Id == i.Id).CurricularNavigation.Id;
-                    i.TiposCarga.Nombre = carga.FirstOrDefault(c => c.Id == i.Id).CurricularNavigation.Nombre;
+                    i.TiposCarga = _mapper.Map<TipoCargaDto>(await _dataContext.TipoCargas.FirstAsync(c => c.Id == i.Curricular));
+                   
                     var codigo = await _dataContext.Codigos.Where(c => c.Codigo1.Contains(i.cod_asignatura)).FirstOrDefaultAsync();
-
                     if (codigo != null)
                     {
                         i.id_asignatura = codigo.Id;
@@ -157,7 +157,7 @@ namespace AkademicReport.Service.CargaServices
                 ResulData.Docente = DocenteFilter;
                 ResulData.CantCredito = Creditos;
                 if (ResulData.Carga.Count > 0)
-                    ResulData.Anio = ResulData.Carga[0].PeriodoObj!.Anio!.Value;
+                    ResulData.Anio = CargaLista[0].PeriodoObj!.Anio!.Value;
                 return new ServiceResponseCarga<DocenteCargaDto, string> { Data = (ResulData, ""), Status = 200 };
             }
             catch (Exception ex)
@@ -258,8 +258,6 @@ namespace AkademicReport.Service.CargaServices
             try
             {
                 var diasDb = await _dataContext.Dias.ToListAsync();
-                var A = await GetCargaUniversitas("2025-01");
-
                 return new ServiceResponseData<List<Dia>>() { Data = diasDb, Status = 200, Message = Msj.MsjSucces };
             }
             catch (Exception ex)
@@ -480,7 +478,7 @@ namespace AkademicReport.Service.CargaServices
 
         }
 
-        public async Task<ServiceResponseData<List<CargaGetDto>>> GetCargaUniversitas(string periodo, string cedula)
+        public async Task<ServiceResponseData<List<CargaGetDto>>> GetCargaUniversitas(string periodo)
         {
             try
             {
@@ -529,7 +527,7 @@ namespace AkademicReport.Service.CargaServices
                     Console.WriteLine($"Error: {firstReponse.StatusCode}");
                     string errorResponse = await firstReponse.Content.ReadAsStringAsync();
                     Console.WriteLine($"Detalles del error: {errorResponse}");
-                    return new ServiceResponseData<List<CargaGetDto>>() { Status =401, Message = errorResponse };
+                    return new ServiceResponseData<List<CargaGetDto>>() { Status =401, Message = errorResponse, Data=new List<CargaGetDto>() };
 
                 }
 
@@ -816,8 +814,7 @@ and t1.id_assignatura = ta.id_assignatura
 and tal.codnum(+) = t2.aul_codnum
 and tal.edi_codnum = edi.codnum(+)
 and edi.cpu_codalf = tc.codnum(+)
-and t2.identificador = '${cedula}'
-and  t1.any_anyaca= '${periodo}';";
+and  t1.any_anyaca= '{periodo}';";
                 List<CargaGetDto> cargaLista = new List<CargaGetDto>();
                 var content = new StringContent(query, Encoding.UTF8, "application/sql");
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", reponseToken.access_token);
@@ -828,12 +825,16 @@ and  t1.any_anyaca= '${periodo}';";
                     ResponseApiUniversitas.Application cargaOfDocente = JsonConvert.DeserializeObject<ResponseApiUniversitas.Application>(jsonResponse);
                     foreach (var carga in cargaOfDocente.items)
                     {
-                        cargaLista.Add(_mapper.Map<CargaGetDto>(carga));
+                        foreach (var item in carga.resultSet.items)
+                        {
+                            cargaLista.Add(_mapper.Map<CargaGetDto>(item));
+
+                        }
                     }
                     //var DocentesLimpio = await CleanData(docentesApi, 1);
-                    //return new ServiceResponseData<List<DocenteGetDto>>() { Data = DocentesLimpio.Data, Status = 200 };
+                    return new ServiceResponseData<List<CargaGetDto>>() { Data = cargaLista, Status = 200 };
                 }
-                return new ServiceResponseData<List<CargaGetDto>>() { Status = 500 };
+                return new ServiceResponseData<List<CargaGetDto>>() { Status = 500, Data =  new List<CargaGetDto>() };
             }
             catch (Exception ex)
             {
@@ -841,6 +842,40 @@ and  t1.any_anyaca= '${periodo}';";
             }
         }
 
+        public async Task<ServiceResponseData<List<CargaGetDto>>> SincronizarCarga(string periodo)
+        {
+            try
+            {
+                var cargUniversitas =  await GetCargaUniversitas(periodo);
+                var periodoDb = await _dataContext.PeriodoAcademicos.Where(c => c.Periodo == periodo).FirstOrDefaultAsync();
+                // Buscamos la carga de este periodo y la eliminamos para insertar la nueva
+                var cargaUniversitasEnAkademick = await _dataContext.CargaDocentes.Where(c => c.Periodo == periodo && c.CodUniversitas != "N/A").ToListAsync();
+                if (cargaUniversitasEnAkademick != null)
+                    _dataContext.CargaDocentes.RemoveRange(cargaUniversitasEnAkademick);
+                if(cargUniversitas.Status!=200)
+                    return new ServiceResponseData<List<CargaGetDto>>() { Status = cargUniversitas.Status, Message = cargUniversitas.Message };
+                if (cargUniversitas.Data!=null)
+                {
+                    foreach (var item in cargUniversitas.Data)
+                    {
+                            // Este codigo agrega la carga nueva
+                            var cargaMap = _mapper.Map<CargaDocente>(item);
+                            cargaMap.Periodo = periodoDb.Periodo;
+                            cargaMap.IdPeriodo = periodoDb.Id;
+                            cargaMap.Aula=cargaMap.Aula==null? "" : cargaMap.Aula.ToString();
+                            _dataContext.CargaDocentes.Add(cargaMap);
+                    }
+                    await _dataContext.SaveChangesAsync();
+                }
+                return new ServiceResponseData<List<CargaGetDto>>() { Data = cargUniversitas.Data, Status = 200 };
 
+            }
+            catch (Exception ex)
+            {
+
+                return new ServiceResponseData<List<CargaGetDto>>() { Status = 500, Message = ex.ToString() };
+                
+            }
+        }
     }
 }
