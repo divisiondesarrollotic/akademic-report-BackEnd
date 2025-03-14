@@ -35,6 +35,7 @@ namespace AkademicReport.Data
         public virtual DbSet<Mese> Meses { get; set; } = null!;
         public virtual DbSet<NivelAcademico> NivelAcademicos { get; set; } = null!;
         public virtual DbSet<NivelUsuario> NivelUsuarios { get; set; } = null!;
+        public virtual DbSet<NotasCargaIrregular> NotasCargaIrregulars { get; set; } = null!;
         public virtual DbSet<PagoFijo> PagoFijos { get; set; } = null!;
         public virtual DbSet<Paisesnacionalidade> Paisesnacionalidades { get; set; } = null!;
         public virtual DbSet<PeriodoAcademico> PeriodoAcademicos { get; set; } = null!;
@@ -46,6 +47,8 @@ namespace AkademicReport.Data
         public virtual DbSet<TipoCargaCodigo> TipoCargaCodigos { get; set; } = null!;
         public virtual DbSet<TipoModalidad> TipoModalidads { get; set; } = null!;
         public virtual DbSet<TipoModalidadCodigo> TipoModalidadCodigos { get; set; } = null!;
+        public virtual DbSet<TipoReporte> TipoReportes { get; set; } = null!;
+        public virtual DbSet<TipoReporteIrregular> TipoReporteIrregulars { get; set; } = null!;
         public virtual DbSet<Usuario> Usuarios { get; set; } = null!;
         public virtual DbSet<Vinculo> Vinculos { get; set; } = null!;
 
@@ -53,7 +56,6 @@ namespace AkademicReport.Data
         {
             if (!optionsBuilder.IsConfigured)
             {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
                 optionsBuilder.UseSqlServer("Name=ConnectionStrings:Sql");
             }
         }
@@ -166,6 +168,8 @@ namespace AkademicReport.Data
                     .IsUnicode(false)
                     .HasColumnName("aula");
 
+                entity.Property(e => e.CantSemanas).HasColumnName("cantSemanas");
+
                 entity.Property(e => e.Cedula)
                     .HasMaxLength(20)
                     .IsUnicode(false)
@@ -214,6 +218,10 @@ namespace AkademicReport.Data
                 entity.Property(e => e.IdPeriodo).HasColumnName("idPeriodo");
 
                 entity.Property(e => e.IdPrograma).HasColumnName("idPrograma");
+
+                entity.Property(e => e.IdTipoReporte).HasColumnName("idTipoReporte");
+
+                entity.Property(e => e.IdTipoReporteIrregular).HasColumnName("idTipoReporteIrregular");
 
                 entity.Property(e => e.MinutoFin)
                     .HasMaxLength(50)
@@ -287,6 +295,16 @@ namespace AkademicReport.Data
                     .HasForeignKey(d => d.IdPrograma)
                     .HasConstraintName("FK__carga_doc__idPro__0E6E26BF");
 
+                entity.HasOne(d => d.IdTipoReporteNavigation)
+                    .WithMany(p => p.CargaDocentes)
+                    .HasForeignKey(d => d.IdTipoReporte)
+                    .HasConstraintName("FK__carga_doc__idTip__607251E5");
+
+                entity.HasOne(d => d.IdTipoReporteIrregularNavigation)
+                    .WithMany(p => p.CargaDocentes)
+                    .HasForeignKey(d => d.IdTipoReporteIrregular)
+                    .HasConstraintName("FK__carga_doc__idTip__6166761E");
+
                 entity.HasOne(d => d.ModalidadNavigation)
                     .WithMany(p => p.CargaDocentes)
                     .HasForeignKey(d => d.Modalidad)
@@ -331,6 +349,10 @@ namespace AkademicReport.Data
 
                 entity.Property(e => e.IdPrograma).HasColumnName("idPrograma");
 
+                entity.Property(e => e.IsGiaCarga)
+                    .HasColumnName("isGiaCarga")
+                    .HasDefaultValueSql("((1))");
+
                 entity.Property(e => e.Modalida)
                     .HasMaxLength(500)
                     .IsUnicode(false)
@@ -374,7 +396,7 @@ namespace AkademicReport.Data
             modelBuilder.Entity<ConceptoPosgrado>(entity =>
             {
                 entity.HasKey(e => e.IdConceptoPosgrado)
-                    .HasName("PK__Concepto__49BA2621DEC1450C");
+                    .HasName("PK__Concepto__49BA2621B4E7C1F4");
 
                 entity.ToTable("ConceptoPosgrado");
 
@@ -430,7 +452,7 @@ namespace AkademicReport.Data
             modelBuilder.Entity<Diplomado>(entity =>
             {
                 entity.HasKey(e => e.CodUnicersita)
-                    .HasName("PK__diplomad__09A0DB54225FD08E");
+                    .HasName("PK__diplomad__09A0DB54A4F28ACD");
 
                 entity.ToTable("diplomado");
 
@@ -504,7 +526,7 @@ namespace AkademicReport.Data
             modelBuilder.Entity<Firma>(entity =>
             {
                 entity.HasKey(e => e.IdFirma)
-                    .HasName("PK__firmas__A9CB15C2B9B7DBE9");
+                    .HasName("PK__firmas__A9CB15C2821D7317");
 
                 entity.ToTable("firmas");
 
@@ -573,7 +595,7 @@ namespace AkademicReport.Data
             modelBuilder.Entity<Mese>(entity =>
             {
                 entity.HasKey(e => e.IdMes)
-                    .HasName("PK__Meses__0D1357C09B4891C7");
+                    .HasName("PK__Meses__0D1357C0383748C8");
 
                 entity.Property(e => e.IdMes).ValueGeneratedNever();
 
@@ -618,6 +640,37 @@ namespace AkademicReport.Data
                     .HasMaxLength(20)
                     .IsUnicode(false)
                     .HasColumnName("nivel");
+            });
+
+            modelBuilder.Entity<NotasCargaIrregular>(entity =>
+            {
+                entity.ToTable("notasCargaIrregular");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+
+                entity.Property(e => e.Cedula)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("cedula");
+
+                entity.Property(e => e.IdCarga).HasColumnName("idCarga");
+
+                entity.Property(e => e.IdPeriodo).HasColumnName("idPeriodo");
+
+                entity.Property(e => e.Nota)
+                    .HasMaxLength(500)
+                    .IsUnicode(false)
+                    .HasColumnName("nota");
+
+                entity.HasOne(d => d.IdCargaNavigation)
+                    .WithMany(p => p.NotasCargaIrregulars)
+                    .HasForeignKey(d => d.IdCarga)
+                    .HasConstraintName("FK__notasCarg__idCar__73852659");
+
+                entity.HasOne(d => d.IdPeriodoNavigation)
+                    .WithMany(p => p.NotasCargaIrregulars)
+                    .HasForeignKey(d => d.IdPeriodo)
+                    .HasConstraintName("FK__notasCarg__idPer__531856C7");
             });
 
             modelBuilder.Entity<PagoFijo>(entity =>
@@ -702,7 +755,7 @@ namespace AkademicReport.Data
             modelBuilder.Entity<ProgramasAcademico>(entity =>
             {
                 entity.HasKey(e => e.IdPrograma)
-                    .HasName("PK__Programa__467DDFD6B0588AA2");
+                    .HasName("PK__Programa__467DDFD649A6BF2B");
 
                 entity.Property(e => e.IdPrograma).HasColumnName("idPrograma");
 
@@ -800,6 +853,30 @@ namespace AkademicReport.Data
                     .WithMany(p => p.TipoModalidadCodigos)
                     .HasForeignKey(d => d.Idcodigo)
                     .HasConstraintName("FK_codigoTipoModalidad");
+            });
+
+            modelBuilder.Entity<TipoReporte>(entity =>
+            {
+                entity.ToTable("tipoReporte");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+
+                entity.Property(e => e.Nombre)
+                    .HasMaxLength(250)
+                    .IsUnicode(false)
+                    .HasColumnName("nombre");
+            });
+
+            modelBuilder.Entity<TipoReporteIrregular>(entity =>
+            {
+                entity.ToTable("tipoReporteIrregular");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+
+                entity.Property(e => e.Nombre)
+                    .HasMaxLength(200)
+                    .IsUnicode(false)
+                    .HasColumnName("nombre");
             });
 
             modelBuilder.Entity<Usuario>(entity =>

@@ -20,6 +20,7 @@
         public static string MsjNoEliminarPeriodo { get; set; } = "No se puede eliminar este periodo, porque hay una carga que dependen de él.";
 
         public static string MsjNoDelete { get; set; } = "No se puede eliminar  este registro, debido a que esta en uso.";
+        public static string ServicesDawm { get; set; } = "Uno de los servicios que intenta consultar no esta disponible favor, intentarlo mas tarde, y si este error persiste comunicate comunicate con tu admministrador";
 
 
     }

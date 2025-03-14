@@ -21,6 +21,7 @@ namespace AkademicReport.Models
         public string? Descripcion { get; set; }
         public int? IdPrograma { get; set; }
         public bool? Deteled { get; set; }
+        public bool? IsGiaCarga { get; set; }
 
         public virtual Concepto? IdConceptoNavigation { get; set; }
         public virtual ProgramasAcademico? IdProgramaNavigation { get; set; }

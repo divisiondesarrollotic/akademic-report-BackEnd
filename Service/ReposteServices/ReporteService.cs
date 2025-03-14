@@ -1,4 +1,5 @@
 ﻿using AkademicReport.Data;
+using AkademicReport.Data;
 using AkademicReport.Dto.AsignaturaDto;
 using AkademicReport.Dto.CargaDto;
 using AkademicReport.Dto.ConceptoDto;
@@ -55,7 +56,8 @@ namespace AkademicReport.Service.ReposteServices
                 var CargaMapeada = new List<CargaReporteDto>();
                 var CargaLista = new List<CargaGetDto>();
                 var Docente = new DocenteReporteDto();
- 
+                
+
                 var cargas = await _cargaService.GetCarga(filtro.Cedula!, filtro.Periodo!, filtro.idPrograma, DocentesAmilca);
                 if (cargas.Data.Value.Item1.Carga.Count > 0)
                 {
@@ -953,9 +955,12 @@ namespace AkademicReport.Service.ReposteServices
             {
                 docentesRecinto = docentesRecinto.Where(c => c.TipoDocente!.Trim() != "Facilitador del DIID" && c.TipoDocente.Trim()!="Facilitadores del DIID").ToList();
             }
-
             foreach (var docente in docentesRecinto)
             {
+                if (docente.identificacion == "402-2545338-6")
+                {
+
+                }
 
                 if (docente.identificacion != null)
                 {
@@ -965,10 +970,7 @@ namespace AkademicReport.Service.ReposteServices
                     filter.Periodo = filtro.Periodo;
                     filter.idRecinto = filtro.idRecinto.ToString();
                     filter.idPrograma = 1;
-                    if(docente.identificacion== "402-0888390-6")
-                    {
-
-                    }
+                   
                     ServiceResponseData<DocenteCargaReporteDto> DocenteConSuCarga = await PorDocente(filter, docentes.Data);
                     if(DocenteConSuCarga.Data.Carga!=null)
                     {
@@ -1122,9 +1124,11 @@ namespace AkademicReport.Service.ReposteServices
                                         Monto += item.precio_hora * item.credito;
                                         MontoPorAsignatura += Monto;
                                         CantCreditos += item.credito;
+                                        item.pago_asignaturaMensual = item.HoraContratada == true ? (item.precio_hora * item.credito) * 4 : 0;
+
                                     }
-                                   
-                                   
+
+
                                 }
 
                                 CantCreditosF = CantCreditos;

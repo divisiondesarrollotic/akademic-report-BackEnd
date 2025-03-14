@@ -31,5 +31,10 @@ namespace AkademicReport.Dto.CargaDto
         public int? IdPrograma { get; set; }
         public bool? HoraContratada { get; set; } = true;
         public int idUsuario { get; set; }
+        // Nuevos campos para manejar las cargas irregulares
+        public int? CantSemanas { get; set; }
+        public int? IdTipoReporte { get; set; }
+        public int? IdTipoReporteIrregular { get; set; }
+        public string? NotaImportante { get; set; }
     }
 }

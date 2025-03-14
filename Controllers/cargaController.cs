@@ -2,6 +2,7 @@
 using AkademicReport.Dto.DocentesDto;
 using AkademicReport.Dto.ReporteDto;
 using AkademicReport.Dto.UsuarioDto;
+using AkademicReport.Models;
 using AkademicReport.Service;
 using AkademicReport.Service.AsignaturaServices;
 using AkademicReport.Service.CargaServices;
@@ -35,7 +36,7 @@ namespace AkademicReport.Controllers
         public async Task<ActionResult> GetCarga(DtoCarga filtro)
         {
 
-            var result = await _service.GetCargaCall(filtro.Cedula, filtro.Periodo, filtro.idPrograma);
+            var result = await _service.GetCargaCall(filtro.Cedula, filtro.Periodo, filtro.idPrograma, filtro.IdTipoReporte.Value, filtro.IdTipoReporteI.Value);
             if (result.Data.Value.Item1.Docente == null && result.Data.Value.Item1.Carga == null)
             {
                 return Ok(new ServicesResponseMessage<string>() { Status = 204, Message = "Docente no existe" });
@@ -56,7 +57,7 @@ namespace AkademicReport.Controllers
             var result = await _service.GetCargaCallPosgrado(filtro.Cedula, filtro.Periodo, filtro.idPrograma, docenteConsulta.Data, int.Parse(docenteConsulta.Data[0].id_recinto));
             if (result.Data.Value.Item1 == null)
             {
-                return Ok(new ServicesResponseMessage<string>() { Status = 204, Message = result.Data.Value.Item2});
+                return Ok(new ServicesResponseMessage<string>() { Status = 204, Message = result.Data.Value.Item2 });
             }
             if (result.Data.Value.Item1.Docente == null && result.Data.Value.Item1.Cargas == null)
             {
@@ -123,14 +124,41 @@ namespace AkademicReport.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Route("sincronizar_carga/{periodo}")]
-        public async Task<ActionResult<List<MesGetDto>>> SincroniZarCarga([Required] string periodo)
+        [Route("sincronizar_carga/{periodo}/{recinto}")]
+        public async Task<ActionResult<List<MesGetDto>>> SincroniZarCarga(string periodo, int recinto)
         {
-            var result = await _service.SincronizarCarga(periodo);
-            if(result.Status==200)
+            var result = await _service.SincronizarCarga(periodo, recinto);
+            if (result.Status == 200)
                 return Ok(result);
             return BadRequest(result);
         }
+        /// <summary>
+        /// --Este  metodo uestra la carga de univeritas con la de akademic para fines de aprobacion
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("getsincronizar_carga/{periodo}/{recinto}")]
+        public async Task<ActionResult<List<MesGetDto>>> GetCargaUniversitasBeforeSincronizacion(string periodo, int recinto)
+        {
+            var result = await _service.GetCargaAkadeicWithUniversitas(periodo, recinto);
+            if (result.Status == 200)
+                return Ok(result);
+            return BadRequest(result);
+        }
+        /// <summary>
+        /// --Este reubica la carga de un docente a otro
+        /// </summary>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("change_carga/{idCarga}/{cedula}/{profesor}")]
+        public async Task<ActionResult<List<MesGetDto>>> ChangeCarga([Required] int idCarga, [Required] string cedula, [Required] string profesor)
+        {
+            var result = await _service.ChangeCarga(cedula, profesor, idCarga);
+            if (result.Status == 200)
+                return Ok(result);
+            return BadRequest(result);
+        }
+
 
         [HttpPost]
         [Route("update")]
@@ -155,7 +183,7 @@ namespace AkademicReport.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("get-tipo-carga/{idprograma}")]
-        public async Task<ActionResult>GetTipoCarga(int idprograma)
+        public async Task<ActionResult> GetTipoCarga(int idprograma)
         {
             return Ok(await _service.GetTipoCarga(idprograma));
         }
@@ -165,6 +193,36 @@ namespace AkademicReport.Controllers
         {
             return Ok(await _service.UpdateHorasContratadas(idCarga));
         }
+        [HttpGet]
+        [Route("tipos_reportes")]
+        public async Task<ActionResult<ServiceResponseData<List<TipoReporte>>>> getTipoReporte()
+        {
+            var response =  await _service.GetTipoReporte();
+            if (response.Status == 200)
+                return Ok(response);
+            return BadRequest(response);
+        }
+        [HttpGet]
+        [Route("tipos_reportes_irregulares")]
+        public async Task<ActionResult<ServiceResponseData<List<TipoReporteIrregular>>>> getTipoReporteIrregulares()
+        {
+            var response = await _service.GetTipoReporteIrregular();
+            if (response.Status == 200)
+                return Ok(response);
+            return BadRequest(response);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
     }
 }
 

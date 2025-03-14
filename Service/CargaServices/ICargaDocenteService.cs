@@ -2,6 +2,7 @@
 using AkademicReport.Dto.DocentesDto;
 using AkademicReport.Dto.PeriodoDto;
 using AkademicReport.Dto.ReporteDto;
+using AkademicReport.Dto.TiposReporteDto;
 using AkademicReport.Models;
 
 namespace AkademicReport.Service.CargaServices
@@ -9,7 +10,7 @@ namespace AkademicReport.Service.CargaServices
     public interface ICargaDocenteService
     {
         Task<ServiceResponseCarga<DocenteCargaDto, string>> GetCarga(string cedula, string periodo, int idPrograma, List<DocenteGetDto> DocentesAmilca);
-        Task<ServiceResponseCarga<DocenteCargaDto, string>> GetCargaCall(string cedula, string periodo, int idPrograma);
+        Task<ServiceResponseCarga<DocenteCargaDto, string>> GetCargaCall(string cedula, string periodo, int idPrograma, int idTipoReporte, int idTipoReporteI);
         Task<ServiceResponseCarga<ReportCargaPosgradoDto, string>> GetCargaCallPosgrado(string cedula, string periodo, int idPrograma, List<DocenteGetDto>? DocentesAmilca, int idRecinto);
         Task<ServicesResponseMessage<string>> Insert(CargaAddDto item);
         Task<ServicesResponseMessage<string>> InsertCargaPosgrado(CargaPosgradroDto item);
@@ -22,8 +23,17 @@ namespace AkademicReport.Service.CargaServices
         Task<ServicesResponseMessage<string>> UpdateHorasContratadas(int idCarga);
         Task<bool> ValidateNivelPosgrado(string nivel);
 
-        Task<ServiceResponseData<List<CargaGetDto>>> GetCargaUniversitas(string periodo);
-        Task<ServiceResponseData<List<CargaGetDto>>> SincronizarCarga(string periodo);
+        Task<ServiceResponseData<List<CargaGetDto>>> GetCargaUniversitas(string periodo, int recinto);
+        Task<ServiceResponseData<List<CargaGetDto>>> SincronizarCarga(string periodo, int recinto);
+        Task<ServiceResponseData<List<CargaGetVerificacionDto>>> GetCargaAkadeicWithUniversitas(string periodo, int recinto);
+
+        Task<ServicesResponseMessage<string>> ChangeCarga(string cedula, string profesor, int idCaga);
+
+        Task<ServiceResponseData<List<TipoReporte>>> GetTipoReporte();
+        Task<ServiceResponseData<List<TipoReporteIrregular>>> GetTipoReporteIrregular();
+
+
+
 
 
 

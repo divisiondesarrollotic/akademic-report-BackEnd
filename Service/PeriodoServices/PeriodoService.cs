@@ -88,7 +88,7 @@ namespace AkademicReport.Service.PeriodoServices
              try
             {
                 var periodo = await _dataContext.PeriodoAcademicos.ToListAsync();
-                return new ServiceResponseData<List<PeriodoGetDto>>() { Status = 200, Data = _mapper.Map<List<PeriodoGetDto>>(periodo) };
+                return new ServiceResponseData<List<PeriodoGetDto>>() { Status = 200, Data = _mapper.Map<List<PeriodoGetDto>>(periodo.OrderByDescending(c=>c.Id)) };
             }
             catch (Exception ex)
             {

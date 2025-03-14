@@ -8,6 +8,7 @@ namespace AkademicReport.Models
         public PeriodoAcademico()
         {
             CargaDocentes = new HashSet<CargaDocente>();
+            NotasCargaIrregulars = new HashSet<NotasCargaIrregular>();
         }
 
         public int Id { get; set; }
@@ -18,5 +19,6 @@ namespace AkademicReport.Models
         public int? Anio { get; set; }
 
         public virtual ICollection<CargaDocente> CargaDocentes { get; set; }
+        public virtual ICollection<NotasCargaIrregular> NotasCargaIrregulars { get; set; }
     }
 }

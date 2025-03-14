@@ -10,5 +10,7 @@ namespace AkademicReport.Dto.CargaDto
         public string? Periodo { get; set; }
         [Required]
         public int idPrograma { get; set; }
+        public int? IdTipoReporte { get; set; } = 0;
+        public int? IdTipoReporteI { get; set; } = 0;
     }
 }

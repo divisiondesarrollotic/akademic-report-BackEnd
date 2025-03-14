@@ -2,6 +2,7 @@
 using AkademicReport.Dto.ConceptoDto;
 using AkademicReport.Dto.ConceptoPosgradoDto;
 using AkademicReport.Dto.PeriodoDto;
+using AkademicReport.Dto.TiposReporteDto;
 using AkademicReport.Models;
 using System.ComponentModel.DataAnnotations;
 
@@ -48,6 +49,12 @@ namespace AkademicReport.Dto.CargaDto
         public PeriodoGetDto? PeriodoObj { get; set; }
         public bool? HoraContratada { get; set; }
         public int idUsuario { get; set; }
+        public bool? isEqual { get; set; }
+        public int? IdTipoReporte { get; set; }
+        public TipoReporteGetDto? TipoReporteObj { get; set; }
+        public int? IdTipoReporteIrregular { get; set; }
+        public TipoReporteIrregularGetDto? TipoReporteIrregularObj { get; set; }
+
 
 
 

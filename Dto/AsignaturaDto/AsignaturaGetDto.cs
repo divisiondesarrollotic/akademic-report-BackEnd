@@ -16,5 +16,7 @@ namespace AkademicReport.Dto.AsignaturaDto
         public string? Horas { get; set; }
         public string? Descripcion { get; set; }
         public ProgramaGetDto? Programa { get; set; }
+        public bool? IsGiaCarga { get; set; }
+
     }
 }

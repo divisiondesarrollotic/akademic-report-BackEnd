@@ -17,5 +17,6 @@
         public string? id_nivel_academico { get; set; }
         public string? nivel { get; set; }
         public string? TipoDocente { get; set; }
+        public string? NotaImportante { get; set; }
     }
 }
