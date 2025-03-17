@@ -40,9 +40,9 @@ namespace AkademicReport.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("codigo-filter/{filtro}/{idprograma}")]
-        public async Task<ActionResult> GetAllFilter( string filtro, int idprograma)
+        public async Task<ActionResult> GetAllFilter( string filtro, int idprograma, bool? isGuia)
         {
-            return Ok(await _service.GetAllFilter(filtro, idprograma));
+            return Ok(await _service.GetAllFilter(filtro, idprograma, isGuia));
         }
 
         /// <summary>

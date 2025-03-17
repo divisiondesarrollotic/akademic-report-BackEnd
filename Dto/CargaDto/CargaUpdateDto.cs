@@ -35,6 +35,6 @@ namespace AkademicReport.Dto.CargaDto
         public int? CantSemanas { get; set; }
         public int? IdTipoReporte { get; set; }
         public int? IdTipoReporteIrregular { get; set; }
-        public string? NotaImportante { get; set; }
+        //public string? NotaImportante { get; set; }
     }
 }

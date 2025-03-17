@@ -29,8 +29,11 @@ namespace AkademicReport.Service.CargaServices
 
         Task<ServicesResponseMessage<string>> ChangeCarga(string cedula, string profesor, int idCaga);
 
-        Task<ServiceResponseData<List<TipoReporte>>> GetTipoReporte();
-        Task<ServiceResponseData<List<TipoReporteIrregular>>> GetTipoReporteIrregular();
+        Task<ServiceResponseData<List<TipoReporteGetDto>>> GetTipoReporte();
+        Task<ServiceResponseData<List<TipoReporteIrregularGetDto>>> GetTipoReporteIrregular();
+        Task<ServiceResponseData<NotaCargaIrregularDto>> InsertNotaCargaIrregular(NotaCargaIrregularDto nota);
+        Task<ServiceResponseData<NotaCargaIrregularDto>> UpdateNotaCargaIrregular(NotaCargaIrregularDto nota);
+
 
 
 

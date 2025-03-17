@@ -61,11 +61,22 @@ namespace AkademicReport.Service.CargaServices
             }
         }
 
+        public async Task<NotaCargaIrregularDto>GetByCdulaPeriodoNotaIrregular(string cedula, string periodo)
+        {
+
+            var periodos = await _dataContext.PeriodoAcademicos.ToListAsync();
+            int idPeriodo = periodos.FirstOrDefault(c => c.Periodo.Contains(periodo)).Id;
+            var notaDb = await _dataContext.NotasCargaIrregulars.FirstOrDefaultAsync(c => c.Cedula == cedula && c.IdPeriodo ==idPeriodo);
+            return _mapper.Map<NotaCargaIrregularDto>(notaDb);
+        }
+
         public async Task<ServiceResponseCarga<DocenteCargaDto, string>> GetCarga(string Cedula, string Periodo, int idPrograma, List<DocenteGetDto> Docentes)
         {
             try
             {
                 var ResulData = new DocenteCargaDto();
+                var NotaIrregular = await GetByCdulaPeriodoNotaIrregular(Cedula, Periodo);
+                ResulData.NotaCargaIrregular = NotaIrregular != null ? NotaIrregular : null;
                 var carga = await _dataContext.CargaDocentes.Where(c => c.Cedula == Cedula && c.Periodo == Periodo && c.IdPrograma == idPrograma && c.Deleted == false)
                     .Include(c => c.DiasNavigation)
                     .Include(c => c.CurricularNavigation)
@@ -342,16 +353,7 @@ namespace AkademicReport.Service.CargaServices
                 EntityEntry<CargaDocente> cargaSave = _dataContext.CargaDocentes.Add(carga);
                 await _dataContext.SaveChangesAsync();
 
-                if (item.NotaImportante != null)
-                {
-                    _dataContext.NotasCargaIrregulars.Add(new NotasCargaIrregular
-                    {
-                        IdPeriodo = periodoDb.Id,
-                        Nota = item.NotaImportante,
-                        Cedula = item.Cedula,
-                        IdCarga = cargaSave.Entity.Id
-                    });
-                }
+               
                 await SaveLogTransaction(new LogTransDto() { Accion = "CREATE", Fecha = DateTime.Now, IdCarga = cargaSave.Entity.Id, IdUsuario = item.idUsuario, Cedula = carga.Cedula });
                 return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjInsert };
             }
@@ -445,13 +447,7 @@ namespace AkademicReport.Service.CargaServices
                     carga.IdPeriodo = periodo.Id;
                     _dataContext.Entry(carga).State = EntityState.Modified;
                     await _dataContext.SaveChangesAsync();
-                    //Editamos la nota
-                    if (item.NotaImportante != null)
-                    {
-                        var NotaImportante = await _dataContext.NotasCargaIrregulars.FirstAsync(c=>c.IdCarga==item.Id);
-                        NotaImportante.Nota = item.NotaImportante;
-                        _dataContext.Entry(NotaImportante).State = EntityState.Modified;
-                    }
+                  
                     await SaveLogTransaction(new LogTransDto() { Accion = "UPDATE", Fecha = DateTime.Now, IdCarga = item.Id, IdUsuario = item.idUsuario, Cedula = item.Cedula });
                 }
                 return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjUpdate };
@@ -996,29 +992,58 @@ AND SUBSTR(t1.id_grp_activ, 1, 1) = '{recinto}'";
             }
         }
 
-        public async Task<ServiceResponseData<List<TipoReporte>>> GetTipoReporte()
+        public async Task<ServiceResponseData<List<TipoReporteGetDto>>> GetTipoReporte()
         {
             try
             {
-                var tipoReporteDb = await _dataContext.TipoReportes.ToListAsync();
-                return new ServiceResponseData<List<TipoReporte>>() { Data = tipoReporteDb, Status = 200, Message = Msj.MsjSucces };
+                var tipoReporteDb = await _dataContext.TipoReportes.ProjectTo<TipoReporteGetDto>(_mapper.ConfigurationProvider).ToListAsync();
+                return new ServiceResponseData<List<TipoReporteGetDto>>() { Data = tipoReporteDb, Status = 200, Message = Msj.MsjSucces };
             }
             catch (Exception ex)
             {
-                return new ServiceResponseData<List<TipoReporte>>() { Status = 500, Message = Msj.MsjError + ex.ToString() };
+                return new ServiceResponseData<List<TipoReporteGetDto>>() { Status = 500, Message = Msj.MsjError + ex.ToString() };
             }
         }
 
-        public async Task<ServiceResponseData<List<TipoReporteIrregular>>> GetTipoReporteIrregular()
+        public async Task<ServiceResponseData<List<TipoReporteIrregularGetDto>>> GetTipoReporteIrregular()
         {
             try
             {
-                var dipoReporteIrregular  = await _dataContext.TipoReporteIrregulars.ToListAsync();
-                return new ServiceResponseData<List<TipoReporteIrregular>>() { Data = dipoReporteIrregular, Status = 200, Message = Msj.MsjSucces };
+                var dipoReporteIrregular  = await _dataContext.TipoReporteIrregulars.ProjectTo<TipoReporteIrregularGetDto>(_mapper.ConfigurationProvider).ToListAsync();
+                return new ServiceResponseData<List<TipoReporteIrregularGetDto>>() { Data = dipoReporteIrregular, Status = 200, Message = Msj.MsjSucces };
             }
             catch (Exception ex)
             {
-                return new ServiceResponseData<List<TipoReporteIrregular>>() { Status = 500, Message = Msj.MsjError + ex.ToString() };
+                return new ServiceResponseData<List<TipoReporteIrregularGetDto>>() { Status = 500, Message = Msj.MsjError + ex.ToString() };
+            }
+        }
+
+        public async Task<ServiceResponseData<NotaCargaIrregularDto>> InsertNotaCargaIrregular(NotaCargaIrregularDto nota)
+        {
+            try
+            {
+                EntityEntry<NotasCargaIrregular> entity = _dataContext.NotasCargaIrregulars.Add(_mapper.Map<NotasCargaIrregular>(nota));
+                await _dataContext.SaveChangesAsync();
+                return new ServiceResponseData<NotaCargaIrregularDto>() { Data = _mapper.Map<NotaCargaIrregularDto>(entity.Entity), Status = 200, Message = Msj.MsjSucces };
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponseData<NotaCargaIrregularDto>() { Status = 500, Message = Msj.MsjError + ex.ToString() };
+            }
+        }
+
+        public async Task<ServiceResponseData<NotaCargaIrregularDto>> UpdateNotaCargaIrregular(NotaCargaIrregularDto nota)
+        {
+            try
+            {
+                var notaDb = await _dataContext.NotasCargaIrregulars.AsNoTracking().FirstOrDefaultAsync(c => c.Id == nota.Id);
+                _dataContext.Entry(_mapper.Map<NotasCargaIrregular>(nota)).State = EntityState.Modified;
+                await _dataContext.SaveChangesAsync();
+                return new ServiceResponseData<NotaCargaIrregularDto>() { Data = _mapper.Map<NotaCargaIrregularDto>(nota), Status = 200, Message = Msj.MsjUpdate };
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponseData<NotaCargaIrregularDto>() { Status = 500, Message = Msj.MsjError + ex.ToString() };
             }
         }
     }

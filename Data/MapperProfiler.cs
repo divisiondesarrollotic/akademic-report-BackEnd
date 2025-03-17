@@ -64,6 +64,10 @@ namespace AkademicReport.Data
             CreateMap<TipoCarga, TipoCargaDto>();
             CreateMap<TipoCargaPivot, TipoCargaCodigo>();
 
+            CreateMap<NotasCargaIrregular, NotaCargaIrregularDto>();
+            CreateMap<NotaCargaIrregularDto, NotasCargaIrregular>();
+
+
             CreateMap<DocenteGetDto, DocenteReporteDto>().ForMember(c => c.Id, o => o.MapFrom(c => c.id))
                 .ForMember(c => c.Id, o => o.MapFrom(c => c.id))
                 .ForMember(c => c.TiempoDedicacion, o => o.MapFrom(c => c.tiempoDedicacion))

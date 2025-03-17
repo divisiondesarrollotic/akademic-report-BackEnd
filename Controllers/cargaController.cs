@@ -8,6 +8,7 @@ using AkademicReport.Service.AsignaturaServices;
 using AkademicReport.Service.CargaServices;
 using AkademicReport.Service.DocenteServices;
 using AkademicReport.Utilities;
+using AutoMapper.Configuration.Annotations;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
@@ -80,6 +81,33 @@ namespace AkademicReport.Controllers
         public async Task<ActionResult> Insert(CargaAddDto Carga)
         {
             return Ok(await _service.Insert(Carga));
+        }
+
+        /// <summary>
+        /// --Este post inserta un comentario en caso de que la carga sea irregular
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("nota_carga_irregular")]
+        public async Task<ActionResult> InsertNotaCargaIrregular(NotaCargaIrregularDto nota)
+        {
+            var result = await _service.InsertNotaCargaIrregular(nota);
+            if(result.Status==200)
+                return Ok(result);
+            return BadRequest(result);
+        }
+        /// <summary>
+        /// --Este post inserta un comentario en caso de que la carga sea irregular
+        /// </summary>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("nota_carga_irregular")]
+        public async Task<ActionResult> UpdateNotaCargaIrregular(NotaCargaIrregularDto nota)
+        {
+            var result = await _service.UpdateNotaCargaIrregular(nota);
+            if (result.Status == 200)
+                return Ok(result);
+            return BadRequest(result);
         }
         /// <summary>
         /// --Este post inserta una carga a un docente  de posgradox
