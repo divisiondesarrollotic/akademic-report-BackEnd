@@ -18,5 +18,6 @@
         public string? nivel { get; set; }
         public string? TipoDocente { get; set; }
         public string? NotaImportante { get; set; }
-    }
+        public string? fechaIngresoIsfodosu { get; set; }
+    } 
 }

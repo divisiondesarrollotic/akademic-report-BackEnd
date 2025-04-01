@@ -6,5 +6,7 @@
         public int? IdPeriodo { get; set; }
         public string? Nota { get; set; }
         public string? Cedula { get; set; }
+        public int? IdTipoReporte { get; set; }
+        public int? IdTipoReporteIrregular { get; set; }
     }
 }

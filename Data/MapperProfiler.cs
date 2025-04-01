@@ -8,9 +8,11 @@ using AkademicReport.Dto.DocentesDto;
 using AkademicReport.Dto.FirmaDto;
 using AkademicReport.Dto.FirmasDto;
 using AkademicReport.Dto.NivelDto;
+using AkademicReport.Dto.NivelesAcademicoDto;
 using AkademicReport.Dto.PeriodoDto;
 using AkademicReport.Dto.ProgramaDto;
 using AkademicReport.Dto.RecintoDto;
+using AkademicReport.Dto.ReporteDto;
 using AkademicReport.Dto.TiposReporteDto;
 using AkademicReport.Dto.UsuarioDto;
 using AkademicReport.Models;
@@ -31,6 +33,7 @@ namespace AkademicReport.Data
                .ForMember(c => c.recinto, opt => opt.MapFrom(c => c.IdRecintoNavigation.Recinto1))
                .ForMember(c => c.id_recinto, opt => opt.MapFrom(c => c.IdRecinto))
                .ForMember(c=>c.Programa, o=>o.MapFrom(c=>c.IdProgramaNavigation))
+               .ForMember(c=>c.RecintoObj, o=>o.MapFrom(c=>c.IdRecintoNavigation))
             .ForMember(c => c.nivelNombre, opt => opt.MapFrom(c => c.NivelNavigation.Nivel));
 
             CreateMap<PeriodoAcademico, PeriodoGetDto>();
@@ -41,10 +44,15 @@ namespace AkademicReport.Data
             CreateMap<TipoCargaCodigo, TipoCargaDto>();
             CreateMap<TipoCargaDto, TipoCargaCodigo>();
 
+            CreateMap<NivelAcademico, NivelAcademicoGetDto>();
+
             CreateMap<ProgramasAcademico, ProgramaGetDto>();
 
             CreateMap<TipoReporte, TipoReporteGetDto>();
             CreateMap<TipoReporteIrregular, TipoReporteIrregularGetDto>();
+
+            CreateMap<DayCantSemanasDto, CantSemanasMe>().ForMember(c=>c.IdCarga, o=>o.Ignore()).ForMember(c=>c.Id, o=>o.Ignore());
+            CreateMap<CantSemanasMe, DayCantSemanasDto>();
 
 
             CreateMap<NivelAddDto, NivelAcademico>();
@@ -127,6 +135,9 @@ namespace AkademicReport.Data
 
             CreateMap<LogTransDto, LogTransacional>();
 
+            CreateMap<Dia, DiaGetDto>();
+            CreateMap<CantSemanasMe, CantSemanaMesDto>()
+                .ForMember(c=>c.MesObj, o=>o.MapFrom(c=>c.MesNavigation));
             CreateMap<CargaDocente, CargaGetDto>().ForMember(c => c.cod_asignatura, o => o.MapFrom(c => c.CodAsignatura))
              .ForMember(c => c.nombre_asignatura, o => o.MapFrom(c => c.NombreAsignatura))
              .ForMember(c => c.cod_universitas, o => o.MapFrom(c => c.CodUniversitas))
@@ -138,13 +149,16 @@ namespace AkademicReport.Data
              .ForMember(c => c.numero_hora, o => o.MapFrom(c => c.NumeroHora))
              .ForMember(c => c.TipoModalidad, o => o.Ignore())
              .ForMember(c => c.nombre_profesor, o => o.MapFrom(c => c.NombreProfesor))
+             .ForMember(c=>c.DiaObj, o=>o.MapFrom(c=>c.DiasNavigation))
              .ForMember(c => c.dia_nombre, o => o.MapFrom(c => c.DiasNavigation.Nombre))
              .ForMember(c => c.ConceptoPosgrado, o => o.MapFrom(c => c.IdConceptoPosgradoNavigation))
              .ForMember(c => c.TipoModalidad, o => o.MapFrom(c => c.ModalidadNavigation))
              .ForMember(c => c.PeriodoObj, o => o.MapFrom(c => c.IdPeriodoNavigation))
              .ForMember(c => c.credito, o => o.MapFrom(c => c.Credito))
-             .ForMember(c => c.TipoReporteObj, o => o.MapFrom(c => c.IdTipoReporteNavigation))
-             .ForMember(c => c.TipoReporteIrregularObj, o => o.MapFrom(c => c.IdTipoReporteIrregularNavigation));
+             //.ForMember(c => c.TipoReporteObj, o => o.MapFrom(c => c.IdTipoReporteNavigation))
+             //.ForMember(c => c.TipoReporteIrregularObj, o => o.MapFrom(c => c.IdTipoReporteIrregularNavigation))
+             .ForMember(c=>c.AsignatureObj, o=>o.MapFrom(c=>c.IdCodigoNavigation));
+
 
             CreateMap<CargaGetDto, CargaDocente>().ForMember(c => c.CodAsignatura, o => o.MapFrom(c => c.cod_asignatura))
              .ForMember(c => c.NombreAsignatura, o => o.MapFrom(c => c.nombre_asignatura))
@@ -164,11 +178,12 @@ namespace AkademicReport.Data
              .ForMember(c => c.Credito, o => o.MapFrom(c => c.credito));
 
 
+            CreateMap<CargaReporteDto, GetCargaIrregularDto>()
+             .ForMember(c => c.TipoCarga, o => o.MapFrom(c => c.TiposCarga));
+
+             
 
 
-
-
-            //.ForMember(c => c.TiposCarga, o => o.MapFrom(c => c.CurricularNavigation));
 
             CreateMap<Mese, MesGetDto>();
             CreateMap<ConceptoPosgrado, ConceptoPosDto>();
@@ -213,19 +228,6 @@ namespace AkademicReport.Data
                 .ForMember(c => c.credito, o => o.MapFrom(c => c.numcre))
                 .ForMember(c=>c.numero_hora, o=>o.MapFrom(c=>c.numcre))
                 .ForMember(c => c.dia_id, o => o.MapFrom(c => c.dsm_codnum));
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         }
     }

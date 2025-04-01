@@ -21,6 +21,7 @@ namespace AkademicReport.Data
         public virtual DbSet<AreaDocente> AreaDocentes { get; set; } = null!;
         public virtual DbSet<Asignatura> Asignaturas { get; set; } = null!;
         public virtual DbSet<Aula> Aulas { get; set; } = null!;
+        public virtual DbSet<CantSemanasMe> CantSemanasMes { get; set; } = null!;
         public virtual DbSet<CargaDocente> CargaDocentes { get; set; } = null!;
         public virtual DbSet<Codigo> Codigos { get; set; } = null!;
         public virtual DbSet<Concepto> Conceptos { get; set; } = null!;
@@ -152,6 +153,29 @@ namespace AkademicReport.Data
                     .HasConstraintName("FK__aula__idrecinto__0C85DE4D");
             });
 
+            modelBuilder.Entity<CantSemanasMe>(entity =>
+            {
+                entity.ToTable("cantSemanasMes");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+
+                entity.Property(e => e.CantSemanas).HasColumnName("cantSemanas");
+
+                entity.Property(e => e.IdCarga).HasColumnName("idCarga");
+
+                entity.Property(e => e.Mes).HasColumnName("mes");
+
+                entity.HasOne(d => d.IdCargaNavigation)
+                    .WithMany(p => p.CantSemanasMes)
+                    .HasForeignKey(d => d.IdCarga)
+                    .HasConstraintName("FK__cantSeman__idCar__0880433F");
+
+                entity.HasOne(d => d.MesNavigation)
+                    .WithMany(p => p.CantSemanasMes)
+                    .HasForeignKey(d => d.Mes)
+                    .HasConstraintName("fk_me");
+            });
+
             modelBuilder.Entity<CargaDocente>(entity =>
             {
                 entity.ToTable("carga_docente");
@@ -209,6 +233,8 @@ namespace AkademicReport.Data
                     .IsUnicode(false)
                     .HasColumnName("hora_inicio");
 
+                entity.Property(e => e.IdCargaRegular).HasColumnName("idCargaRegular");
+
                 entity.Property(e => e.IdCodigo).HasColumnName("idCodigo");
 
                 entity.Property(e => e.IdConceptoPosgrado).HasColumnName("idConceptoPosgrado");
@@ -222,6 +248,10 @@ namespace AkademicReport.Data
                 entity.Property(e => e.IdTipoReporte).HasColumnName("idTipoReporte");
 
                 entity.Property(e => e.IdTipoReporteIrregular).HasColumnName("idTipoReporteIrregular");
+
+                entity.Property(e => e.IsAuth)
+                    .HasColumnName("isAuth")
+                    .HasDefaultValueSql("((1))");
 
                 entity.Property(e => e.MinutoFin)
                     .HasMaxLength(50)
@@ -599,6 +629,8 @@ namespace AkademicReport.Data
 
                 entity.Property(e => e.IdMes).ValueGeneratedNever();
 
+                entity.Property(e => e.Cuatrimestre).HasColumnName("cuatrimestre");
+
                 entity.Property(e => e.Nombre)
                     .HasMaxLength(15)
                     .IsUnicode(false);
@@ -657,6 +689,10 @@ namespace AkademicReport.Data
 
                 entity.Property(e => e.IdPeriodo).HasColumnName("idPeriodo");
 
+                entity.Property(e => e.IdTipoReporte).HasColumnName("idTipoReporte");
+
+                entity.Property(e => e.IdTipoReporteIrregular).HasColumnName("idTipoReporteIrregular");
+
                 entity.Property(e => e.Nota)
                     .HasMaxLength(500)
                     .IsUnicode(false)
@@ -671,6 +707,16 @@ namespace AkademicReport.Data
                     .WithMany(p => p.NotasCargaIrregulars)
                     .HasForeignKey(d => d.IdPeriodo)
                     .HasConstraintName("FK__notasCarg__idPer__531856C7");
+
+                entity.HasOne(d => d.IdTipoReporteNavigation)
+                    .WithMany(p => p.NotasCargaIrregulars)
+                    .HasForeignKey(d => d.IdTipoReporte)
+                    .HasConstraintName("FK__notasCarg__idTip__19AACF41");
+
+                entity.HasOne(d => d.IdTipoReporteIrregularNavigation)
+                    .WithMany(p => p.NotasCargaIrregulars)
+                    .HasForeignKey(d => d.IdTipoReporteIrregular)
+                    .HasConstraintName("FK__notasCarg__idTip__1A9EF37A");
             });
 
             modelBuilder.Entity<PagoFijo>(entity =>
@@ -711,6 +757,8 @@ namespace AkademicReport.Data
                 entity.Property(e => e.Id).HasColumnName("id");
 
                 entity.Property(e => e.Anio).HasColumnName("anio");
+
+                entity.Property(e => e.Cuatrimestre).HasColumnName("cuatrimestre");
 
                 entity.Property(e => e.Descripcion)
                     .HasMaxLength(350)

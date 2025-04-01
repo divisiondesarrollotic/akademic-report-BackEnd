@@ -13,11 +13,13 @@ using AkademicReport.Service.DocenteServices;
 using AkademicReport.Utilities;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Identity.Client;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -59,7 +61,7 @@ namespace AkademicReport.Service.CargaServices
             {
                 return new ServicesResponseMessage<string>() { Status = 500, Message = Msj.MsjError + ex.ToString };
             }
-        }
+        } 
 
         public async Task<NotaCargaIrregularDto>GetByCdulaPeriodoNotaIrregular(string cedula, string periodo)
         {
@@ -77,7 +79,7 @@ namespace AkademicReport.Service.CargaServices
                 var ResulData = new DocenteCargaDto();
                 var NotaIrregular = await GetByCdulaPeriodoNotaIrregular(Cedula, Periodo);
                 ResulData.NotaCargaIrregular = NotaIrregular != null ? NotaIrregular : null;
-                var carga = await _dataContext.CargaDocentes.Where(c => c.Cedula == Cedula && c.Periodo == Periodo && c.IdPrograma == idPrograma && c.Deleted == false)
+                var carga = await _dataContext.CargaDocentes.Where(c => c.Cedula == Cedula && c.Periodo == Periodo && c.IdPrograma == idPrograma && c.Deleted == false && c.IsAuth==true)
                     .Include(c => c.DiasNavigation)
                     .Include(c => c.CurricularNavigation)
                     .Include(c => c.ModalidadNavigation)
@@ -86,7 +88,9 @@ namespace AkademicReport.Service.CargaServices
                     .Include(c => c.IdCodigoNavigation)
                     .Include(c => c.IdPeriodoNavigation)
                     .Include(c=>c.IdTipoReporteIrregularNavigation)
-                    .Include(c=>c.IdTipoReporteNavigation).ToListAsync();
+                    .Include(c=>c.IdTipoReporteNavigation)
+                    .Include(c=>c.CantSemanasMes)
+                    .ToListAsync();
                 var docentes = Docentes;
                 int Creditos = 0;
                 var DocenteFilter = docentes.Where(c => c.identificacion.ToString().Contains(Cedula)).FirstOrDefault();
@@ -113,13 +117,21 @@ namespace AkademicReport.Service.CargaServices
                 foreach (var i in CargaMap)
                 {
                     if (i.IdCodigo != null)
+                    {
                         i.nombre_asignatura = carga.First(c => c.Id == i.Id).IdCodigoNavigation.Nombre;
+
+                    }
+
 
                     var tiposModalidad = await _dataContext.TipoModalidads.FirstAsync(c => c.Id == i.TipoModalidad.Id);
                     var TipoModalida = new TipoModalidadDto();
                     TipoModalida = _mapper.Map<TipoModalidadDto>(tiposModalidad);
                     i.TipoModalidad = TipoModalida;
-                    
+                    var cantSemanasMes = carga.FirstOrDefault(c => c.Id == i.Id);
+                    if (cantSemanasMes != null)
+                        i.cantSemanaMes = _mapper.Map<List<DayCantSemanasDto>>(cantSemanasMes.CantSemanasMes);
+
+
                     var recinto = await _dataContext.Recintos.FirstOrDefaultAsync(c => c.Id == int.Parse(i.Recinto));
                     if (recinto != null)
                     {
@@ -148,6 +160,7 @@ namespace AkademicReport.Service.CargaServices
                     {
                         i.id_asignatura = codigo.Id;
                         i.id_concepto = codigo.IdConcepto;
+                         
                     }
                     //decimal Horas = CalculoTiempoHoras.Calcular(int.Parse(i.hora_inicio), int.Parse(i.minuto_inicio), int.Parse(i.hora_fin), int.Parse(i.minuto_fin));
                     //i.credito = Convert.ToInt32(Horas);
@@ -244,8 +257,6 @@ namespace AkademicReport.Service.CargaServices
                 string error = ex.ToString();
                 throw;
             }
-
-
         }
 
 
@@ -257,10 +268,18 @@ namespace AkademicReport.Service.CargaServices
             var Result = await GetCarga(cedula, periodo, idPrograma, Docentes.Data);
             if(Result.Data!=null && Result.Data.Value.Item1!=null && Result.Data.Value.Item1.Carga!=null)
             {
-                Result.Data.Value.Item1.Carga = idTipoReporte != 0 && idTipoReporteI != 0 ?
-                     Result.Data.Value.Item1.Carga.Where(c => c.IdTipoReporte == idTipoReporte
-                     && c.IdTipoReporteIrregular == idTipoReporteI).ToList() : Result.Data.Value.Item1.Carga;
+                Result.Data.Value.Item1.CargaRegular = new List<CargaGetDto>();
+                if(idTipoReporteI==2 || idTipoReporteI == 9 || idTipoReporteI == 10 || idTipoReporteI ==11 || idTipoReporteI == 12 || idTipoReporteI == 13)
+                {
+                    var notaCargaIrregular = await _dataContext.NotasCargaIrregulars.Include(c=>c.IdPeriodoNavigation)
+                        .FirstOrDefaultAsync(c => c.IdPeriodoNavigation.Periodo == periodo && c.Cedula==cedula && c.IdTipoReporte==idTipoReporte && c.IdTipoReporteIrregular==idTipoReporteI);
+                    Result.Data.Value.Item1.NotaCargaIrregular = notaCargaIrregular != null ?  _mapper.Map<NotaCargaIrregularDto>(notaCargaIrregular) : null;
 
+                    Result.Data.Value.Item1.CargaRegular = Result.Data.Value.Item1.Carga.Where(c => c.IdTipoReporte == 1
+                && c.IdTipoReporteIrregular == 4).ToList();
+                }
+                Result.Data.Value.Item1.Carga = Result.Data.Value.Item1.Carga.Where(c => c.IdTipoReporte == idTipoReporte && c.IdTipoReporteIrregular == idTipoReporteI).ToList();
+             
             }
             return Result;
 
@@ -290,10 +309,12 @@ namespace AkademicReport.Service.CargaServices
         }
 
         public async Task<ServiceResponseData<List<MesGetDto>>> GetMeses()
-        {
+        { 
+
             try
             {
                 var meses = await _dataContext.Meses.ToListAsync();
+
                 return new ServiceResponseData<List<MesGetDto>>() { Data = _mapper.Map<List<MesGetDto>>(meses), Status = 200, Message = Msj.MsjSucces };
             }
             catch (Exception ex)
@@ -313,17 +334,6 @@ namespace AkademicReport.Service.CargaServices
         {
             try
             {
-                //// Validacion el calculo de las horas no puede dar decimal
-                //decimal Horas = CalculoTiempoHoras.Calcular(int.Parse(item.hora_inicio), int.Parse(item.minuto_inicio), int.Parse(item.hora_fin), int.Parse(item.minuto_fin));
-                //if(int.Parse(Horas.ToString().Split('.')[1])<1) return new ServicesResponseMessage<string>() { Status = 400, Message = Msj.MsjHorarioIncorrecto };
-
-                //var cargaDocente = await _cargaDocenteService.GetCargaCall(item.Cedula, item.periodo);
-                //if(cargaDocente.Data.Value.Item1.CantCredito+item.credito>40) return new ServicesResponseMessage<string>() { Status = 400, Message = (cargaDocente.Data.Value.Item1.Docente.tiempoDedicacion=="TC" 
-                //  || cargaDocente.Data.Value.Item1.Docente.tiempoDedicacion == "A" || cargaDocente.Data.Value.Item1.Docente.tiempoDedicacion == "F" 
-                //  || cargaDocente.Data.Value.Item1.Docente.tiempoDedicacion == "M") ?  Msj.MsjPasoDeCredito : Msj.MsjPasoDeCreditoMedioTimepo};
-
-                //if (cargaDocente.Data.Value.Item1.Docente.tiempoDedicacion == "MT" && cargaDocente.Data.Value.Item1.CantCredito + item.credito > 32) return new ServicesResponseMessage<string>() { Status = 400, Message = Msj.MsjPasoDeCreditoMedioTimepo};
-
                 CargaDocente carga = new CargaDocente();
                 carga.HoraContratada = true;
                 carga.Curricular = item.idTipoCarga;
@@ -348,12 +358,24 @@ namespace AkademicReport.Service.CargaServices
                 carga.DiaMes = null;
                 carga.IdPrograma = 1;
                 carga.Deleted = false;
+                carga.IsAuth = item.cod_universitas == "N/A" ? true : false;
+                carga.IdTipoReporte = item.IdTipoReporte == 0 || item.IdTipoReporte == null ? 1 : item.IdTipoReporte;
+                carga.IdTipoReporteIrregular = item.IdTipoReporteIrregular == 0 || item.IdTipoReporteIrregular == null ? 4 : item.IdTipoReporteIrregular;
+                carga.CantSemanas = item.CantSemanas;
                 var periodoDb = await _dataContext.PeriodoAcademicos.Where(c => c.Periodo == item.periodo).FirstAsync();
                 carga.IdPeriodo = periodoDb.Id;
                 EntityEntry<CargaDocente> cargaSave = _dataContext.CargaDocentes.Add(carga);
                 await _dataContext.SaveChangesAsync();
 
-               
+                if(item.CantSemanaMes!=null && item.CantSemanaMes.Count>0)
+                {
+                    foreach (var c in item.CantSemanaMes)
+                    {
+                        var mesSeamanas = _mapper.Map<CantSemanasMe>(c);
+                        mesSeamanas.IdCarga = cargaSave.Entity.Id;
+                        _dataContext.CantSemanasMes.Add(mesSeamanas);
+                    }
+                }
                 await SaveLogTransaction(new LogTransDto() { Accion = "CREATE", Fecha = DateTime.Now, IdCarga = cargaSave.Entity.Id, IdUsuario = item.idUsuario, Cedula = carga.Cedula });
                 return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjInsert };
             }
@@ -384,6 +406,7 @@ namespace AkademicReport.Service.CargaServices
                 carga.IdPrograma = 2;
                 carga.NumeroHora = 0;
                 carga.Deleted = false;
+                carga.IsAuth = true;
                 carga.Curricular = item.idTipoCarga;
                 carga.HoraContratada = true;
                 carga.IdConceptoPosgrado = item.IdConceptoPosgrado;
@@ -414,6 +437,7 @@ namespace AkademicReport.Service.CargaServices
                     carga.Curricular = null;
                     carga.NumeroHora = 0;
                     carga.Curricular = 5;
+                    carga.IsAuth = true;
                     carga.HoraContratada = true;
                     carga.Deleted = false;
                     var periodo = await _dataContext.PeriodoAcademicos.Where(c => c.Periodo == item.Periodo).FirstAsync();
@@ -444,10 +468,33 @@ namespace AkademicReport.Service.CargaServices
                     carga.IdPrograma = 1;
                     carga.Deleted = false;
                     var periodo = await _dataContext.PeriodoAcademicos.Where(c => c.Periodo == item.Periodo).FirstAsync();
+                    carga.CantSemanas = item.CantSemanas;
                     carga.IdPeriodo = periodo.Id;
+                    carga.IsAuth = item.cod_universitas == "N/A" ? true : false;
+                    carga.IdTipoReporte = item.IdTipoReporte == 0 || item.IdTipoReporte == null ? 1 : item.IdTipoReporte;
+                    carga.IdTipoReporteIrregular = item.IdTipoReporteIrregular == 0 || item.IdTipoReporteIrregular == null ? 4 : item.IdTipoReporteIrregular;
                     _dataContext.Entry(carga).State = EntityState.Modified;
                     await _dataContext.SaveChangesAsync();
-                  
+
+                    //Eliminamos los horario senabales para luego
+                    var semanas = await _dataContext.CantSemanasMes.Where(c => c.IdCarga == item.Id).ToListAsync();
+                    if(semanas.Any())
+                    {
+                        _dataContext.CantSemanasMes.RemoveRange(semanas);
+                    }
+
+                    if (item.CantSemanaMes?.Any()==true)
+                    {
+                        var nuevasSemanasa = item.CantSemanaMes.Select(c => _mapper.Map<CantSemanasMe>(c)).ToList();
+                        foreach (var i in nuevasSemanasa)
+                        {
+                            i.IdCarga = item.Id;
+                            _dataContext.CantSemanasMes.Add(i);
+
+                        }
+                    }
+                    await _dataContext.SaveChangesAsync();
+                   
                     await SaveLogTransaction(new LogTransDto() { Accion = "UPDATE", Fecha = DateTime.Now, IdCarga = item.Id, IdUsuario = item.idUsuario, Cedula = item.Cedula });
                 }
                 return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjUpdate };
@@ -997,7 +1044,7 @@ AND SUBSTR(t1.id_grp_activ, 1, 1) = '{recinto}'";
             try
             {
                 var tipoReporteDb = await _dataContext.TipoReportes.ProjectTo<TipoReporteGetDto>(_mapper.ConfigurationProvider).ToListAsync();
-                return new ServiceResponseData<List<TipoReporteGetDto>>() { Data = tipoReporteDb, Status = 200, Message = Msj.MsjSucces };
+                return new ServiceResponseData<List<TipoReporteGetDto>>() { Data = tipoReporteDb.OrderBy(c=>c.Nombre).ToList(), Status = 200, Message = Msj.MsjSucces };
             }
             catch (Exception ex)
             {
@@ -1010,7 +1057,7 @@ AND SUBSTR(t1.id_grp_activ, 1, 1) = '{recinto}'";
             try
             {
                 var dipoReporteIrregular  = await _dataContext.TipoReporteIrregulars.ProjectTo<TipoReporteIrregularGetDto>(_mapper.ConfigurationProvider).ToListAsync();
-                return new ServiceResponseData<List<TipoReporteIrregularGetDto>>() { Data = dipoReporteIrregular, Status = 200, Message = Msj.MsjSucces };
+                return new ServiceResponseData<List<TipoReporteIrregularGetDto>>() { Data = dipoReporteIrregular.OrderBy(c=>c.Nombre).ToList(), Status = 200, Message = Msj.MsjSucces };
             }
             catch (Exception ex)
             {
@@ -1024,6 +1071,7 @@ AND SUBSTR(t1.id_grp_activ, 1, 1) = '{recinto}'";
             {
                 EntityEntry<NotasCargaIrregular> entity = _dataContext.NotasCargaIrregulars.Add(_mapper.Map<NotasCargaIrregular>(nota));
                 await _dataContext.SaveChangesAsync();
+
                 return new ServiceResponseData<NotaCargaIrregularDto>() { Data = _mapper.Map<NotaCargaIrregularDto>(entity.Entity), Status = 200, Message = Msj.MsjSucces };
             }
             catch (Exception ex)
@@ -1044,6 +1092,42 @@ AND SUBSTR(t1.id_grp_activ, 1, 1) = '{recinto}'";
             catch (Exception ex)
             {
                 return new ServiceResponseData<NotaCargaIrregularDto>() { Status = 500, Message = Msj.MsjError + ex.ToString() };
+            }
+        }
+
+        public async Task<ServiceResponseData<List<MesGetDto>>> GetMesesByCuatrimestre(int cuatrimestre)
+        {
+            try
+            {
+                var meses = await _dataContext.Meses.Where(c => c.Cuatrimestre == cuatrimestre).ToListAsync();
+
+                return new ServiceResponseData<List<MesGetDto>>() { Data = _mapper.Map<List<MesGetDto>>(meses), Status = 200, Message = Msj.MsjSucces };
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponseData<List<MesGetDto>>() { Status = 500, Message = Msj.MsjError + ex.ToString() };
+            }
+        }
+
+        public async Task<ServiceResponseData<CargaGetDto>> AutorizarCarga(List<AuthCargaDto> Cargas)
+        {
+            try
+            {
+                foreach (var carga in Cargas)
+                {
+                    var cargaDb = await _dataContext.CargaDocentes.AsNoTracking().FirstAsync(c=>c.Id == carga.IdCarga);
+                    cargaDb.IsAuth = cargaDb.IsAuth == true? false : true;
+                    _dataContext.Entry(cargaDb).State = EntityState.Modified;
+                    await _dataContext.SaveChangesAsync();
+                }
+                return new ServiceResponseData<CargaGetDto>() {Status = 200, Message = Msj.MsjUpdate };
+
+            }
+            catch (Exception ex)
+            {
+
+                return new ServiceResponseData<CargaGetDto>() { Status = 500, Message = Msj.MsjError + ex.ToString() };
+                
             }
         }
     }

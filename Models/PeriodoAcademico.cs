@@ -17,6 +17,7 @@ namespace AkademicReport.Models
         public bool? EstadoPosgrado { get; set; }
         public string? Descripcion { get; set; }
         public int? Anio { get; set; }
+        public int? Cuatrimestre { get; set; }
 
         public virtual ICollection<CargaDocente> CargaDocentes { get; set; }
         public virtual ICollection<NotasCargaIrregular> NotasCargaIrregulars { get; set; }

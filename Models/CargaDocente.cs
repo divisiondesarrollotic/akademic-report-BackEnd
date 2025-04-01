@@ -7,6 +7,7 @@ namespace AkademicReport.Models
     {
         public CargaDocente()
         {
+            CantSemanasMes = new HashSet<CantSemanasMe>();
             LogTransacionals = new HashSet<LogTransacional>();
             NotasCargaIrregulars = new HashSet<NotasCargaIrregular>();
         }
@@ -42,6 +43,8 @@ namespace AkademicReport.Models
         public int? CantSemanas { get; set; }
         public int? IdTipoReporte { get; set; }
         public int? IdTipoReporteIrregular { get; set; }
+        public int? IdCargaRegular { get; set; }
+        public bool? IsAuth { get; set; }
 
         public virtual TipoCarga? CurricularNavigation { get; set; }
         public virtual Dia DiasNavigation { get; set; } = null!;
@@ -54,6 +57,7 @@ namespace AkademicReport.Models
         public virtual TipoReporte? IdTipoReporteNavigation { get; set; }
         public virtual TipoModalidad? ModalidadNavigation { get; set; }
         public virtual Recinto RecintoNavigation { get; set; } = null!;
+        public virtual ICollection<CantSemanasMe> CantSemanasMes { get; set; }
         public virtual ICollection<LogTransacional> LogTransacionals { get; set; }
         public virtual ICollection<NotasCargaIrregular> NotasCargaIrregulars { get; set; }
     }

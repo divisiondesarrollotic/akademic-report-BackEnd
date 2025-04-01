@@ -140,7 +140,7 @@ namespace AkademicReport.Service.AsignaturaServices
             {
                 var filtroUpper = filtro.ToUpper().Trim(); 
                 var codigosFilter = await _dataContext.Codigos
-                    .Where(c => c.IdPrograma == IdPrograma
+                    .Where(c => c.IdPrograma == IdPrograma && c.Deteled==false
                         && (c.Codigo1.ToUpper().Contains(filtroUpper) || c.Nombre.ToUpper().Contains(filtroUpper)))
                     .Include(c => c.TipoCargaCodigos).ThenInclude(c => c.IdTipoCargaNavigation)
                     .Include(c => c.IdConceptoNavigation)

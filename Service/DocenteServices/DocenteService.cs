@@ -1,8 +1,10 @@
 ﻿using AkademicReport.Data;
 using AkademicReport.Dto.CargaDto;
 using AkademicReport.Dto.DocentesDto;
+using AkademicReport.Dto.NivelesAcademicoDto;
 using AkademicReport.Utilities;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft;
@@ -58,6 +60,7 @@ namespace AkademicReport.Service.DocenteServices
                 docente.TipoDocente = d.TipoDocente;
                 docente.nacionalidad = d.Nacionalidad;
                 docente.sexo = d.Sexo;
+                docente.fechaIngresoIsfodosu = d.FechaIngresoIsfodosu;
                 if (d.TiempoDedicacion != null && d.TiempoDedicacion != "N/A"  &&  d.TiempoDedicacion != "N/D")
                 {
                     var vinculo = await _dataContext.Vinculos
@@ -323,6 +326,41 @@ namespace AkademicReport.Service.DocenteServices
 
         }
 
-      
+        public async Task<ServiceResponseData<List<NivelAcademicoGetDto>>> GetNivelAcademico(int idPrograma)
+        {
+            try
+            {
+                var niveles = await _dataContext.NivelAcademicos.ProjectTo<NivelAcademicoGetDto>(_mapper.ConfigurationProvider).Where(c => c.IdPrograma == idPrograma).ToListAsync();
+                return new ServiceResponseData<List<NivelAcademicoGetDto>>() { Data = niveles, Status = 200 };
+
+            }
+            catch (Exception ex)
+            {
+
+                return new ServiceResponseData<List<NivelAcademicoGetDto>>() {Status = 500, Message = Msj.MsjError + ex.ToString() }; 
+            }
+        }
+
+        public async Task<ServiceResponseData<List<NivelAcademicoGetDto>>> UpdatePriceNivelAcademico(List<NivelAcademicoUpdatePrice> Precios)
+        {
+            try
+            {
+                foreach (var precio in Precios)
+                {
+                    var nivel = await _dataContext.NivelAcademicos.AsNoTracking().FirstAsync(c => c.Id == precio.Id);
+                    nivel.PagoHora = precio.PrecioHora;
+                    _dataContext.Entry(nivel).State = EntityState.Modified;
+                    await _dataContext.SaveChangesAsync();
+                }
+                return new ServiceResponseData<List<NivelAcademicoGetDto>>() { Message =  Msj.MsjUpdate, Status = 200 };
+
+            }
+            catch (Exception ex)
+            { 
+            
+                return new ServiceResponseData<List<NivelAcademicoGetDto>>() { Status = 500, Message = Msj.MsjError + ex.ToString() };
+               
+            }
+        }
     }
 }

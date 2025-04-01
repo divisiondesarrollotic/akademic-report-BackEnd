@@ -8,5 +8,7 @@
         public bool estado { get; set; }
         public bool EstadoPosgrado { get; set; }
         public int? Anio { get; set; }
+        public int? Cuatrimestre { get; set; }
+
     }
 }

@@ -7,5 +7,8 @@
         public string? Periodo { get; set; }
         public string? Curricular { get; set; }
         public string? TipoDocente { get; set; } = null;
+        public int? IdTipoReporte { get; set; } = 0;
+        public int? IdTipoReporteIrregular { get; set; } = 0;
+
     }
 }

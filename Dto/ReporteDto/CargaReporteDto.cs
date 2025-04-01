@@ -1,4 +1,5 @@
 ﻿using AkademicReport.Dto.AsignaturaDto;
+using AkademicReport.Dto.CargaDto;
 using AkademicReport.Dto.ConceptoDto;
 using AkademicReport.Dto.PeriodoDto;
 
@@ -13,10 +14,12 @@ namespace AkademicReport.Dto.ReporteDto
         public TipoCargaDto TiposCarga { get; set; }
         public string codigo_asignatura { get; set; } = null!;
         public string nombre_asignatura { get; set; } = null!;
+        public AsignaturaGetDto? AsignaturaObj { get; set; }
         public string modalidad { get; set; }
         public int id { get; set; }
         public int seccion { get; set; }
         public string? CodUniversitas { get; set; }
+        public DiaGetDto? DiaObj { get; set; }
         public string Horario_dia { get; set; } = null!;
         public string Horario_inicio { get; set; } = null!;
         public string Horario_final { get; set; } = null!;
@@ -30,5 +33,7 @@ namespace AkademicReport.Dto.ReporteDto
         public int? IdPeriodo { get; set; }
         public bool? HoraContratada { get; set; }
         public PeriodoGetDto? PeriodoObj { get; set; }
+        public int? IdTipoReporte { get; set; }
+        public int? IdTipoReporteIrregular { get; set; }
     }
 }

@@ -11,6 +11,8 @@ namespace AkademicReport.Service.ReposteServices
         Task<ServiceResponseReporte<List<DocenteCargaReporteDto>>> PorRecinto(ReportePorRecintoDto filtro);
         Task<ServiceResponseReporte<List<DocenteCargaReporteDto>>> ReporteDiplomado(ReportePorRecintoDto filtro);
         Task<ServiceResponseReporte<List<ReporteConsolidadoResponseDto>>>ReporteConsolidado(FiltroReporteConsolidado filtro);
+        // Reporte para la carga de grado cuando sea irregular
+        Task<ServiceResponseReporte<List<CargaIrregularReporteGetDto>>> GetCargaIrregularReport(ReportePorRecintoDto filtro);
 
         // Repostes de posgrado'
         //Reporte por el id concepto de la carga

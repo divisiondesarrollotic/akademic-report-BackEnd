@@ -1,4 +1,5 @@
-﻿using AkademicReport.Dto.ProgramaDto;
+﻿using AkademicReport.Dto.ConceptoDto;
+using AkademicReport.Dto.ProgramaDto;
 
 namespace AkademicReport.Dto.AsignaturaDto
 {
@@ -6,6 +7,7 @@ namespace AkademicReport.Dto.AsignaturaDto
     {
         public int? Id { get; set; }
         public int? Id_concepto { get; set; }
+        public ConceptoGetDto? ConceptoObj { get; set; }
         public string? NombreConcepto { get; set; }
         public string? Codigo { get; set; }
         public List<TipoCargaDto>? TiposCargas { get; set; }

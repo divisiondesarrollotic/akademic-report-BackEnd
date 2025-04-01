@@ -16,8 +16,15 @@ namespace AkademicReport.Dto.CargaDto
         public string RecintoNombre { get; set; }
         public int? id_asignatura { get; set; } = null!;
         public string cod_asignatura { get; set; } = null!;
+        public string codigo { get
+            {
+                return cod_asignatura;
+            }}
+
         public int? IdCodigo { get; set; }
         public string nombre_asignatura { get; set; } = null!;
+        public AsignaturaGetDto? AsignatureObj { get; set; }
+        public string? nombre { get { return nombre_asignatura; } }
         public string cod_universitas { get; set; } = null!;
         public string CodUniversitas { get; set; } = null!;
         public int Seccion { get; set; }
@@ -25,8 +32,10 @@ namespace AkademicReport.Dto.CargaDto
         public string? Edificio { get; set; }
         public int? Modalidad { get; set; }
         public TipoModalidadDto TipoModalidad { get; set; } = null!;
+        public TipoModalidadDto Modalidades { get; set; }
         public int dia_id { get; set; }
         public string dia_nombre { get; set; }=null!;
+        public DiaGetDto? DiaObj { get; set; }
         public string hora_inicio { get; set; } = null!;
         public string minuto_inicio { get; set; } = null!;
         public string hora_fin { get; set; } = null!;
@@ -50,10 +59,14 @@ namespace AkademicReport.Dto.CargaDto
         public bool? HoraContratada { get; set; }
         public int idUsuario { get; set; }
         public bool? isEqual { get; set; }
+        public int? CantSemanas { get; set; }
         public int? IdTipoReporte { get; set; }
         public TipoReporteGetDto? TipoReporteObj { get; set; }
         public int? IdTipoReporteIrregular { get; set; }
         public TipoReporteIrregularGetDto? TipoReporteIrregularObj { get; set; }
+        public List<DayCantSemanasDto>? cantSemanaMes { get; set; }
+        public bool? IsAuth { get; set; }
+
 
 
 

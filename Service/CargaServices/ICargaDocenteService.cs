@@ -18,7 +18,8 @@ namespace AkademicReport.Service.CargaServices
         Task<ServicesResponseMessage<string>> Update(CargaUpdateDto item);
         Task<ServicesResponseMessage<string>> Delete(int id, int idUsuario);
         Task<ServiceResponseData<List<TipoDeCargaDto>>> GetTipoCarga(int IdPrograma);
-        Task<ServiceResponseData<List<MesGetDto>>> GetMeses();  
+        Task<ServiceResponseData<List<MesGetDto>>> GetMesesByCuatrimestre(int cuatrimestre);
+        Task<ServiceResponseData<List<MesGetDto>>> GetMeses();
         Task<ServiceResponseData<List<Dia>>> GetDias();
         Task<ServicesResponseMessage<string>> UpdateHorasContratadas(int idCarga);
         Task<bool> ValidateNivelPosgrado(string nivel);
@@ -33,6 +34,10 @@ namespace AkademicReport.Service.CargaServices
         Task<ServiceResponseData<List<TipoReporteIrregularGetDto>>> GetTipoReporteIrregular();
         Task<ServiceResponseData<NotaCargaIrregularDto>> InsertNotaCargaIrregular(NotaCargaIrregularDto nota);
         Task<ServiceResponseData<NotaCargaIrregularDto>> UpdateNotaCargaIrregular(NotaCargaIrregularDto nota);
+        Task<ServiceResponseData<CargaGetDto>> AutorizarCarga(List<AuthCargaDto> Cargas);
+
+
+
 
 
 

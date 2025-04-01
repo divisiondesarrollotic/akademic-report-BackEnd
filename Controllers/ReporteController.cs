@@ -66,9 +66,21 @@ namespace AkademicReport.Controllers
         {
             var response = await _reposteService.PorRecinto(filtro);
             return Ok(response);
-           
-
         }
+
+        /// <summary>
+        /// --Este post trae la los docentes y su carga de un recinto cuando la carga es irregular
+        /// /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("recinto_carga_irregular")]
+        public async Task<ActionResult> CargaIrregularPorRecinto([Required]ReportePorRecintoDto filtro)
+        {
+            var response = await _reposteService.GetCargaIrregularReport(filtro);
+            return Ok(response);
+        }
+
+
 
         /// <summary>
         /// --Este post trae la los docentes y su carga de un recinto
@@ -107,13 +119,15 @@ namespace AkademicReport.Controllers
             return Ok(response);
         }
         [HttpGet]
-
         [Route("reporte_by_programa_posgrado/{idconcepto}/{periodo}/{idrecinto}")]
         public async Task<ActionResult> ReporteByIdProgramCargaPosgrado(int idconcepto, string periodo, int idrecinto)
         {
             var response = await _reposteService.ReporteByIdProgramCargaPosgrado(idconcepto, periodo, idrecinto);
             return Ok(response);
         }
+
+
+
 
 
 

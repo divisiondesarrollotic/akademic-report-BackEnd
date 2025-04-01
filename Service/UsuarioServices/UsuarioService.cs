@@ -114,7 +114,12 @@ namespace AkademicReport.Service.UsuarioServices
             try
             {
 
-                var usuariodb = await _dataContext.Usuarios.Where(c => c.Correo == credentials.correo && c.Contra == credentials.contra && c.SoftDelete==0).Include(c => c.IdRecintoNavigation).Include(c => c.NivelNavigation).Include(c=>c.IdProgramaNavigation).ToListAsync();
+                var usuariodb = await _dataContext.Usuarios.Where(c => c.Correo == credentials.correo && c.Contra == credentials.contra && c.SoftDelete==0)
+                    .Include(c => c.IdRecintoNavigation)
+                    .Include(c => c.NivelNavigation)
+                    .Include(c=>c.IdProgramaNavigation)
+                    .Include(c=>c.IdRecintoNavigation)
+                    .ToListAsync();
                 if (usuariodb == null)
                     return new ServisResponseLogin<List<UsuarioGetDto>, string>() { Status = 204, Message = (_mapper.Map<List<UsuarioGetDto>>(usuariodb), Msj.MsjCredencialesIncorrectas) };
 

@@ -8,6 +8,8 @@ namespace AkademicReport.Dto.PeriodoDto
         public string? Descripcion { get; set; }
         [Required]
         public int? Anio { get; set; }
+        public int? Cuatrimestre { get; set; }
+
 
 
     }

@@ -11,5 +11,6 @@ namespace AkademicReport.Dto.AulaDto
         public RecintoGetDto? Recinto { get; set; }
 
 
+
     }
 }

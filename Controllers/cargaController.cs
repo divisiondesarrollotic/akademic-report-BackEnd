@@ -1,6 +1,7 @@
 ﻿using AkademicReport.Dto.CargaDto;
 using AkademicReport.Dto.DocentesDto;
 using AkademicReport.Dto.ReporteDto;
+using AkademicReport.Dto.TiposReporteDto;
 using AkademicReport.Dto.UsuarioDto;
 using AkademicReport.Models;
 using AkademicReport.Service;
@@ -140,6 +141,17 @@ namespace AkademicReport.Controllers
         {
             return Ok(await _service.GetMeses());
         }
+
+        /// <summary>
+        /// --Este  get trae todos los meses del ano
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("getmesesbycuatrimestre{cuatrimestre}")]
+        public async Task<ActionResult<List<MesGetDto>>> GetMesesByCuatrimestre(int cuatrimestre)
+        {
+            return Ok(await _service.GetMesesByCuatrimestre(cuatrimestre));
+        }
         [HttpGet]
         [Route("getdias")]
         public async Task<ActionResult<List<MesGetDto>>> GetDias()
@@ -223,7 +235,7 @@ namespace AkademicReport.Controllers
         }
         [HttpGet]
         [Route("tipos_reportes")]
-        public async Task<ActionResult<ServiceResponseData<List<TipoReporte>>>> getTipoReporte()
+        public async Task<ActionResult<ServiceResponseData<List<TipoReporteGetDto>>>> getTipoReporte()
         {
             var response =  await _service.GetTipoReporte();
             if (response.Status == 200)
@@ -232,11 +244,25 @@ namespace AkademicReport.Controllers
         }
         [HttpGet]
         [Route("tipos_reportes_irregulares")]
-        public async Task<ActionResult<ServiceResponseData<List<TipoReporteIrregular>>>> getTipoReporteIrregulares()
+        public async Task<ActionResult<ServiceResponseData<List<TipoReporteIrregularGetDto>>>> getTipoReporteIrregulares()
         {
             var response = await _service.GetTipoReporteIrregular();
             if (response.Status == 200)
                 return Ok(response);
+            return BadRequest(response);
+        }
+
+        // <summary>
+        /// --Autoriza la carga del id que se le mande
+        /// </summary>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("auth_carga")]
+        public async Task<ActionResult> AutCarga(List<AuthCargaDto> Cargas)
+        {
+            var response = await _service.AutorizarCarga(Cargas);
+            if (response.Status == 200)
+                 return Ok( response);
             return BadRequest(response);
         }
 

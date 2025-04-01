@@ -1,6 +1,8 @@
 ﻿using AkademicReport.Dto.DocentesDto;
+using AkademicReport.Dto.NivelesAcademicoDto;
 using AkademicReport.Service.DocenteServices;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace AkademicReport.Controllers
 {
@@ -72,6 +74,32 @@ namespace AkademicReport.Controllers
         public async Task<ActionResult> GetAllNacionalidadesFilter(FiltroDto filtro)
         {
             var response = await _service.GetNacionalidades(filtro);
+            return Ok(response);
+        }
+
+
+        /// <summary>
+        /// --Trae todas los niveles academios del programa
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("{idPrograma}")]
+        public async Task<ActionResult> GetAllNivelesAcademico(int idPrograma)
+        {
+            var response = await _service.GetNivelAcademico(idPrograma);
+            return Ok(response);
+        }
+
+
+        /// <summary>
+        /// Actualiza los precios de los niveles academicos segun sean enviados
+        /// </summary>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("niveles_academicos")]
+        public async Task<ActionResult> UpdateNivelesAcademicos([Required] List<NivelAcademicoUpdatePrice> Niveles)
+        {
+            var response = await _service.UpdatePriceNivelAcademico(Niveles);
             return Ok(response);
         }
     }

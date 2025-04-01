@@ -1,4 +1,5 @@
 ﻿using AkademicReport.Dto.ProgramaDto;
+using AkademicReport.Dto.RecintoDto;
 
 namespace AkademicReport.Dto.UsuarioDto
 {
@@ -10,6 +11,7 @@ namespace AkademicReport.Dto.UsuarioDto
         public string? nivel { get; set; }
         public string? nivelNombre { get; set; }
         public string? recinto { get; set; }
+        public RecintoGetDto? RecintoObj { get; set; }
         public string? id_recinto { get; set; }
         public string? nombre_corto { get; set; }
         public int? IdPrograma { get; set; }

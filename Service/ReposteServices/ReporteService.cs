@@ -39,6 +39,72 @@ namespace AkademicReport.Service.ReposteServices
             _mapper = mapper;
         }
 
+        public async Task<ServiceResponseReporte<List<CargaIrregularReporteGetDto>>> GetCargaIrregularReport(ReportePorRecintoDto filtro)
+        {
+            try
+            {
+                var cargaPorRecinto = await PorRecinto(filtro);
+                decimal monto = 0;
+                var cargaDone = new List<CargaIrregularReporteGetDto>();
+                if(cargaPorRecinto.Status==200)
+                {
+        
+                    foreach (var item in cargaPorRecinto.Data)
+                    {
+                        var newCarga = new CargaIrregularReporteGetDto();
+                        newCarga.Docente = item.Docente;
+                        foreach (var carga in item.Carga)
+                        {
+                            //Traemos los meses y las cantidades de semanas en las cuales se le va a pagar
+                            var cantSemanasMes = await _dataContext.CantSemanasMes.Where(c => c.IdCarga == carga.id).Include(c=>c.MesNavigation) .ToListAsync();
+                            var cantSemanasMesMap = _mapper.Map<List<CantSemanaMesDto>>(cantSemanasMes);
+                            foreach (var c in cantSemanasMesMap)
+                            {
+                                c.Monto = (carga.precio_hora * carga.credito) * c.CantSemanas;
+                                monto += c.Monto;
+                            }
+                            var cargaMap = _mapper.Map<GetCargaIrregularDto>(carga);
+                            cargaMap.MontosMesObj = cantSemanasMesMap;
+                            newCarga.Carga.Add(cargaMap);
+                        }
+                        cargaDone.Add(newCarga);
+                    }
+
+                    return new ServiceResponseReporte<List<CargaIrregularReporteGetDto>>()
+                    {
+                        Anio = cargaPorRecinto.Anio,
+                        Data = cargaDone,
+                        Message = cargaPorRecinto.Message,
+                        MontoTotal = monto,
+                        Status = cargaPorRecinto.Status,
+                        totalRecinto = cargaPorRecinto.totalRecinto
+                    };
+                }
+                else
+                {
+                    return new ServiceResponseReporte<List<CargaIrregularReporteGetDto>>()
+                    {
+                        Anio = cargaPorRecinto.Anio,
+                        Data = cargaDone,
+                        Message = cargaPorRecinto.Message,
+                        MontoTotalesPorMes = cargaPorRecinto.MontoTotalesPorMes,
+                        Status = cargaPorRecinto.Status,
+                        totalRecinto = cargaPorRecinto.totalRecinto
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+
+                return new ServiceResponseReporte<List<CargaIrregularReporteGetDto>>()
+                {
+              
+                    Message =$"{Msj.MsjError} {ex.ToString()}",
+                    Status = 500
+                };
+            }
+
+        }
 
         public async Task<ServiceResponseData<DocenteCargaReporteDto>> PorDocente(ReporteDto filtro, List<DocenteGetDto> DocentesAmilca)
         {
@@ -146,6 +212,8 @@ namespace AkademicReport.Service.ReposteServices
                             c.IdPeriodo = periodo.Id;
                             c.PeriodoObj = _mapper.Map<PeriodoGetDto>(periodo);
                             c.HoraContratada = item.HoraContratada;
+                            c.IdTipoReporteIrregular = item.IdTipoReporteIrregular;
+                            c.IdTipoReporte = item.IdTipoReporte;
                             DataResult.Carga.Add(c);
 
                         }
@@ -219,6 +287,8 @@ namespace AkademicReport.Service.ReposteServices
                             c.Concepto = item.Concepto;
                             var periodo = await _dataContext.PeriodoAcademicos.Where(c => c.Periodo == item.Periodo).FirstAsync();
                             c.IdPeriodo = periodo.Id;
+                            c.IdTipoReporteIrregular = item.IdTipoReporteIrregular;
+                            c.IdTipoReporte = item.IdTipoReporte;
                             c.HoraContratada = item.HoraContratada;
                             c.PeriodoObj = _mapper.Map<PeriodoGetDto>(periodo);
                             var recinto = await _dataContext.Recintos.FirstOrDefaultAsync(c => c.Id == int.Parse(item.Recinto));
@@ -302,6 +372,8 @@ namespace AkademicReport.Service.ReposteServices
                             var periodo = await _dataContext.PeriodoAcademicos.Where(c => c.Periodo == item.Periodo).FirstAsync();
                             c.IdPeriodo = periodo.Id;
                             c.HoraContratada = item.HoraContratada;
+                            c.IdTipoReporteIrregular = item.IdTipoReporteIrregular;
+                            c.IdTipoReporte = item.IdTipoReporte;
                             c.PeriodoObj = _mapper.Map<PeriodoGetDto>(periodo);
                             DataResult.Docente.Pago_hora = c.precio_hora.ToString();
                             DataResult.Carga.Add(c);
@@ -360,6 +432,8 @@ namespace AkademicReport.Service.ReposteServices
                             c.IdPeriodo = periodo.Id;
                             c.PeriodoObj = _mapper.Map<PeriodoGetDto>(periodo);
                             c.pago_asignatura = c.precio_hora * c.credito;
+                            c.IdTipoReporteIrregular = item.IdTipoReporteIrregular;
+                            c.IdTipoReporte = item.IdTipoReporte;
                             DataResult.Docente.Pago_hora = c.precio_hora.ToString();
                             DataResult.Carga.Add(c);
 
@@ -427,6 +501,8 @@ namespace AkademicReport.Service.ReposteServices
                             var periodo = await _dataContext.PeriodoAcademicos.Where(c => c.Periodo == item.Periodo).FirstAsync();
                             c.IdPeriodo = periodo.Id;
                             c.PeriodoObj = _mapper.Map<PeriodoGetDto>(periodo);
+                            c.IdTipoReporteIrregular = item.IdTipoReporteIrregular;
+                            c.IdTipoReporte = item.IdTipoReporte;
                             DataResult.Carga.Add(c);
                         }
 
@@ -908,299 +984,257 @@ namespace AkademicReport.Service.ReposteServices
 
         public async Task<ServiceResponseReporte<List<DocenteCargaReporteDto>>> PorRecinto(ReportePorRecintoDto filtro)
         {
-
-            var recintoActual = await _dataContext.Recintos.Where(c => c.Id == filtro.idRecinto).FirstOrDefaultAsync();
-            var docentes = await _docentesService.GetAllRecinto(new FiltroDocentesDto(), recintoActual.Id);
-            List<DocenteGetDto> docentesRecinto = new List<DocenteGetDto>();
-
-            switch (filtro.TipoDocente)
+            try
             {
-                case "MT":
-                    docentesRecinto = docentes.Data!.Where(c =>
-                        c.id_recinto == filtro.idRecinto.ToString() &&
-                        c.tiempoDedicacion == "MT").ToList();
-                    break;
+                var recintoActual = await _dataContext.Recintos.Where(c => c.Id == filtro.idRecinto).FirstOrDefaultAsync();
+                var docentes = await _docentesService.GetAllRecinto(new FiltroDocentesDto(), recintoActual.Id);
+                List<DocenteGetDto> docentesRecinto = new List<DocenteGetDto>();
 
-                case "A":
-                    docentesRecinto = docentes.Data!.Where(c =>
-                        c.id_recinto == filtro.idRecinto.ToString() &&
-                        (c.tiempoDedicacion == "MT" || c.tiempoDedicacion == "A" || c.tiempoDedicacion == "M" || c.tiempoDedicacion == "F")).ToList();
-                    break;
-
-                case "TC":
-                    docentesRecinto = docentes.Data!.Where(c =>
-                        c.id_recinto == filtro.idRecinto.ToString() &&
-                        c.tiempoDedicacion == "TC").ToList();
-                    break;
-
-                default:
-                    docentesRecinto = docentes.Data!.Where(c =>
-                        c.id_recinto == filtro.idRecinto.ToString()).ToList();
-                    break;
-            }
-
-            List<DocenteCargaReporteDto> CargadDocentes = new List<DocenteCargaReporteDto>();
-            var vinculacion = await _dataContext.Vinculos.ToListAsync();
-            int Monto = 0;
-            int MontoPorAsignatura = 0;
-            int Total = 0;
-            int CantCreditos = 0;
-            int CantidadPagada = 0;
-            int CantCreditosF = 0;
-            if (filtro.Curricular == "3")
-            {
-                docentesRecinto = docentesRecinto.Where(c => c.tiempoDedicacion == "F" && c.TipoDocente!.Trim() == "Facilitador del DIID" || c.TipoDocente!.Trim() == "Facilitadores del DIID").ToList();
-            }
-            else
-            {
-                docentesRecinto = docentesRecinto.Where(c => c.TipoDocente!.Trim() != "Facilitador del DIID" && c.TipoDocente.Trim()!="Facilitadores del DIID").ToList();
-            }
-            foreach (var docente in docentesRecinto)
-            {
-                if (docente.identificacion == "402-2545338-6")
+                switch (filtro.TipoDocente)
                 {
+                    case "MT":
+                        docentesRecinto = docentes.Data!.Where(c =>
+                            c.id_recinto == filtro.idRecinto.ToString() &&
+                            c.tiempoDedicacion == "MT").ToList();
+                        break;
 
+                    case "A":
+                        docentesRecinto = docentes.Data!.Where(c =>
+                            c.id_recinto == filtro.idRecinto.ToString() &&
+                            (c.tiempoDedicacion == "MT" || c.tiempoDedicacion == "A" || c.tiempoDedicacion == "M" || c.tiempoDedicacion == "F")).ToList();
+                        break;
+
+                    case "TC":
+                        docentesRecinto = docentes.Data!.Where(c =>
+                            c.id_recinto == filtro.idRecinto.ToString() &&
+                            c.tiempoDedicacion == "TC").ToList();
+                        break;
+
+                    default:
+                        docentesRecinto = docentes.Data!.Where(c =>
+                            c.id_recinto == filtro.idRecinto.ToString()).ToList();
+                        break;
                 }
 
-                if (docente.identificacion != null)
+                List<DocenteCargaReporteDto> CargadDocentes = new List<DocenteCargaReporteDto>();
+                var vinculacion = await _dataContext.Vinculos.ToListAsync();
+                int Monto = 0;
+                int MontoPorAsignatura = 0;
+                int Total = 0;
+                int CantCreditos = 0;
+                int CantidadPagada = 0;
+                int CantCreditosF = 0;
+                if (filtro.Curricular == "3")
                 {
-
-                    var filter = new ReporteDto();
-                    filter.Cedula = docente.identificacion;
-                    filter.Periodo = filtro.Periodo;
-                    filter.idRecinto = filtro.idRecinto.ToString();
-                    filter.idPrograma = 1;
-                   
-                    ServiceResponseData<DocenteCargaReporteDto> DocenteConSuCarga = await PorDocente(filter, docentes.Data);
-                    if(DocenteConSuCarga.Data.Carga!=null)
+                    docentesRecinto = docentesRecinto.Where(c => c.tiempoDedicacion == "F" && c.TipoDocente!.Trim() == "Facilitador del DIID" || c.TipoDocente!.Trim() == "Facilitadores del DIID").ToList();
+                }
+                else
+                {
+                    docentesRecinto = docentesRecinto.Where(c => c.TipoDocente!.Trim() != "Facilitador del DIID" && c.TipoDocente.Trim() != "Facilitadores del DIID").ToList();
+                }
+                foreach (var docente in docentesRecinto)
+                {
+                    if (docente.identificacion == "001-1063486-2")
                     {
-                        if (DocenteConSuCarga.Data.Docente!.TiempoDedicacion == "M" || DocenteConSuCarga.Data.Docente!.TiempoDedicacion == "F" && DocenteConSuCarga.Data.Carga.Count>0)
-                        {
 
-                        }
                     }
-                   
-
-                    if (DocenteConSuCarga.Data != null && DocenteConSuCarga.Data.Carga != null)
+                    if (docente.identificacion != null)
                     {
 
-                        List<CargaReporteDto> CargaFilter = new List<CargaReporteDto>();
-                        if (filtro.Curricular != "0" && filtro.Curricular != null)
+                        var filter = new ReporteDto();
+                        filter.Cedula = docente.identificacion;
+                        filter.Periodo = filtro.Periodo;
+                        filter.idRecinto = filtro.idRecinto.ToString();
+                        filter.idPrograma = 1;
+                        ServiceResponseData<DocenteCargaReporteDto> DocenteConSuCarga = await PorDocente(filter, docentes.Data);
+                        //Validacion para que filtre por los tipos de reporte si estos no llegan vacios, si llegan vacios filtrara por los reportes de tipo regular
+                        if ((filtro.IdTipoReporte is not null and not 0) && (filtro.IdTipoReporteIrregular is not null and not 0))
                         {
-                            if (DocenteConSuCarga.Data.Docente!.TiempoDedicacion == "F")
-                            {
-                                CargaFilter = DocenteConSuCarga.Data.Carga.ToList();
-                            }
-                            else
-                            {
-                                CargaFilter = DocenteConSuCarga.Data.Carga.Where(c => c.TiposCarga.Id == Convert.ToInt32(filtro.Curricular)).ToList();
-                            }
-
-                            if (DocenteConSuCarga.Data.Docente.TiempoDedicacion == "TC")
-                            {
-                                Monto = DocenteConSuCarga.Data.MontoVinculacion;
-                                foreach (var item in CargaFilter)
-                                {
-                                    item.precio_hora = 0;
-                                    CantCreditos += item.credito;
-                                }
-                            }
-
-                            else if (DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT" && filtro.TipoDocente != "A")
-                            {
-                                CargaFilter = CargaFilter.Where(c => c.HoraContratada == false).ToList();
-                                CantCreditosF = CargaFilter.Sum(c => c.credito);
-
-                            }
-                            if (DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT" || DocenteConSuCarga.Data.Docente.TiempoDedicacion == "M" || DocenteConSuCarga.Data.Docente.TiempoDedicacion == "F" && filtro.TipoDocente == "A"|| filtro.TipoDocente==null)
-                            {
-                                CargaFilter = CargaFilter.Where(c => c.HoraContratada == true).ToList();
-                                foreach (var item in CargaFilter)
-                                {
-                                    item.precio_hora = int.Parse(DocenteConSuCarga.Data.Docente.Pago_hora);
-                                    Monto += item.precio_hora * item.credito;
-                                    MontoPorAsignatura += Monto;
-                                    CantCreditos += item.credito;
-                                    item.pago_asignaturaMensual = item.HoraContratada == true ? (item.precio_hora * item.credito) * 4 : 0;
-
-                                }
-
-                            }
-
+                            DocenteConSuCarga.Data.Carga = DocenteConSuCarga.Data.Carga.Where(c => c.IdTipoReporte == filtro.IdTipoReporte
+                            && c.IdTipoReporteIrregular == filtro.IdTipoReporteIrregular).ToList();
                         }
-                        else
+
+                        if (DocenteConSuCarga.Data != null && DocenteConSuCarga.Data.Carga != null )
                         {
-                            CargaFilter = DocenteConSuCarga.Data.Carga;
-                            if (DocenteConSuCarga.Data.Docente.TiempoDedicacion == "TC")
+                            List<CargaReporteDto> CargaFilter = new List<CargaReporteDto>();
+                            if (filtro.Curricular != "0" && filtro.Curricular != null)
                             {
-                                Monto = DocenteConSuCarga.Data.MontoVinculacion;
-                                foreach (var item in CargaFilter)
+                                if (DocenteConSuCarga.Data.Docente!.TiempoDedicacion == "F")
                                 {
-                                    item.precio_hora = 0;
-                                    CantCreditos += item.credito;
-
+                                    CargaFilter = DocenteConSuCarga.Data.Carga.ToList();
                                 }
-                            }
-                            else if (DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT" && filtro.TipoDocente != "A" && filtro.TipoDocente != null)
-                            {
+                                else
+                                {
+                                    CargaFilter = DocenteConSuCarga.Data.Carga.Where(c => c.TiposCarga.Id == Convert.ToInt32(filtro.Curricular)).ToList();
+                                }
 
-                                CargaFilter = CargaFilter.Where(c => c.HoraContratada == false).ToList();
-                                CantCreditosF = CargaFilter.Sum(c => c.credito);
+                                if (DocenteConSuCarga.Data.Docente.TiempoDedicacion == "TC")
+                                {
+                                    Monto = DocenteConSuCarga.Data.MontoVinculacion;
+                                    foreach (var item in CargaFilter)
+                                    {
+                                        item.precio_hora = 0;
+                                        CantCreditos += item.credito;
+                                    }
+                                }
 
-
-                                //foreach (var item in CargaFilter.Where(c => c.HoraContratada == false))
-                                //{
-                                //    if (CantCreditosF + item.credito > 12)
-                                //    {
-                                //        // verificacion por si el monto resultante de la suma en mayor a 20 que solo tome despues de; va;pr 20
-                                //        CantCreditosF += item.credito;
-                                //        if (CantidadPagada == 0)
-                                //        {
-                                //            CantidadPagada = CantCreditosF - 12;
-                                //            item.precio_hora = item.precio_hora;
-                                //            item.pago_asignatura = item.precio_hora * CantidadPagada;
-                                //            MontoPorAsignatura += item.pago_asignatura;
-                                //        }
-                                //        else
-                                //        {
-                                //            item.precio_hora = item.precio_hora;
-                                //            item.pago_asignatura = item.precio_hora * item.credito;
-                                //            MontoPorAsignatura += item.pago_asignatura;
-                                //        }
-                                //    }
-                                //    else
-                                //    {
-                                //        CantCreditosF += item.credito;
-                                //        item.precio_hora = 0;
-                                //        item.pago_asignatura = 0;
-                                //    }
-                                //}
-
-                            }
-
-
-                            //else if (DocenteConSuCarga.Data.Carga.Count() == CargaFilter.Count())
-                            //{
-                            //    Monto = DocenteConSuCarga.Data.MontoSemanal;
-                            //    foreach (var item in CargaFilter)
-                            //    {
-
-                            //        CantCreditos += item.credito;
-
-                            //    }
-                            //}
-                            if (filtro.TipoDocente != "MT" && DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT" || DocenteConSuCarga.Data.Docente.TiempoDedicacion == "A" || DocenteConSuCarga.Data.Docente.TiempoDedicacion == "M" || DocenteConSuCarga.Data.Docente.TiempoDedicacion == "F")
-                            {
-                                Monto = 0;
-                                if(DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT" && filtro.TipoDocente == "MT" && CargaFilter.Where(c => c.HoraContratada == false).ToList().Sum(c=>c.credito)>=0)
+                                else if (DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT" && filtro.TipoDocente != "A")
                                 {
                                     CargaFilter = CargaFilter.Where(c => c.HoraContratada == false).ToList();
-                                }
-                                else if(filtro.TipoDocente!=null && filtro.TipoDocente!="MT" )
-                                {
-                                    if(DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT"&& CargaFilter.Where(c => c.HoraContratada == false).ToList().Sum(c => c.credito) < 1)
-                                    {
-                                        CargaFilter = new List<CargaReporteDto>();
-                                    }
-                                    else
-                                    {
-                                        CargaFilter = CargaFilter.Where(c => c.HoraContratada == true).ToList();
-                                    }
+                                    CantCreditosF = CargaFilter.Sum(c => c.credito);
 
                                 }
-                                //Esta condicion lo saca de la lista de todos si la carga no tiene por lo menos una fija
-                                else if(DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT" && filtro.TipoDocente==null && CargaFilter.Where(c => c.HoraContratada == false).ToList().Sum(c => c.credito) <1)
+                                if (DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT" || DocenteConSuCarga.Data.Docente.TiempoDedicacion == "M" || DocenteConSuCarga.Data.Docente.TiempoDedicacion == "F" && filtro.TipoDocente == "A" || filtro.TipoDocente == null)
                                 {
-                                    CargaFilter = new List<CargaReporteDto>();
-                                }
-
-
-                                foreach (var item in CargaFilter)
-                                {
-                                    item.precio_hora = int.Parse(DocenteConSuCarga.Data.Docente.Pago_hora);
-                                    item.pago_asignaturaMensual = item.HoraContratada == true ? (item.precio_hora * item.credito) * 4 : 0;
-                                    if(item.HoraContratada==true)
+                                    CargaFilter = CargaFilter.Where(c => c.HoraContratada == true).ToList();
+                                    foreach (var item in CargaFilter)
                                     {
+                                        item.precio_hora = int.Parse(DocenteConSuCarga.Data.Docente.Pago_hora);
                                         Monto += item.precio_hora * item.credito;
                                         MontoPorAsignatura += Monto;
                                         CantCreditos += item.credito;
                                         item.pago_asignaturaMensual = item.HoraContratada == true ? (item.precio_hora * item.credito) * 4 : 0;
-
                                     }
-
-
                                 }
-
-                                CantCreditosF = CantCreditos;
-                            }
-                        }
-
-                        var DocenteCargaListo = new DocenteCargaReporteDto();
-                        DocenteCargaListo.Docente = DocenteConSuCarga.Data.Docente;
-                        DocenteCargaListo.MontoVinculacion = DocenteConSuCarga.Data.MontoVinculacion;
-                        DocenteCargaListo.Carga = CargaFilter;
-                        if (docente.tiempoDedicacion == "TC")
-                        {
-                            DocenteCargaListo.MontoSemanal = 0;
-                            DocenteCargaListo.MontoMensual = DocenteConSuCarga.Data.MontoVinculacion;
-                            DocenteCargaListo.CantCreditos = CantCreditos;
-                        }
-                        else if (docente.tiempoDedicacion == "MT")
-                        {
-                            if (filtro.TipoDocente == null)
-                            {
-                                DocenteCargaListo.MontoVinculacion = DocenteConSuCarga.Data.MontoVinculacion;
-                                DocenteCargaListo.MontoSemanal = Monto;
-                                DocenteCargaListo.MontoMensual = DocenteConSuCarga.Data.MontoVinculacion + (Monto * 4);
-                                DocenteCargaListo.CantCreditos = CargaFilter.Sum(c=>c.credito);
                             }
                             else
                             {
-                                DocenteCargaListo.MontoVinculacion = docente.tiempoDedicacion == "MT" && filtro.TipoDocente == "MT" ? DocenteConSuCarga.Data.MontoVinculacion : 0;
+                                CargaFilter = DocenteConSuCarga.Data.Carga;
+                                if (DocenteConSuCarga.Data.Docente?.TiempoDedicacion == "TC")
+                                {
+                                    Monto = DocenteConSuCarga.Data.MontoVinculacion;
+                                    foreach (var item in CargaFilter)
+                                    {
+                                        item.precio_hora = 0;
+                                        CantCreditos += item.credito;
+                                    }
+                                }
+                                else if (DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT" && filtro.TipoDocente != "A" && filtro.TipoDocente != null)
+                                {
+                                    CargaFilter = CargaFilter.Where(c => c.HoraContratada == false).ToList();
+                                    CantCreditosF = CargaFilter.Sum(c => c.credito);
+                                }
+
+
+                                if (filtro.TipoDocente != "MT" && DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT" || DocenteConSuCarga.Data.Docente.TiempoDedicacion == "A" || DocenteConSuCarga.Data.Docente.TiempoDedicacion == "M" || DocenteConSuCarga.Data.Docente.TiempoDedicacion == "F")
+                                {
+                                    Monto = 0;
+                                    if (DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT" && filtro.TipoDocente == "MT" && CargaFilter.Where(c => c.HoraContratada == false).ToList().Sum(c => c.credito) >= 0)
+                                    {
+                                        CargaFilter = CargaFilter.Where(c => c.HoraContratada == false).ToList();
+                                    }
+                                    else if (filtro.TipoDocente != null && filtro.TipoDocente != "MT")
+                                    {
+                                        if (DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT" && CargaFilter.Where(c => c.HoraContratada == false).ToList().Sum(c => c.credito) < 1)
+                                        {
+                                            CargaFilter = new List<CargaReporteDto>();
+                                        }
+                                        else
+                                        {
+                                            CargaFilter = CargaFilter.Where(c => c.HoraContratada == true).ToList();
+                                        }
+                                    }
+                                    //Esta condicion lo saca de la lista de todos si la carga no tiene por lo menos una fija
+                                    else if (DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT" && filtro.TipoDocente == null && CargaFilter.Where(c => c.HoraContratada == false).ToList().Sum(c => c.credito) < 1)
+                                    {
+                                        CargaFilter = new List<CargaReporteDto>();
+                                    }
+
+                                    foreach (var item in CargaFilter)
+                                    {
+                                        item.precio_hora = int.Parse(DocenteConSuCarga.Data.Docente.Pago_hora);
+                                        item.pago_asignaturaMensual = item.HoraContratada == true ? (item.precio_hora * item.credito) * 4 : 0;
+                                        if (item.HoraContratada == true)
+                                        {
+                                            Monto += item.precio_hora * item.credito;
+                                            MontoPorAsignatura += Monto;
+                                            CantCreditos += item.credito;
+                                            item.pago_asignaturaMensual = item.HoraContratada == true ? (item.precio_hora * item.credito) * 4 : 0;
+                                        }
+                                    }
+                                    CantCreditosF = CantCreditos;
+                                }
+                            }
+                            var DocenteCargaListo = new DocenteCargaReporteDto();
+                            DocenteCargaListo.Docente = DocenteConSuCarga.Data.Docente;
+                            DocenteCargaListo.MontoVinculacion = DocenteConSuCarga.Data.MontoVinculacion;
+                            DocenteCargaListo.Carga = CargaFilter;
+                            if (docente.tiempoDedicacion == "TC")
+                            {
+                                DocenteCargaListo.MontoSemanal = 0;
+                                DocenteCargaListo.MontoMensual = DocenteConSuCarga.Data.MontoVinculacion;
+                                DocenteCargaListo.CantCreditos = CantCreditos;
+                            }
+                            else if (docente.tiempoDedicacion == "MT")
+                            {
+                                if (filtro.TipoDocente == null)
+                                {
+                                    DocenteCargaListo.MontoVinculacion = DocenteConSuCarga.Data.MontoVinculacion;
+                                    DocenteCargaListo.MontoSemanal = Monto;
+                                    DocenteCargaListo.MontoMensual = DocenteConSuCarga.Data.MontoVinculacion + (Monto * 4);
+                                    DocenteCargaListo.CantCreditos = CargaFilter.Sum(c => c.credito);
+                                }
+                                else
+                                {
+                                    DocenteCargaListo.MontoVinculacion = docente.tiempoDedicacion == "MT" && filtro.TipoDocente == "MT" ? DocenteConSuCarga.Data.MontoVinculacion : 0;
+                                    DocenteCargaListo.MontoSemanal = Monto;
+                                    DocenteCargaListo.MontoMensual = docente.tiempoDedicacion == "MT" && filtro.TipoDocente == "MT" ? DocenteConSuCarga.Data.MontoVinculacion : (Monto * 4);
+                                    DocenteCargaListo.CantCreditos = CargaFilter.Sum(c => c.credito);
+                                }
+
+                            }
+                            else if (docente.tiempoDedicacion == "A")
+                            {
                                 DocenteCargaListo.MontoSemanal = Monto;
-                                DocenteCargaListo.MontoMensual = docente.tiempoDedicacion == "MT" && filtro.TipoDocente == "MT" ? DocenteConSuCarga.Data.MontoVinculacion : (Monto * 4);
-                                DocenteCargaListo.CantCreditos = CargaFilter.Sum(c => c.credito);
+                                DocenteCargaListo.MontoMensual = Monto * 4;
+                                DocenteCargaListo.CantCreditos = CantCreditos;
+                            }
+                            else
+                            {
+                                DocenteCargaListo.MontoSemanal = Monto;
+                                DocenteCargaListo.MontoMensual = Monto * 4;
+                                DocenteCargaListo.CantCreditos = CantCreditos;
                             }
 
-                        }
-                        else if (docente.tiempoDedicacion == "A")
-                        {
-                            DocenteCargaListo.MontoSemanal = Monto;
-                            DocenteCargaListo.MontoMensual = Monto * 4;
-                            DocenteCargaListo.CantCreditos = CantCreditos;
-                        }
-                        else
-                        {
-                            DocenteCargaListo.MontoSemanal = Monto;
-                            DocenteCargaListo.MontoMensual = Monto * 4;
-                            DocenteCargaListo.CantCreditos = CantCreditos;
-                        }
-
-                        if (DocenteCargaListo.Carga.Count > 0)
-                        {
-                            CargadDocentes.Add(DocenteCargaListo);
-                            Total += DocenteCargaListo.MontoMensual;
-                            Monto = 0;
-                            CantCreditos = 0;
-                            CantCreditosF = 0;
-                            CantidadPagada = 0;
-                            MontoPorAsignatura = 0;
+                            if (DocenteCargaListo.Carga.Count > 0)
+                            {
+                                CargadDocentes.Add(DocenteCargaListo);
+                                Total += DocenteCargaListo.MontoMensual;
+                                Monto = 0;
+                                CantCreditos = 0;
+                                CantCreditosF = 0;
+                                CantidadPagada = 0;
+                                MontoPorAsignatura = 0;
+                            }
                         }
                     }
                 }
+                var response = new ServiceResponseReporte<List<DocenteCargaReporteDto>>()
+                {
+                    Status = 200,
+                    Data = CargadDocentes.OrderBy(c => c.Docente.Nombre).ToList(),
+                    totalRecinto = Total
+                };
+                if (filtro.Periodo != null)
+                {
+                    var periodo = await _dataContext.PeriodoAcademicos.Where(c => c.Periodo == filtro.Periodo).FirstAsync();
+                    response.Anio = periodo.Anio!.Value;
+                }
+                return response;
+
             }
-            var response = new ServiceResponseReporte<List<DocenteCargaReporteDto>>()
+            catch (Exception ex )
             {
-                Status = 200,
-                Data = CargadDocentes.OrderBy(c => c.Docente.Nombre).ToList(),
-                totalRecinto = Total
-            };
-            if (filtro.Periodo != null)
-            {
-                var periodo = await _dataContext.PeriodoAcademicos.Where(c => c.Periodo == filtro.Periodo).FirstAsync();
-                response.Anio = periodo.Anio!.Value;
+
+                return new ServiceResponseReporte<List<DocenteCargaReporteDto>>()
+                {
+                    Status = 500,
+                    Message = Msj.MsjError + ex.ToString()
+               
+                };
             }
-            return response;
+            
+
         }
 
         public async Task<ServiceResponseReporte<List<ReportCargaPosgradoDto>>> ReporteByDocentePosgrado(string cedula, string periodo, int idRecinto)
