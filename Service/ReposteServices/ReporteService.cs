@@ -44,38 +44,93 @@ namespace AkademicReport.Service.ReposteServices
             try
             {
                 var cargaPorRecinto = await PorRecinto(filtro);
-                decimal monto = 0;
+                var periodo = await _dataContext.PeriodoAcademicos.Where(c => c.Periodo == filtro.Periodo).FirstAsync();
+                var meses =  await _dataContext.Meses.Where(c => c.Cuatrimestre == periodo.Cuatrimestre).ToListAsync();
+
+
+              
                 var cargaDone = new List<CargaIrregularReporteGetDto>();
                 if(cargaPorRecinto.Status==200)
                 {
         
-                    foreach (var item in cargaPorRecinto.Data)
+                    foreach (var docenteConSuCarga in cargaPorRecinto.Data)
                     {
                         var newCarga = new CargaIrregularReporteGetDto();
-                        newCarga.Docente = item.Docente;
-                        foreach (var carga in item.Carga)
+                        newCarga.Docente = docenteConSuCarga.Docente;
+                        var montoGenerales = new List<CantSemanaMesDto>();
+                        foreach (var mes in meses)
+                        {
+                            var nuevo = new CantSemanaMesDto()
+                            {
+                                CantSemanas = 0,
+                                MesObj = _mapper.Map<MesGetDto>(mes),
+                                Monto = 0
+                            };
+                            montoGenerales.Add(nuevo);
+
+                        }
+                       
+                        foreach (var carga in docenteConSuCarga.Carga)
                         {
                             //Traemos los meses y las cantidades de semanas en las cuales se le va a pagar
                             var cantSemanasMes = await _dataContext.CantSemanasMes.Where(c => c.IdCarga == carga.id).Include(c=>c.MesNavigation) .ToListAsync();
-                            var cantSemanasMesMap = _mapper.Map<List<CantSemanaMesDto>>(cantSemanasMes);
-                            foreach (var c in cantSemanasMesMap)
+                            var cantSemanasMesMap = new List<CantSemanaMesDto>();
+
+                            foreach (var mes in meses)
                             {
-                                c.Monto = (carga.precio_hora * carga.credito) * c.CantSemanas;
-                                monto += c.Monto;
+                                var nuevo = new CantSemanaMesDto()
+                                {
+                                    CantSemanas = 0,
+                                    MesObj = _mapper.Map<MesGetDto>(mes),
+                                    Monto = 0
+                                };
+                                cantSemanasMesMap.Add(nuevo);
+
                             }
+
+
+                            foreach (var i in cantSemanasMesMap)
+                            {
+                                if (cantSemanasMes.FirstOrDefault(c => c.MesNavigation.IdMes == i.MesObj.IdMes)!=null)
+                                {
+                                    i.CantSemanas = cantSemanasMes.FirstOrDefault(c => c.MesNavigation.IdMes == i.MesObj.IdMes).CantSemanas.Value;
+                                    i.MesObj = _mapper.Map<MesGetDto>(i.MesObj);
+                                    i.Monto = (carga.precio_hora * carga.credito) * cantSemanasMes.First(c => c.MesNavigation.IdMes == i.MesObj.IdMes).CantSemanas.Value;
+                                    montoGenerales.FirstOrDefault(c => c.MesObj.IdMes == i.MesObj.IdMes).Monto += i.Monto;
+                                }
+         
+                                else
+                                {
+                                    i.CantSemanas = 0;
+                                    i.Monto = 0;
+                                }
+
+                            }
+                             
+                           
+                            //foreach (var c in cantSemanasMesMap)
+                            //{
+                            //    c.Monto = (carga.precio_hora * carga.credito) * c.CantSemanas;
+                            //    monto += c.Monto;
+                            //    montoGenerales.FirstOrDefault(i => i.MesObj.IdMes == c.MesObj.IdMes).Monto += c.Monto;
+                            //}
                             var cargaMap = _mapper.Map<GetCargaIrregularDto>(carga);
                             cargaMap.MontosMesObj = cantSemanasMesMap;
                             newCarga.Carga.Add(cargaMap);
                         }
+
+                        newCarga.MontosTotales = montoGenerales;
                         cargaDone.Add(newCarga);
                     }
+
+
 
                     return new ServiceResponseReporte<List<CargaIrregularReporteGetDto>>()
                     {
                         Anio = cargaPorRecinto.Anio,
                         Data = cargaDone,
                         Message = cargaPorRecinto.Message,
-                        MontoTotal = monto,
+                        MontoTotal = 0,
                         Status = cargaPorRecinto.Status,
                         totalRecinto = cargaPorRecinto.totalRecinto
                     };
@@ -1034,13 +1089,12 @@ namespace AkademicReport.Service.ReposteServices
                 }
                 foreach (var docente in docentesRecinto)
                 {
-                    if (docente.identificacion == "001-1063486-2")
+                    if (docente.identificacion == "402-2428351-1")
                     {
 
                     }
                     if (docente.identificacion != null)
                     {
-
                         var filter = new ReporteDto();
                         filter.Cedula = docente.identificacion;
                         filter.Periodo = filtro.Periodo;
