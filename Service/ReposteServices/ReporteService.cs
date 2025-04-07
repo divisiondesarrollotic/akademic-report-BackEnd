@@ -29,7 +29,7 @@ namespace AkademicReport.Service.ReposteServices
         private readonly IMapper _mapper;
         public List<string> CodigosIngles = new List<string> { "ING-201", "ING-302", "ING-403", "ING-504", "ING-605", "IOP-01", "IOP-02", "IOP-03", "ING-220", "ING-100", "ING-110", "ING-200", "ING-210", "FRP-201", "FRP-301", "FRP-601", "FRP-701", "FRP-801", "PVS-300", "PVS-305" };
         //Docentes que tienen traslado en este periodo
-       public List<string> CedulasDocentePosGradoTraslado = new List<string>() {""};
+        public List<string> CedulasDocentePosGradoTraslado = new List<string>() { "" };
 
         public ReporteService(ICargaDocenteService cargaService, DataContext dataContext, IDocenteService docenteService, IMapper mapper)
         {
@@ -41,120 +41,113 @@ namespace AkademicReport.Service.ReposteServices
 
         public async Task<ServiceResponseReporte<List<CargaIrregularReporteGetDto>>> GetCargaIrregularReport(ReportePorRecintoDto filtro)
         {
+            
             try
             {
                 var cargaPorRecinto = await PorRecinto(filtro);
-                var periodo = await _dataContext.PeriodoAcademicos.Where(c => c.Periodo == filtro.Periodo).FirstAsync();
-                var meses =  await _dataContext.Meses.Where(c => c.Cuatrimestre == periodo.Cuatrimestre).ToListAsync();
-
-
-              
-                var cargaDone = new List<CargaIrregularReporteGetDto>();
-                if(cargaPorRecinto.Status==200)
+                if (cargaPorRecinto.Status != 200)
                 {
-        
-                    foreach (var docenteConSuCarga in cargaPorRecinto.Data)
-                    {
-                        var newCarga = new CargaIrregularReporteGetDto();
-                        newCarga.Docente = docenteConSuCarga.Docente;
-                        var montoGenerales = new List<CantSemanaMesDto>();
-                        foreach (var mes in meses)
-                        {
-                            var nuevo = new CantSemanaMesDto()
-                            {
-                                CantSemanas = 0,
-                                MesObj = _mapper.Map<MesGetDto>(mes),
-                                Monto = 0
-                            };
-                            montoGenerales.Add(nuevo);
-
-                        }
-                       
-                        foreach (var carga in docenteConSuCarga.Carga)
-                        {
-                            //Traemos los meses y las cantidades de semanas en las cuales se le va a pagar
-                            var cantSemanasMes = await _dataContext.CantSemanasMes.Where(c => c.IdCarga == carga.id).Include(c=>c.MesNavigation) .ToListAsync();
-                            var cantSemanasMesMap = new List<CantSemanaMesDto>();
-
-                            foreach (var mes in meses)
-                            {
-                                var nuevo = new CantSemanaMesDto()
-                                {
-                                    CantSemanas = 0,
-                                    MesObj = _mapper.Map<MesGetDto>(mes),
-                                    Monto = 0
-                                };
-                                cantSemanasMesMap.Add(nuevo);
-
-                            }
-
-
-                            foreach (var i in cantSemanasMesMap)
-                            {
-                                if (cantSemanasMes.FirstOrDefault(c => c.MesNavigation.IdMes == i.MesObj.IdMes)!=null)
-                                {
-                                    i.CantSemanas = cantSemanasMes.FirstOrDefault(c => c.MesNavigation.IdMes == i.MesObj.IdMes).CantSemanas.Value;
-                                    i.MesObj = _mapper.Map<MesGetDto>(i.MesObj);
-                                    i.Monto = (carga.precio_hora * carga.credito) * cantSemanasMes.First(c => c.MesNavigation.IdMes == i.MesObj.IdMes).CantSemanas.Value;
-                                    montoGenerales.FirstOrDefault(c => c.MesObj.IdMes == i.MesObj.IdMes).Monto += i.Monto;
-                                }
-         
-                                else
-                                {
-                                    i.CantSemanas = 0;
-                                    i.Monto = 0;
-                                }
-
-                            }
-                             
-                           
-                            //foreach (var c in cantSemanasMesMap)
-                            //{
-                            //    c.Monto = (carga.precio_hora * carga.credito) * c.CantSemanas;
-                            //    monto += c.Monto;
-                            //    montoGenerales.FirstOrDefault(i => i.MesObj.IdMes == c.MesObj.IdMes).Monto += c.Monto;
-                            //}
-                            var cargaMap = _mapper.Map<GetCargaIrregularDto>(carga);
-                            cargaMap.MontosMesObj = cantSemanasMesMap;
-                            newCarga.Carga.Add(cargaMap);
-                        }
-
-                        newCarga.MontosTotales = montoGenerales;
-                        cargaDone.Add(newCarga);
-                    }
-
-
-
-                    return new ServiceResponseReporte<List<CargaIrregularReporteGetDto>>()
+                    return new ServiceResponseReporte<List<CargaIrregularReporteGetDto>>
                     {
                         Anio = cargaPorRecinto.Anio,
-                        Data = cargaDone,
-                        Message = cargaPorRecinto.Message,
-                        MontoTotal = 0,
-                        Status = cargaPorRecinto.Status,
-                        totalRecinto = cargaPorRecinto.totalRecinto
-                    };
-                }
-                else
-                {
-                    return new ServiceResponseReporte<List<CargaIrregularReporteGetDto>>()
-                    {
-                        Anio = cargaPorRecinto.Anio,
-                        Data = cargaDone,
+                        Data = new List<CargaIrregularReporteGetDto>(),
                         Message = cargaPorRecinto.Message,
                         MontoTotalesPorMes = cargaPorRecinto.MontoTotalesPorMes,
                         Status = cargaPorRecinto.Status,
                         totalRecinto = cargaPorRecinto.totalRecinto
                     };
                 }
+
+                var periodo = await _dataContext.PeriodoAcademicos
+                    .Where(c => c.Periodo == filtro.Periodo)
+                    .FirstAsync();
+
+                var meses = await _dataContext.Meses
+                    .Where(c => c.Cuatrimestre == periodo.Cuatrimestre)
+                    .ToListAsync();
+
+                var cargaDone = new List<CargaIrregularReporteGetDto>();
+
+                foreach (var docenteConSuCarga in cargaPorRecinto.Data)
+                {
+                    var NotaCargaIrregular = await _dataContext.NotasCargaIrregulars.Where(c=>c.Cedula == docenteConSuCarga.Docente.Identificacion && c.IdPeriodoNavigation.Periodo == filtro.Periodo).FirstOrDefaultAsync();
+                    var newCarga = new CargaIrregularReporteGetDto
+                    {
+                        Docente = docenteConSuCarga.Docente,
+                        NotaCargaIrregular = NotaCargaIrregular != null ? _mapper.Map<NotaCargaIrregularDto>(NotaCargaIrregular) : null
+                    };
+
+                    // Inicializar montos generales con todos los meses
+                    var montoGenerales = meses.Select(mes => new CantSemanaMesDto
+                    {
+                        CantSemanas = 0,
+                        MesObj = _mapper.Map<MesGetDto>(mes),
+                        Monto = 0
+                    }).ToList();
+
+                    foreach (var carga in docenteConSuCarga.Carga)
+                    {
+                        var cantSemanasMes = await _dataContext.CantSemanasMes
+                            .Where(c => c.IdCarga == carga.id)
+                            .Include(c => c.MesNavigation)
+                            .ToListAsync();
+
+                        if (!cantSemanasMes.Any())
+                        {
+                            return new ServiceResponseReporte<List<CargaIrregularReporteGetDto>>
+                            {
+                                Anio = cargaPorRecinto.Anio,
+                                Message = Msj.MsjNoData,
+                                MontoTotalesPorMes = cargaPorRecinto.MontoTotalesPorMes,
+                                Status = 204,
+                                totalRecinto = cargaPorRecinto.totalRecinto
+                            };
+                        }
+
+                        var cantSemanasMesMap = meses.Select(mes =>
+                        {
+                            var registro = cantSemanasMes.FirstOrDefault(c => c.MesNavigation.IdMes == mes.IdMes);
+                            var semanas = registro?.CantSemanas ?? 0;
+                            var monto = (carga.precio_hora * carga.credito) * semanas;
+
+                            // Sumar al total del mes
+                            var montoGeneral = montoGenerales.FirstOrDefault(m => m.MesObj.IdMes == mes.IdMes);
+                            if (montoGeneral != null)
+                                montoGeneral.Monto += monto;
+
+                            return new CantSemanaMesDto
+                            {
+                                CantSemanas = semanas,
+                                MesObj = _mapper.Map<MesGetDto>(mes),
+                                Monto = monto
+                            };
+                        }).ToList();
+
+                        var cargaMap = _mapper.Map<GetCargaIrregularDto>(carga);
+                        cargaMap.MontosMesObj = cantSemanasMesMap;
+                        
+                        newCarga.Carga.Add(cargaMap);
+                    }
+
+                    newCarga.MontosTotales = montoGenerales;
+                    cargaDone.Add(newCarga);
+                }
+
+                return new ServiceResponseReporte<List<CargaIrregularReporteGetDto>>
+                {
+                    Anio = cargaPorRecinto.Anio,
+                    Data = cargaDone,
+                    Message = cargaPorRecinto.Message,
+                    MontoTotal = 0, // ¿Este monto debería calcularse con base en los datos?
+                    Status = cargaPorRecinto.Status,
+                    totalRecinto = cargaPorRecinto.totalRecinto
+                };
             }
             catch (Exception ex)
             {
-
-                return new ServiceResponseReporte<List<CargaIrregularReporteGetDto>>()
+                return new ServiceResponseReporte<List<CargaIrregularReporteGetDto>>
                 {
-              
-                    Message =$"{Msj.MsjError} {ex.ToString()}",
+                    Message = $"{Msj.MsjError} {ex}",
                     Status = 500
                 };
             }
@@ -168,7 +161,7 @@ namespace AkademicReport.Service.ReposteServices
             {
                 if (filtro.Periodo != null)
                 {
-                    var periodo = await _dataContext.PeriodoAcademicos.Where(c => c.Periodo == filtro.Periodo).FirstAsync();
+                    var periodo = await _dataContext.PeriodoAcademicos.FirstOrDefaultAsync(c => c.Periodo == filtro.Periodo);
                     Response.Anio = periodo.Anio!.Value;
                 }
                 DocenteCargaReporteDto DataResult = new DocenteCargaReporteDto();
@@ -177,7 +170,7 @@ namespace AkademicReport.Service.ReposteServices
                 var CargaMapeada = new List<CargaReporteDto>();
                 var CargaLista = new List<CargaGetDto>();
                 var Docente = new DocenteReporteDto();
-                
+
 
                 var cargas = await _cargaService.GetCarga(filtro.Cedula!, filtro.Periodo!, filtro.idPrograma, DocentesAmilca);
                 if (cargas.Data.Value.Item1.Carga.Count > 0)
@@ -1089,10 +1082,8 @@ namespace AkademicReport.Service.ReposteServices
                 }
                 foreach (var docente in docentesRecinto)
                 {
-                    if (docente.identificacion == "402-2428351-1")
-                    {
-
-                    }
+                 
+       
                     if (docente.identificacion != null)
                     {
                         var filter = new ReporteDto();
@@ -1102,13 +1093,13 @@ namespace AkademicReport.Service.ReposteServices
                         filter.idPrograma = 1;
                         ServiceResponseData<DocenteCargaReporteDto> DocenteConSuCarga = await PorDocente(filter, docentes.Data);
                         //Validacion para que filtre por los tipos de reporte si estos no llegan vacios, si llegan vacios filtrara por los reportes de tipo regular
-                        if ((filtro.IdTipoReporte is not null and not 0) && (filtro.IdTipoReporteIrregular is not null and not 0))
+                        if ((filtro.IdTipoReporte is not null and not 0) && (filtro.IdTipoReporteIrregular is not null and not 0) && DocenteConSuCarga.Data != null)
                         {
                             DocenteConSuCarga.Data.Carga = DocenteConSuCarga.Data.Carga.Where(c => c.IdTipoReporte == filtro.IdTipoReporte
                             && c.IdTipoReporteIrregular == filtro.IdTipoReporteIrregular).ToList();
                         }
 
-                        if (DocenteConSuCarga.Data != null && DocenteConSuCarga.Data.Carga != null )
+                        if (DocenteConSuCarga.Data != null && DocenteConSuCarga.Data.Carga != null)
                         {
                             List<CargaReporteDto> CargaFilter = new List<CargaReporteDto>();
                             if (filtro.Curricular != "0" && filtro.Curricular != null)
@@ -1138,7 +1129,7 @@ namespace AkademicReport.Service.ReposteServices
                                     CantCreditosF = CargaFilter.Sum(c => c.credito);
 
                                 }
-                                if (DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT" || DocenteConSuCarga.Data.Docente.TiempoDedicacion == "M" || DocenteConSuCarga.Data.Docente.TiempoDedicacion == "F" && filtro.TipoDocente == "A" || filtro.TipoDocente == null)
+                                if ((DocenteConSuCarga.Data.Docente.TiempoDedicacion == "A" || DocenteConSuCarga.Data.Docente.TiempoDedicacion == "MT" || DocenteConSuCarga.Data.Docente.TiempoDedicacion == "M" || DocenteConSuCarga.Data.Docente.TiempoDedicacion == "F") && filtro.TipoDocente == "A" || filtro.TipoDocente == null)
                                 {
                                     CargaFilter = CargaFilter.Where(c => c.HoraContratada == true).ToList();
                                     foreach (var item in CargaFilter)
@@ -1265,7 +1256,7 @@ namespace AkademicReport.Service.ReposteServices
                 }
                 var response = new ServiceResponseReporte<List<DocenteCargaReporteDto>>()
                 {
-                    Status = 200,
+                    Status = CargadDocentes.Count<1? 204 : 200,
                     Data = CargadDocentes.OrderBy(c => c.Docente.Nombre).ToList(),
                     totalRecinto = Total
                 };
@@ -1277,17 +1268,17 @@ namespace AkademicReport.Service.ReposteServices
                 return response;
 
             }
-            catch (Exception ex )
+            catch (Exception ex)
             {
 
                 return new ServiceResponseReporte<List<DocenteCargaReporteDto>>()
                 {
                     Status = 500,
                     Message = Msj.MsjError + ex.ToString()
-               
+
                 };
             }
-            
+
 
         }
 
@@ -1323,7 +1314,7 @@ namespace AkademicReport.Service.ReposteServices
                 var nivelAcademicoDb = await _dataContext.NivelAcademicos.Where(c => c.IdPrograma == 2).ToListAsync();
                 //Este codigo es provicional por este periodo 2025-01
                 NivelAcademico nivelAcademico = new NivelAcademico();
-                if(CedulasDocentePosGradoTraslado.Contains(cedula) && periodo=="2025-01")
+                if (CedulasDocentePosGradoTraslado.Contains(cedula) && periodo == "2025-01")
                 {
                     nivelAcademico = nivelAcademicoDb.Find(c => c.Id == 8);
                 }

@@ -38,7 +38,7 @@ namespace AkademicReport.Models
         public string? Anio { get; set; }
         public int? IdCodigo { get; set; }
         public int? IdPeriodo { get; set; }
-        public bool? HoraContratada { get; set; }
+        public bool? HoraContratada{ get; set; }
         public bool? Deleted { get; set; }
         public int? CantSemanas { get; set; }
         public int? IdTipoReporte { get; set; }

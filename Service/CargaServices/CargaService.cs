@@ -522,6 +522,7 @@ namespace AkademicReport.Service.CargaServices
                 var carga = await _dataContext.CargaDocentes.AsNoTracking().FirstOrDefaultAsync(c => c.Id == idCarga);
                 if (carga != null)
                 {
+
                     carga.HoraContratada = carga.HoraContratada == null || carga.HoraContratada == false ? true : false;
                     _dataContext.Entry(carga).State = EntityState.Modified;
                     await _dataContext.SaveChangesAsync();
@@ -921,6 +922,7 @@ AND SUBSTR(t1.id_grp_activ, 1, 1) = '{recinto}'";
         {
             try
             {
+                var docenteRecinto = await _docenteService.GetAllRecinto(new FiltroDocentesDto(), recinto);
                 var cargUniversitas =  await GetCargaUniversitas(periodo, recinto);
                 var periodoDb = await _dataContext.PeriodoAcademicos.Where(c => c.Periodo == periodo).FirstOrDefaultAsync();
                 // Buscamos la carga de este periodo y la eliminamos para insertar la nueva
@@ -937,16 +939,18 @@ AND SUBSTR(t1.id_grp_activ, 1, 1) = '{recinto}'";
                     
                     foreach (var item in cargUniversitas.Data)
                     {
-                        if (item.Cedula== "001-1063486-2")
-                        {
-
-
-                        }
+         
                             // Este codigo agrega la carga nueva
+                            
                             var cargaMap = _mapper.Map<CargaDocente>(item);
+                            cargaMap.HoraContratada = docenteRecinto.Data.Where(c => c.identificacion == item.Cedula).FirstOrDefault()!=null 
+                            && docenteRecinto.Data.Where(c => c.identificacion == item.Cedula).FirstOrDefault().tiempoDedicacion== "MT" ? false : true;
                             cargaMap.Periodo = periodoDb.Periodo;
                             cargaMap.IdPeriodo = periodoDb.Id;
                             cargaMap.Aula=cargaMap.Aula==null? "" : cargaMap.Aula.ToString();
+                            cargaMap.IdTipoReporte = 1;
+                            cargaMap.IdTipoReporteIrregular = 4;
+                            cargaMap.IsAuth = true;
                             _dataContext.CargaDocentes.Add(cargaMap);
                     }
                     await _dataContext.SaveChangesAsync();
