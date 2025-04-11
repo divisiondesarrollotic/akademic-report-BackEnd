@@ -49,6 +49,8 @@ namespace AkademicReport.Dto.CargaDto
         // Campos dinamicos 
         public MontosPosgradosDto? DistribucionMontos { get; set; }
         public int idUsuario { get; set; }
+        public bool? IsAuth { get; set; }
+
 
     }
 }

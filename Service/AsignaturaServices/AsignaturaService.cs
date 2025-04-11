@@ -285,7 +285,9 @@ namespace AkademicReport.Service.AsignaturaServices
         {
             try
             {
-                EntityEntry<Codigo> result = _dataContext.Codigos.Add(_mapper.Map<Codigo>(item));
+                var codigoMap = _mapper.Map<Codigo>(item);
+                codigoMap.Deteled = false;
+                EntityEntry<Codigo> result = _dataContext.Codigos.Add(codigoMap);
                 await _dataContext.SaveChangesAsync();
                 if (item.TiposCargas != null)
                 {
@@ -350,6 +352,7 @@ namespace AkademicReport.Service.AsignaturaServices
                     _dataContext.TipoModalidadCodigos.Add(Privot);
                 }
                 codigo = _mapper.Map<Codigo>(item);
+                codigo.Deteled = false;
                 _dataContext.Entry(codigo).State = EntityState.Modified;
                 await _dataContext.SaveChangesAsync();
                 return new ServicesResponseMessage<string>() { Status = 200, Message = Msj.MsjUpdate };

@@ -35,5 +35,6 @@ namespace AkademicReport.Dto.ReporteDto
         public PeriodoGetDto? PeriodoObj { get; set; }
         public int? IdTipoReporte { get; set; }
         public int? IdTipoReporteIrregular { get; set; }
+        public bool? IsAuth { get; set; }
     }
 }

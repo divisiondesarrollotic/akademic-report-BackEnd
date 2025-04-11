@@ -30,7 +30,7 @@
             public int ass_codnum { get; set; }
             public string id_grp_activ { get; set; }
             public string desid1 { get; set; }
-            public int cpcgrp { get; set; }
+            public int? cpcgrp { get; set; }
             public int numcre { get; set; }
             public string id_assignatura { get; set; }
             public string nomid1 { get; set; }

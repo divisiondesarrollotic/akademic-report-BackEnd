@@ -2,6 +2,7 @@
 using AkademicReport.Dto.CargaDto;
 using AkademicReport.Dto.DocentesDto;
 using AkademicReport.Dto.NivelesAcademicoDto;
+using AkademicReport.Models;
 using AkademicReport.Utilities;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft;
 using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -28,6 +30,21 @@ namespace AkademicReport.Service.DocenteServices
 
         }
 
+        public async Task<ServiceResponseData<List<DocenteOtroPrecioDto>>> AddDocenteOtherPrice([Required] List<DocenteOtroPrecioDto> Docentes)
+        {
+            try
+            {
+                var docentesMap = _mapper.Map<List<DocentesOtroPrecio>>(Docentes);
+                _dataContext.DocentesOtroPrecios.AddRange(docentesMap);
+                await _dataContext.SaveChangesAsync();
+                return new ServiceResponseData<List<DocenteOtroPrecioDto>>() { Data = null, Message = Msj.MsjSucces, Status = 200 };
+            }
+            catch (Exception ex)
+            {
+
+                return new ServiceResponseData<List<DocenteOtroPrecioDto>>() { Data = null, Message = Msj.MsjError + ex.ToString(), Status = 500};
+            }
+        }
 
         public async Task<ServiceResponseData<List<DocenteGetDto>>> CleanData(List<DocenteAmilcaDto> DocentesAmilca, int accion)
         {
@@ -35,10 +52,7 @@ namespace AkademicReport.Service.DocenteServices
             List<DocenteGetDto> Docentes = new List<DocenteGetDto>();
             foreach (var d in DocentesAmilca)
             {
-                if(d.CedulaPasaporte == "402-2529221-4")
-                {
-
-                }
+                
                 var docente = new DocenteGetDto();
                 docente.id = d.Id;
                 docente.tiempoDedicacion = d.TiempoDedicacion;
@@ -341,17 +355,32 @@ namespace AkademicReport.Service.DocenteServices
             }
         }
 
-        public async Task<ServiceResponseData<List<NivelAcademicoGetDto>>> UpdatePriceNivelAcademico(List<NivelAcademicoUpdatePrice> Precios)
+        public async Task<ServiceResponseData<List<DocenteOtroPrecioDto>>> RemoveDocenteDeTraslado(List<DocenteOtroPrecioDto> Docentes)
         {
             try
             {
-                foreach (var precio in Precios)
-                {
-                    var nivel = await _dataContext.NivelAcademicos.AsNoTracking().FirstAsync(c => c.Id == precio.Id);
-                    nivel.PagoHora = precio.PrecioHora;
+                var docentesMap = _mapper.Map<List<DocentesOtroPrecio>>(Docentes);
+                _dataContext.DocentesOtroPrecios.RemoveRange(docentesMap);
+                await _dataContext.SaveChangesAsync();
+                return new ServiceResponseData<List<DocenteOtroPrecioDto>>() { Data = null, Message = Msj.MsjDelete, Status = 200 };
+            }
+            catch (Exception ex)
+            {
+
+                return new ServiceResponseData<List<DocenteOtroPrecioDto>>() { Data = null, Message = Msj.MsjError + ex.ToString(), Status = 500};
+            }
+        }
+
+        public async Task<ServiceResponseData<List<NivelAcademicoGetDto>>> UpdatePriceNivelAcademico(NivelAcademicoUpdatePrice Precio)
+        {
+            try
+            {
+                
+                    var nivel = await _dataContext.NivelAcademicos.AsNoTracking().FirstAsync(c => c.Id == Precio.Id);
+                    nivel.PagoHora = Precio.PrecioHora;
                     _dataContext.Entry(nivel).State = EntityState.Modified;
                     await _dataContext.SaveChangesAsync();
-                }
+                
                 return new ServiceResponseData<List<NivelAcademicoGetDto>>() { Message =  Msj.MsjUpdate, Status = 200 };
 
             }

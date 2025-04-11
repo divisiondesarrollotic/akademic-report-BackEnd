@@ -13,8 +13,13 @@ namespace AkademicReport.Service.DocenteServices
         Task<ServiceResponseData<List<DocenteGetDto>>> GetAllRecinto(FiltroDocentesDto filtro, int idRecinto);
         Task<ServiceResponseDataDocentes<List<DocenteCantidadDto>>> GetDocentexRecinto();
         Task<ServiceResponseData<List<NacionalidadDto>>> GetNacionalidades(FiltroDto filtro);
-        Task<ServiceResponseData<List<NivelAcademicoGetDto>>> UpdatePriceNivelAcademico(List<NivelAcademicoUpdatePrice> Precios);
+        Task<ServiceResponseData<List<NivelAcademicoGetDto>>> UpdatePriceNivelAcademico(NivelAcademicoUpdatePrice Precios);
+        Task<ServiceResponseData<List<DocenteOtroPrecioDto>>> AddDocenteOtherPrice(List<DocenteOtroPrecioDto> Docentes);
+        Task<ServiceResponseData<List<DocenteOtroPrecioDto>>> RemoveDocenteDeTraslado(List<DocenteOtroPrecioDto> Docentes);
+
+
         Task<ServiceResponseData<List<NivelAcademicoGetDto>>> GetNivelAcademico(int idPrograma);
+       
 
     }
 }

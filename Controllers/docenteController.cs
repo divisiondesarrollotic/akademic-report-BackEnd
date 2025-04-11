@@ -1,4 +1,5 @@
-﻿using AkademicReport.Dto.DocentesDto;
+﻿using AkademicReport.Dto.CargaDto;
+using AkademicReport.Dto.DocentesDto;
 using AkademicReport.Dto.NivelesAcademicoDto;
 using AkademicReport.Service.DocenteServices;
 using Microsoft.AspNetCore.Mvc;
@@ -97,9 +98,34 @@ namespace AkademicReport.Controllers
         /// <returns></returns>
         [HttpPut]
         [Route("niveles_academicos")]
-        public async Task<ActionResult> UpdateNivelesAcademicos([Required] List<NivelAcademicoUpdatePrice> Niveles)
+        public async Task<ActionResult> UpdateNivelesAcademicos([Required] NivelAcademicoUpdatePrice Niveles)
         {
             var response = await _service.UpdatePriceNivelAcademico(Niveles);
+            return Ok(response);
+        }
+
+
+        /// <summary>
+        /// Este metodo inserta los docentes que tendra un precio especial por que se trasladan y necesitan otro tipo de gastos
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("add_docente_traslado")]
+        public async Task<ActionResult> AddDocentesTraslado([Required] List<DocenteOtroPrecioDto> Docentes)
+        {
+            var response = await _service.AddDocenteOtherPrice(Docentes);
+            return Ok(response);
+        }
+
+        /// <summary>
+        /// Este metodo inserta los docentes que tendra un precio especial por que se trasladan y necesitan otro tipo de gastos
+        /// </summary>
+        /// <returns></returns>
+        [HttpDelete]
+        [Route("remove_docentes_traslado")]
+        public async Task<ActionResult> RemoveDocentesTraslado([Required] List<DocenteOtroPrecioDto> Docentes)
+        {
+            var response = await _service.RemoveDocenteDeTraslado(Docentes);
             return Ok(response);
         }
     }

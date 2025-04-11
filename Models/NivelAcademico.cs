@@ -8,6 +8,7 @@ namespace AkademicReport.Models
         public NivelAcademico()
         {
             Docentereals = new HashSet<Docentereal>();
+            DocentesOtroPrecios = new HashSet<DocentesOtroPrecio>();
         }
 
         public int Id { get; set; }
@@ -17,5 +18,6 @@ namespace AkademicReport.Models
 
         public virtual ProgramasAcademico? IdProgramaNavigation { get; set; }
         public virtual ICollection<Docentereal> Docentereals { get; set; }
+        public virtual ICollection<DocentesOtroPrecio> DocentesOtroPrecios { get; set; }
     }
 }

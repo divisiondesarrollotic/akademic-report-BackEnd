@@ -44,6 +44,9 @@ namespace AkademicReport.Data
             CreateMap<TipoCargaCodigo, TipoCargaDto>();
             CreateMap<TipoCargaDto, TipoCargaCodigo>();
 
+            CreateMap<DocentesOtroPrecio, DocenteOtroPrecioDto>();
+            CreateMap<DocenteOtroPrecioDto, DocentesOtroPrecio>();
+
             CreateMap<NivelAcademico, NivelAcademicoGetDto>();
 
             CreateMap<ProgramasAcademico, ProgramaGetDto>();
@@ -206,11 +209,11 @@ namespace AkademicReport.Data
             CreateMap<ResponseApiUniversitas.Items, CargaGetDto>()
                 .ForMember(c => c.Periodo, o => o.MapFrom(c => c.any_anyaca))
                 .ForMember(c => c.RecintoNombre, o => o.MapFrom(c => c.recinto))
-                .ForMember(c => c.cod_asignatura, o => o.MapFrom(c => c.nomid1.Substring(0, 6).ToString()))
+                .ForMember(c => c.cod_asignatura, o => o.MapFrom(c => c.nomid1.Substring(0, 7).ToString()))
                 .ForMember(c => c.nombre_asignatura, o => o.MapFrom(c => c.nomid1.Substring(7)))
-                .ForMember(c => c.cod_universitas, o => o.MapFrom(c => c.codnum))
-                .ForMember(c => c.CodUniversitas, o => o.MapFrom(c => c.codnum))
-                .ForMember(c => c.Seccion, o => o.MapFrom(c => c.id_grp_activ[1]))
+                .ForMember(c => c.cod_universitas, o => o.MapFrom(c => c.id_assignatura))
+                .ForMember(c => c.CodUniversitas, o => o.MapFrom(c => c.id_assignatura))
+                //.ForMember(c => c.Seccion, o => o.MapFrom(c => c.id_grp_activ[1]))
                 .ForMember(c => c.Recinto, o => o.MapFrom(c => c.id_grp_activ[0]))
                 .ForMember(c => c.Aula, o => o.MapFrom(c => c.aul_desc))
                 .ForMember(c => c.hora_inicio, o => o.MapFrom(c => c.horini))
