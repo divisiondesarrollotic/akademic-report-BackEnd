@@ -1,6 +1,7 @@
 ﻿using AkademicReport.Dto.AsignaturaDto;
 using AkademicReport.Dto.AulaDto;
 using AkademicReport.Dto.ConceptoDto;
+using AkademicReport.Dto.DocentesDto;
 using AkademicReport.Dto.RecintoDto;
 using AkademicReport.Dto.ReporteDto;
 using AkademicReport.Models;
@@ -25,6 +26,7 @@ namespace AkademicReport.Dto.CargaDto
         public TipoCargaDto TiposCarga { get; set; }
         public List<CantSemanaMesDto> MontosMesObj { get; set; }
         public bool? IsAuth { get; set; }
+        public DocenteReporteDto DataDocente { get; set; }
 
 
 

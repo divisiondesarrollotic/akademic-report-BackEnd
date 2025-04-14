@@ -1,6 +1,7 @@
 ﻿using AkademicReport.Dto.AsignaturaDto;
 using AkademicReport.Dto.ConceptoDto;
 using AkademicReport.Dto.ConceptoPosgradoDto;
+using AkademicReport.Dto.DocentesDto;
 using AkademicReport.Dto.PeriodoDto;
 using AkademicReport.Dto.TiposReporteDto;
 using AkademicReport.Models;
@@ -66,6 +67,7 @@ namespace AkademicReport.Dto.CargaDto
         public TipoReporteIrregularGetDto? TipoReporteIrregularObj { get; set; }
         public List<DayCantSemanasDto>? cantSemanaMes { get; set; }
         public bool? IsAuth { get; set; }
+        public DocenteGetDto? DataDocente { get; set; }
 
 
 

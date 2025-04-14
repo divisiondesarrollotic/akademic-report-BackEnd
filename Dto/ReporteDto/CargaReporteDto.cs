@@ -1,6 +1,7 @@
 ﻿using AkademicReport.Dto.AsignaturaDto;
 using AkademicReport.Dto.CargaDto;
 using AkademicReport.Dto.ConceptoDto;
+using AkademicReport.Dto.DocentesDto;
 using AkademicReport.Dto.PeriodoDto;
 
 namespace AkademicReport.Dto.ReporteDto
@@ -36,5 +37,6 @@ namespace AkademicReport.Dto.ReporteDto
         public int? IdTipoReporte { get; set; }
         public int? IdTipoReporteIrregular { get; set; }
         public bool? IsAuth { get; set; }
+        public DocenteReporteDto? DataDocente { get; set; }
     }
 }

@@ -38,8 +38,6 @@ namespace AkademicReport.Service.ReposteServices
             _docentesService = docenteService;
             _mapper = mapper;
 
-            CargarDocentesConTraslado();
-
         }
 
         public async void CargarDocentesConTraslado()
@@ -135,11 +133,14 @@ namespace AkademicReport.Service.ReposteServices
 
                         var cargaMap = _mapper.Map<GetCargaIrregularDto>(carga);
                         cargaMap.MontosMesObj = cantSemanasMesMap;
-                        
+                        cargaMap.DataDocente = docenteConSuCarga.Docente;
+
+
                         newCarga.Carga.Add(cargaMap);
                     }
 
                     newCarga.MontosTotales = montoGenerales;
+                    newCarga.Docente = docenteConSuCarga.Docente;
                     cargaDone.Add(newCarga);
                 }
 
@@ -228,7 +229,7 @@ namespace AkademicReport.Service.ReposteServices
                         Monto = vinculacion!.Monto;
                         DataResult.MontoMensual = Monto;
                         DataResult.MontoVinculacion = Monto;
-
+                        DataResult.Docente.Pago_hora = Monto.ToString();
                         var nivelAcademico = await _dataContext.NivelAcademicos
                             .Where(n => n.Nivel.ToUpper().Replace("á", "a")
                                                 .Replace("é", "e")
@@ -243,7 +244,7 @@ namespace AkademicReport.Service.ReposteServices
                             .FirstOrDefaultAsync();
                         foreach (var item in cargas.Data.Value.Item1.Carga)
                         {
-
+                            item.DataDocente =  _mapper.Map<DocenteGetDto>(Docente);
                             decimal Horas = CalculoTiempoHoras.Calcular(int.Parse(item.hora_inicio), int.Parse(item.minuto_inicio), int.Parse(item.hora_fin), int.Parse(item.minuto_fin));
                             item.credito = Convert.ToInt32(Horas);
                             CargaLista.Add(item);
@@ -273,7 +274,7 @@ namespace AkademicReport.Service.ReposteServices
                             c.IdTipoReporteIrregular = item.IdTipoReporteIrregular;
                             c.IdTipoReporte = item.IdTipoReporte;
                             c.IsAuth = item.IsAuth;
-
+                            c.DataDocente = Docente;
                             DataResult.Carga.Add(c);
 
                         }
@@ -291,6 +292,8 @@ namespace AkademicReport.Service.ReposteServices
                     {
                         var vinculacion = await _dataContext.Vinculos.FirstOrDefaultAsync(c => c.Corto == "MT");
                         DataResult.MontoVinculacion = vinculacion.Monto;
+                        DataResult.Docente.Pago_hora = Monto.ToString();
+
                         //var nivelAcademico = await _dataContext.NivelAcademicos
                         //     .Where(n => n.Nivel.ToUpper().Trim().Replace("á", "a")
                         //                         .Replace("é", "e")
@@ -354,7 +357,7 @@ namespace AkademicReport.Service.ReposteServices
                             c.PeriodoObj = _mapper.Map<PeriodoGetDto>(periodo);
                             var recinto = await _dataContext.Recintos.FirstOrDefaultAsync(c => c.Id == int.Parse(item.Recinto));
                             c.recinto = recinto.NombreCorto;
-
+                            c.DataDocente = Docente;
                             if (CantCreditosF + c.credito > 12)
                             {
                                 // verificacion por si el monto resultante de la suma en mayor a 20 que solo tome despues de; va;pr 20
@@ -437,6 +440,7 @@ namespace AkademicReport.Service.ReposteServices
                             c.IdTipoReporteIrregular = item.IdTipoReporteIrregular;
                             c.IdTipoReporte = item.IdTipoReporte;
                             c.PeriodoObj = _mapper.Map<PeriodoGetDto>(periodo);
+                            c.DataDocente = Docente;
                             DataResult.Docente.Pago_hora = c.precio_hora.ToString();
                             DataResult.Carga.Add(c);
                         }
@@ -497,6 +501,7 @@ namespace AkademicReport.Service.ReposteServices
                             c.pago_asignatura = c.precio_hora * c.credito;
                             c.IdTipoReporteIrregular = item.IdTipoReporteIrregular;
                             c.IdTipoReporte = item.IdTipoReporte;
+                            c.DataDocente = Docente;
                             DataResult.Docente.Pago_hora = c.precio_hora.ToString();
                             DataResult.Carga.Add(c);
 
@@ -567,6 +572,7 @@ namespace AkademicReport.Service.ReposteServices
                             c.PeriodoObj = _mapper.Map<PeriodoGetDto>(periodo);
                             c.IdTipoReporteIrregular = item.IdTipoReporteIrregular;
                             c.IdTipoReporte = item.IdTipoReporte;
+                            c.DataDocente = Docente;
                             DataResult.Carga.Add(c);
                         }
 
@@ -1098,7 +1104,10 @@ namespace AkademicReport.Service.ReposteServices
                 }
                 foreach (var docente in docentesRecinto)
                 {
-                 
+                    if(docente.identificacion== "001-0833680-1")
+                    {
+                        
+                    }
        
                     if (docente.identificacion != null)
                     {
@@ -1108,6 +1117,10 @@ namespace AkademicReport.Service.ReposteServices
                         filter.idRecinto = filtro.idRecinto.ToString();
                         filter.idPrograma = 1;
                         ServiceResponseData<DocenteCargaReporteDto> DocenteConSuCarga = await PorDocente(filter, docentes.Data);
+                        if(DocenteConSuCarga.Status==500)
+                        {
+
+                        }
                         //Validacion para que filtre por los tipos de reporte si estos no llegan vacios, si llegan vacios filtrara por los reportes de tipo regular
                         if ((filtro.IdTipoReporte is not null and not 0) && (filtro.IdTipoReporteIrregular is not null and not 0) && DocenteConSuCarga.Data != null)
                         {
@@ -1302,7 +1315,7 @@ namespace AkademicReport.Service.ReposteServices
         {
             try
             {
-
+                CargarDocentesConTraslado();
                 MontosPosgradosDto tGMontosTotalesPorMes = new MontosPosgradosDto() { Mes1 = 0, Mes2 = 0, Mes3 = 0, Mes4 = 0 };
                 var reponseDataList = new List<ReportCargaPosgradoDto>();
                 var docenteConsulta = await _docentesService.GetAllFilter(new FiltroDocentesDto() { Filtro = cedula, idPrograma = 2, elementosPorPagina = 100, paginaActual = 1 });
@@ -1384,7 +1397,7 @@ namespace AkademicReport.Service.ReposteServices
         {
             try
             {
-
+                CargarDocentesConTraslado();
                 var response = new List<ReportCargaPosgradoDto>();
                 MontosPosgradosDto tGMontosTotalesPorMes = new MontosPosgradosDto() { Mes1 = 0, Mes2 = 0, Mes3 = 0, Mes4 = 0 };
                 var docentesAmilka = await _docentesService.GetAll();
@@ -1398,10 +1411,7 @@ namespace AkademicReport.Service.ReposteServices
 
                     foreach (var docente in docentesAmilka.Data)
                     {
-                        if (docente.identificacion == "001-0904425-5")
-                        {
-
-                        }
+                        
                         if (docente.nivel != null && await _cargaService.ValidateNivelPosgrado(docente.nivel) == true)
                         {
                             var DocenteCarga = await _cargaService.GetCargaCallPosgrado(docente.identificacion, periodo, 2, docentesAmilka.Data, idRecinto);

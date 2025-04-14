@@ -94,6 +94,23 @@ namespace AkademicReport.Data
                 .ForMember(c => c.Id_nivel_academico, o => o.MapFrom(c => c.id_nivel_academico))
                 .ForMember(c => c.Nivel, o => o.MapFrom(c => c.nivel));
 
+            CreateMap<DocenteReporteDto, DocenteGetDto>().ForMember(c => c.id, o => o.MapFrom(c => c.Id))
+               .ForMember(c => c.id, o => o.MapFrom(c => c.Id))
+               .ForMember(c => c.tiempoDedicacion, o => o.MapFrom(c => c.TiempoDedicacion))
+               .ForMember(c => c.identificacion, o => o.MapFrom(c => c.Identificacion))
+               .ForMember(c => c.nombre, o => o.MapFrom(c => c.Nombre))
+               .ForMember(c => c.nacionalidad, o => o.MapFrom(c => c.Nacionalidad))
+               .ForMember(c => c.sexo, o => o.MapFrom(c => c.Sexo))
+               .ForMember(c => c.id_vinculo, o => o.MapFrom(c => c.Id_vinculo))
+               .ForMember(c => c.nombreVinculo, o => o.MapFrom(c => c.NombreVinculo))
+               .ForMember(c => c.id_recinto, o => o.MapFrom(c => c. Id_recinto))
+               .ForMember(c => c.recinto, o => o.MapFrom(c => c.Recinto))
+               .ForMember(c => c.nombre_corto, o => o.MapFrom(c => c.Nombre_corto))
+               .ForMember(c => c.id_nivel_academico, o => o.MapFrom(c => c.Id_nivel_academico))
+               .ForMember(c => c.nivel, o => o.MapFrom(c => c.Nivel));
+
+
+
             CreateMap<TipoModalidad, TipoModalidadDto>();
 
 

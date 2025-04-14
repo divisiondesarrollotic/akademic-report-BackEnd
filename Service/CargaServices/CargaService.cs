@@ -115,6 +115,7 @@ namespace AkademicReport.Service.CargaServices
                 var CargaLista = new List<CargaGetDto>();
                 foreach (var i in CargaMap)
                 {
+                    i.DataDocente = DocenteFilter;
                     if (i.IdCodigo != null)
                     {
                         i.nombre_asignatura = carga.First(c => c.Id == i.Id).IdCodigoNavigation.Nombre;
