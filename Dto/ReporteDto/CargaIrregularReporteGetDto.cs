@@ -9,6 +9,7 @@ namespace AkademicReport.Dto.ReporteDto
         public NotaCargaIrregularDto? NotaCargaIrregular { get; set; }
 
         public List<CantSemanaMesDto> MontosTotales { get; set; }
+        public int? CantCreditos { get; set; }
         public List<GetCargaIrregularDto> Carga { get; set; } = new List<GetCargaIrregularDto>();
 
 

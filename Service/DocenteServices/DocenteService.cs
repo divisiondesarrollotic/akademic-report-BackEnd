@@ -30,12 +30,12 @@ namespace AkademicReport.Service.DocenteServices
 
         }
 
-        public async Task<ServiceResponseData<List<DocenteOtroPrecioDto>>> AddDocenteOtherPrice([Required] List<DocenteOtroPrecioDto> Docentes)
+        public async Task<ServiceResponseData<List<DocenteOtroPrecioDto>>> AddDocenteOtherPrice([Required] DocenteOtroPrecioDto Docente)
         {
             try
             {
-                var docentesMap = _mapper.Map<List<DocentesOtroPrecio>>(Docentes);
-                _dataContext.DocentesOtroPrecios.AddRange(docentesMap);
+                var docentesMap = _mapper.Map<DocentesOtroPrecio>(Docente);
+                _dataContext.DocentesOtroPrecios.Add(docentesMap);
                 await _dataContext.SaveChangesAsync();
                 return new ServiceResponseData<List<DocenteOtroPrecioDto>>() { Data = null, Message = Msj.MsjSucces, Status = 200 };
             }
@@ -306,6 +306,20 @@ namespace AkademicReport.Service.DocenteServices
 
         }
 
+        public async Task<ServiceResponseData<List<DocenteOtroPrecioDto>>> GetDocenteTraslado()
+        {
+            try
+            {
+                var docentesTraslados = await _dataContext.DocentesOtroPrecios.ToListAsync();
+                return new ServiceResponseData<List<DocenteOtroPrecioDto>>() { Data = _mapper.Map <List<DocenteOtroPrecioDto>>(docentesTraslados), Message = Msj.MsjSucces, Status = 200 };
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
         public async Task<ServiceResponseDataDocentes<List<DocenteCantidadDto>>> GetDocentexRecinto()
         {
             List<DocenteCantidadDto> ResulDat = new List<DocenteCantidadDto>();
@@ -355,12 +369,12 @@ namespace AkademicReport.Service.DocenteServices
             }
         }
 
-        public async Task<ServiceResponseData<List<DocenteOtroPrecioDto>>> RemoveDocenteDeTraslado(List<DocenteOtroPrecioDto> Docentes)
+        public async Task<ServiceResponseData<List<DocenteOtroPrecioDto>>> RemoveDocenteDeTraslado(int id)
         {
             try
             {
-                var docentesMap = _mapper.Map<List<DocentesOtroPrecio>>(Docentes);
-                _dataContext.DocentesOtroPrecios.RemoveRange(docentesMap);
+                var docentesMap = await _dataContext.DocentesOtroPrecios.FirstAsync(c=>c.Id==id);
+                _dataContext.DocentesOtroPrecios.Remove(docentesMap);
                 await _dataContext.SaveChangesAsync();
                 return new ServiceResponseData<List<DocenteOtroPrecioDto>>() { Data = null, Message = Msj.MsjDelete, Status = 200 };
             }

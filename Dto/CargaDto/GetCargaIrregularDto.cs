@@ -10,6 +10,7 @@ namespace AkademicReport.Dto.CargaDto
 {
     public class GetCargaIrregularDto   
     {
+        public int id { get; set; }
         public string Recinto { get; set; } = null!;
         public TipoCargaDto? TipoCarga { get; set; }
         public int Seccion { get; set; }
@@ -22,6 +23,7 @@ namespace AkademicReport.Dto.CargaDto
         public string codigo_asignatura { get; set; } = null!;
         public string nombre_asignatura { get; set; } = null!;
         public string modalidad { get; set; }
+        public string? CodUniversitas { get; set; }
         public ConceptoGetDto? Concepto { get; set; }
         public TipoCargaDto TiposCarga { get; set; }
         public List<CantSemanaMesDto> MontosMesObj { get; set; }

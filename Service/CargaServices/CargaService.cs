@@ -79,7 +79,7 @@ namespace AkademicReport.Service.CargaServices
                 var ResulData = new DocenteCargaDto();
                 var NotaIrregular = await GetByCdulaPeriodoNotaIrregular(Cedula, Periodo);
                 ResulData.NotaCargaIrregular = NotaIrregular != null ? NotaIrregular : null;
-                var carga = await _dataContext.CargaDocentes.Where(c => c.Cedula == Cedula && c.Periodo == Periodo && c.IdPrograma == idPrograma && c.Deleted == false && c.IsAuth == true)
+                var carga = await _dataContext.CargaDocentes.Where(c => c.Cedula == Cedula && c.Periodo == Periodo && c.IdPrograma == idPrograma && c.Deleted == false)
                     .Include(c => c.DiasNavigation)
                     .Include(c => c.CurricularNavigation)
                     .Include(c => c.ModalidadNavigation)
@@ -332,10 +332,13 @@ namespace AkademicReport.Service.CargaServices
 
         public async Task<ServicesResponseMessage<string>> Insert(CargaAddDto item)
         {
+            if (item.IdTipoReporte != 1 && item.CantSemanaMes.Count == 0)
+                return new ServicesResponseMessage<string>() { Status = 400, Message = "Si la carga es irregular," +
+                    " tiene que enviar la distribuccion de las demanas de los meses en las cuale se impartira la docencia" };
             try
             {
                 CargaDocente carga = new CargaDocente();
-                carga.HoraContratada = true;
+                carga.HoraContratada = false;
                 carga.Curricular = item.idTipoCarga;
                 carga.Periodo = item.periodo;
                 carga.Recinto = item.recinto;
@@ -358,7 +361,7 @@ namespace AkademicReport.Service.CargaServices
                 carga.DiaMes = null;
                 carga.IdPrograma = 1;
                 carga.Deleted = false;
-                carga.IsAuth = item.cod_universitas == "N/A" ? true : false;
+                carga.IsAuth = false;
                 carga.IdTipoReporte = item.IdTipoReporte == 0 || item.IdTipoReporte == null ? 1 : item.IdTipoReporte;
                 carga.IdTipoReporteIrregular = item.IdTipoReporteIrregular == 0 || item.IdTipoReporteIrregular == null ? 4 : item.IdTipoReporteIrregular;
                 carga.CantSemanas = item.CantSemanas;
@@ -406,7 +409,7 @@ namespace AkademicReport.Service.CargaServices
                 carga.IdPrograma = 2;
                 carga.NumeroHora = 0;
                 carga.Deleted = false;
-                carga.IsAuth = true;
+                carga.IsAuth = false;
                 carga.Curricular = item.idTipoCarga;
                 carga.HoraContratada = true;
                 carga.IdConceptoPosgrado = item.IdConceptoPosgrado;
@@ -437,7 +440,7 @@ namespace AkademicReport.Service.CargaServices
                     carga.Curricular = null;
                     carga.NumeroHora = 0;
                     carga.Curricular = 5;
-                    carga.IsAuth = true;
+                    carga.IsAuth = false;
                     carga.HoraContratada = true;
                     carga.Deleted = false;
                     var periodo = await _dataContext.PeriodoAcademicos.Where(c => c.Periodo == item.Periodo).FirstAsync();
@@ -459,18 +462,22 @@ namespace AkademicReport.Service.CargaServices
         {
             try
             {
+                if(item.IdTipoReporte!=1 && item.CantSemanaMes.Count==0)
+                    return new ServicesResponseMessage<string>() { Status = 400, Message = "Si la carga es irregular, tiene que enviar la distribuccion de las demanas de los meses en las cuale se impartira la docencia" };
+
                 var carga = await _dataContext.CargaDocentes.AsNoTracking().FirstOrDefaultAsync(c => c.Id == Convert.ToInt32(item.Id));
+                var horaContratadaOld = carga.HoraContratada;
                 if (carga != null)
                 {
                     carga = _mapper.Map<CargaDocente>(item);
                     carga.Curricular = item.idTipoCarga;
-                    carga.HoraContratada = true;
+                    carga.HoraContratada = horaContratadaOld;
                     carga.IdPrograma = 1;
                     carga.Deleted = false;
                     var periodo = await _dataContext.PeriodoAcademicos.Where(c => c.Periodo == item.Periodo).FirstAsync();
                     carga.CantSemanas = item.CantSemanas;
                     carga.IdPeriodo = periodo.Id;
-                    carga.IsAuth = item.cod_universitas == "N/A" ? true : false;
+                    carga.IsAuth =false;
                     carga.IdTipoReporte = item.IdTipoReporte == 0 || item.IdTipoReporte == null ? 1 : item.IdTipoReporte;
                     carga.IdTipoReporteIrregular = item.IdTipoReporteIrregular == 0 || item.IdTipoReporteIrregular == null ? 4 : item.IdTipoReporteIrregular;
                     _dataContext.Entry(carga).State = EntityState.Modified;
@@ -522,7 +529,6 @@ namespace AkademicReport.Service.CargaServices
                 var carga = await _dataContext.CargaDocentes.AsNoTracking().FirstOrDefaultAsync(c => c.Id == idCarga);
                 if (carga != null)
                 {
-
                     carga.HoraContratada = carga.HoraContratada == null || carga.HoraContratada == false ? true : false;
                     _dataContext.Entry(carga).State = EntityState.Modified;
                     await _dataContext.SaveChangesAsync();
@@ -558,16 +564,21 @@ namespace AkademicReport.Service.CargaServices
             try
             {
                 // Datos de autenticación
-                string clientId = "1lHZgaHDvpD8rmctuJnn9w..";
-                string clientSecret = "6YlofIMT6TqmQ6TOL_z_BQ..";
+                string clientId = "Isfodosu-Uni#apiCargaDocente#ac#ress";
+                string clientSecret = "e8e00a27-68fe-4213-b2d5-f9e2a8a7beda";
                 ResponseTokenUniversitasDto reponseToken = new ResponseTokenUniversitasDto();
                 // Codificar client_id y client_secret en Base64
                 var credentials = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{clientId}:{clientSecret}"));
 
                 // URL del endpoint de la API
-                string tokenUrl = "https://uxxi.isfodosu.edu.do/ac_api_sql/uxxiac_api_sql/oauth/token";
-                string consultaUrl = "https://uxxi.isfodosu.edu.do/ac_api_sql/uxxiac_api_sql/_/sql";
+                //string tokenUrl = "https://uxxi.isfodosu.edu.do/ac_api_sql/uxxiac_api_sql/oauth/token";
+                //string consultaUrl = "https://uxxi.isfodosu.edu.do/ac_api_sql/uxxiac_api_sql/_/sql";
+                string tokenUrl = "https://isfodosu.universitasxxi.cloud/api/uxxi/sta/apipr/oauth2/v1/oauth/token?grant_type=client_credentials";
+                string consultaUrl = " https://isfodosu.universitasxxi.cloud/api/uxxi/ac/api_sql/v1/_/sql";
+
+           
                 HttpClient client = new HttpClient();
+
 
                 // Crear HttpClient
 
@@ -909,6 +920,7 @@ AND SUBSTR(t1.id_grp_activ, 1, 1) = '{recinto}'";
                             if (codigosPosGrado.FirstOrDefault(c => c.Codigo1 == (item.nomid1.Substring(0, 7).ToString())) == null)
                             {
                                 var cargaMap = _mapper.Map<CargaGetDto>(item);
+                                cargaMap.HoraContratada = false;
                                 cargaMap.Seccion = int.Parse(item.id_grp_activ.ToString()[1].ToString());
                                 // validacion para que haya carga duplicada
                                 if (cargaLista.Where(c => c.dia_id == cargaMap.dia_id
@@ -957,7 +969,7 @@ AND SUBSTR(t1.id_grp_activ, 1, 1) = '{recinto}'";
                 {
 
                     foreach (var item in cargUniversitas.Data)
-                    {
+                    { 
                         // Este codigo agrega la carga nueva
 
                         var cargaMap = _mapper.Map<CargaDocente>(item);
@@ -968,7 +980,7 @@ AND SUBSTR(t1.id_grp_activ, 1, 1) = '{recinto}'";
                         cargaMap.Aula = cargaMap.Aula == null ? "" : cargaMap.Aula.ToString();
                         cargaMap.IdTipoReporte = 1;
                         cargaMap.IdTipoReporteIrregular = 4;
-                        cargaMap.IsAuth = true;
+                        cargaMap.IsAuth = false;
                         _dataContext.CargaDocentes.Add(cargaMap);
                     }
                     await _dataContext.SaveChangesAsync();
@@ -1138,7 +1150,7 @@ AND SUBSTR(t1.id_grp_activ, 1, 1) = '{recinto}'";
                 foreach (var carga in Cargas)
                 {
                     var cargaDb = await _dataContext.CargaDocentes.AsNoTracking().FirstAsync(c => c.Id == carga.IdCarga);
-                    cargaDb.IsAuth = cargaDb.IsAuth == true ? false : true;
+                    cargaDb.IsAuth = carga.IsAuth;
                     _dataContext.Entry(cargaDb).State = EntityState.Modified;
                     await _dataContext.SaveChangesAsync();
                 }

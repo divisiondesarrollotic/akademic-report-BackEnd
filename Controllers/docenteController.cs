@@ -111,9 +111,9 @@ namespace AkademicReport.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("add_docente_traslado")]
-        public async Task<ActionResult> AddDocentesTraslado([Required] List<DocenteOtroPrecioDto> Docentes)
+        public async Task<ActionResult> AddDocentesTraslado([Required] DocenteOtroPrecioDto Docente)
         {
-            var response = await _service.AddDocenteOtherPrice(Docentes);
+            var response = await _service.AddDocenteOtherPrice(Docente);
             return Ok(response);
         }
 
@@ -123,9 +123,17 @@ namespace AkademicReport.Controllers
         /// <returns></returns>
         [HttpDelete]
         [Route("remove_docentes_traslado")]
-        public async Task<ActionResult> RemoveDocentesTraslado([Required] List<DocenteOtroPrecioDto> Docentes)
+        public async Task<ActionResult> RemoveDocentesTraslado([Required] int id)
         {
-            var response = await _service.RemoveDocenteDeTraslado(Docentes);
+            var response = await _service.RemoveDocenteDeTraslado(id);
+            return Ok(response);
+        }
+
+        [HttpGet]
+        [Route("traslados")]
+        public async Task<ActionResult> GetDocentesTraslados()
+        {
+            var response = await _service.GetDocenteTraslado();
             return Ok(response);
         }
     }
